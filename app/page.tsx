@@ -303,6 +303,14 @@ const projectGroups: Record<ProjectGroup, number[]> = {
   data: [3, 4, 5, 6],
 };
 
+const guideSections = [
+  { id: "top", label: "先从名字开始。" },
+  { id: "work", label: "这里分成 AI 应用和数据分析。" },
+  { id: "self", label: "这些关键词会拼成「我」。" },
+  { id: "fit", label: "再看做事的方法和常用工具。" },
+  { id: "about", label: "最后，看看屏幕之外。" },
+] as const;
+
 export default function Home() {
   const [introLifted, setIntroLifted] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
@@ -315,6 +323,7 @@ export default function Home() {
   const [openProject, setOpenProject] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
+  const [guideWalking, setGuideWalking] = useState(false);
   const glyphCanvasRef = useRef<HTMLCanvasElement>(null);
   const wordCloudRef = useRef<HTMLButtonElement>(null);
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
@@ -353,6 +362,7 @@ export default function Home() {
     let wasOpen = false;
     let maskWidth = 0;
     let maskHeight = 0;
+    let resizeFrame = 0;
 
     type WordParticle = {
       element: HTMLElement;
@@ -390,8 +400,11 @@ export default function Home() {
 
       const previousWidth = maskWidth || bounds.width;
       const previousHeight = maskHeight || bounds.height;
-      maskWidth = Math.max(1, Math.round(bounds.width));
-      maskHeight = Math.max(1, Math.round(bounds.height));
+      const nextWidth = Math.min(1200, Math.max(1, Math.round(bounds.width)));
+      const nextHeight = Math.min(900, Math.max(1, Math.round(bounds.height)));
+      if (particleStates.length && nextWidth === maskWidth && nextHeight === maskHeight) return;
+      maskWidth = nextWidth;
+      maskHeight = nextHeight;
       glyphCanvas.width = maskWidth;
       glyphCanvas.height = maskHeight;
       const context = glyphCanvas.getContext("2d", { willReadFrequently: true });
@@ -527,7 +540,10 @@ export default function Home() {
     }
 
     initParticles();
-    const observer = new ResizeObserver(initParticles);
+    const observer = new ResizeObserver(() => {
+      window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(initParticles);
+    });
     observer.observe(wordCloud);
     const entranceObserver = new IntersectionObserver((entries) => {
       const entry = entries[0];
@@ -548,6 +564,7 @@ export default function Home() {
     return () => {
       window.cancelAnimationFrame(animationFrame);
       window.cancelAnimationFrame(entryFrame);
+      window.cancelAnimationFrame(resizeFrame);
       observer.disconnect();
       entranceObserver.disconnect();
       wordCloud.removeEventListener("pointermove", updatePointer);
@@ -782,7 +799,7 @@ export default function Home() {
       const available = document.documentElement.scrollHeight - window.innerHeight;
       setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
     };
-    const sections = ["top", "work", "fit", "about"]
+    const sections = ["top", "work", "self", "fit", "about"]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     const sectionObserver = new IntersectionObserver(
@@ -801,6 +818,13 @@ export default function Home() {
       sectionObserver.disconnect();
     };
   }, []);
+
+  useEffect(() => {
+    if (!activeSection || !introLifted) return;
+    setGuideWalking(true);
+    const timer = window.setTimeout(() => setGuideWalking(false), 820);
+    return () => window.clearTimeout(timer);
+  }, [activeSection, introLifted]);
 
   // Cinematic reveal: each section heading's label + h2 rise through a
   // clip-path curtain once scrolled into view, instead of popping in with
@@ -871,12 +895,31 @@ export default function Home() {
     setOpenProject(projectGroups[group][0]);
   };
 
+  const guideIndex = Math.max(0, guideSections.findIndex((section) => section.id === activeSection));
+  const currentGuide = guideSections[guideIndex];
+  const nextGuide = guideSections[(guideIndex + 1) % guideSections.length];
+  const advanceGuide = () => document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
       <div className={"site-intro" + (introLifted ? " is-lifted" : "")} aria-hidden="true">
         <span className="site-intro-mark">AY<span>·</span></span>
         <span className="intro-subtext">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</span>
       </div>
+      <button
+        className={`site-guide magnetic${!introLifted ? " is-entering" : ""}${guideWalking ? " is-walking" : ""}`}
+        data-section={currentGuide.id}
+        type="button"
+        onClick={advanceGuide}
+        aria-label={`${currentGuide.label} 点击前往${nextGuide.id === "top" ? "首页" : "下一部分"}`}
+      >
+        <span className="guide-path" aria-hidden="true"><i style={{ "--guide-step": guideIndex } as CSSProperties} /></span>
+        <span className="guide-note">
+          <strong>{currentGuide.label}</strong>
+          <small>{nextGuide.id === "top" ? "回到开头" : "点击继续"} · {String(guideIndex + 1).padStart(2, "0")} / {String(guideSections.length).padStart(2, "0")}</small>
+        </span>
+        <span className="guide-avatar" aria-hidden="true"><i /></span>
+      </button>
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
       <header className="topbar">
