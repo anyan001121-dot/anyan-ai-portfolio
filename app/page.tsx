@@ -177,8 +177,12 @@ const projects = [
     metric: "≤ 3",
     metricLabel: "即时优先项",
     lead: "把一团乱麻的任务，整理成几分钟内就能动手的第一步。",
-    detail: "我围绕注意力与任务管理困难，做了 Brain Dump、任务拆解、专注计时、中断暂存和断点恢复。LangGraph 负责控制流程，系统会参考实际用时和预估用时调整后续任务的大小，数据保存在本地 SQLite。",
-    opinion: "我把每周成功启动任务数设为核心指标，同时记录启动耗时、完成率和恢复成功率。我希望 AI 少说一点，让用户少费一点力气，尽快开始。",
+    star: {
+      situation: "注意力与任务管理困难时，大任务常让“开始”本身变得很难。",
+      task: "把杂乱输入转成少量、可立即执行的步骤，并支持中断后继续。",
+      action: "用 LangGraph 串联 Brain Dump、任务拆解、专注计时、暂存与恢复；用 SQLite 保存本地记录，并按实际与预计用时调整任务粒度。",
+      result: "每轮最多给出 3 个即时优先项，并建立启动耗时、完成率和恢复成功率等验证指标。",
+    },
     tone: "focus",
     preview: "focusflow",
     url: "https://github.com/anyan001121-dot/focusflow",
@@ -191,8 +195,12 @@ const projects = [
     metric: "727",
     metricLabel: "道题 · 三大模块",
     lead: "把分散的测评题，整理成随时能练、练完有反馈的刷题流程。",
-    detail: "收录言语理解 321 题、资料分析 254 题和图形推理 152 题，支持快速小测、顺序或随机练习、错题与收藏筛选，并用答题卡和成绩报告串起完整反馈。学习记录只保存在用户自己的浏览器中。",
-    opinion: "重点不是把题堆在页面上，而是缩短“找到薄弱项—马上练习—看到结果—回看错题”的路径。",
+    star: {
+      situation: "727 道测评题分散在三个模块，选题、练习与复盘路径割裂。",
+      task: "设计一套从选题、答题到错题回看的完整静态刷题流程。",
+      action: "用原生 JS 与 LocalStorage 实现快速小测、顺序/随机练习、答题卡、收藏、错题筛选和成绩报告。",
+      result: "统一收录言语 321 题、资料 254 题、图形 152 题；学习记录保存在本地，可直接在线使用。",
+    },
     tone: "quiz",
     preview: "quiz",
     url: "https://github.com/anyan001121-dot/beisen-quiz",
@@ -206,8 +214,12 @@ const projects = [
     metric: "TOP 3",
     metricLabel: "知识片段召回",
     lead: "让知识助手先找依据，再回答问题。",
-    detail: "A1 用五个节点串起检索与回答，召回知识库 Top 3 片段，再补充 arXiv 的实时信息，最低匹配度设为 0.14。A2 会按关键词整理 10 条新闻并定时推送。",
-    opinion: "这个项目让我开始在意回答从哪里来。语气再自然，如果没有可信来源和可追溯的上下文，也很难让人放心。",
+    star: {
+      situation: "通用大模型面对本地资料和最新信息时，容易生成缺少依据的回答。",
+      task: "让知识助手先检索证据，再生成可追溯的回答。",
+      action: "用 LangChain 与 Coze 搭建五节点流程，召回 Top 3 知识片段并补充 arXiv 实时信息，最低匹配度设为 0.14。",
+      result: "形成“检索—筛选—生成—溯源”闭环；扩展模块可按关键词整理并定时推送 10 条新闻。",
+    },
     tone: "coral",
     preview: "aybot",
   },
@@ -219,8 +231,13 @@ const projects = [
     metric: "0.85",
     metricLabel: "预警准确度",
     lead: "从一组复杂的飞行参数里，找出值得持续监测的信号。",
-    detail: "PCA 把着陆 G 值的 10 项数据压缩成 1 个主成分，保留 90% 以上的信息。随机森林筛出 5 项关键指标，LOF 与 SVM 组合后的预警准确度达到 0.85。",
-    opinion: "降维让数据更容易计算和解释。最终留下的指标，应该让一线人员看得懂，也知道接下来要做什么。",
+    award: "MathorCup 数学建模挑战赛全国二等奖",
+    star: {
+      situation: "飞行参数维度高、异常信号分散，难以直接形成稳定的监测规则。",
+      task: "压缩变量、筛选关键指标，并建立航空安全预警模型。",
+      action: "用 PCA 将 10 项着陆 G 值数据压缩为 1 个主成分并保留 90% 以上信息，再以随机森林筛出 5 项指标，组合 LOF 与 SVM。",
+      result: "预警准确度达到 0.85，项目获 MathorCup 数学建模挑战赛全国二等奖。",
+    },
     tone: "blue",
     preview: "metric",
   },
@@ -232,8 +249,13 @@ const projects = [
     metric: "R² .973",
     metricLabel: "岭回归拟合",
     lead: "把分散的数据放到同一个框架里，研究市场增长和双碳目标。",
-    detail: "GM(1,1) 的后验差比值为 0.002，平均相对误差为 1.983%。Cobb-Douglas 岭回归 R² 为 0.973，模型估计 2025 年达到碳峰值、2055 年实现碳中和。",
-    opinion: "一个预测值很难单独支持决策。我更想知道哪些因素推动了变化，以及这个解释是否站得住。",
+    award: "长三角数学建模竞赛二等奖",
+    star: {
+      situation: "新能源市场、能源消费与碳排放指标分散，缺少统一的预测和解释框架。",
+      task: "评估新能源汽车增长与双碳目标之间的关系，并推演关键时间节点。",
+      action: "结合 GM(1,1) 与 Cobb-Douglas 岭回归，检验后验差、相对误差和模型拟合表现。",
+      result: "后验差比值 0.002、平均相对误差 1.983%、R² 0.973；项目获长三角数学建模竞赛二等奖。",
+    },
     tone: "acid",
     preview: "metric",
   },
@@ -245,8 +267,12 @@ const projects = [
     metric: "AUC .769",
     metricLabel: "随机森林",
     lead: "同一批数据，在不同业务目标下需要不同的模型。",
-    detail: "我只使用上映前变量，避免把未来信息带进模型。比较 7 类模型后，SVM 的正类召回率为 45.5%，随机森林的 AUC 为 0.769，前者更适合寻找机会，后者更适合控制误判。",
-    opinion: "漏掉一部可能成功的电影，与错判一部电影的成本不同。选指标之前，得先说清楚更不能接受哪一种错误。",
+    star: {
+      situation: "电影商业判断只能使用上映前信息，且漏判与误判对应不同的业务成本。",
+      task: "比较多类模型，并为不同决策偏好选择合适指标。",
+      action: "仅保留上映前变量以防止数据泄漏，统一比较 7 类模型，重点评估 SVM 与随机森林。",
+      result: "SVM 正类召回率 45.5%，随机森林 AUC 0.769，形成面向机会发现与误判控制的差异化建议。",
+    },
     tone: "paper",
     preview: "metric",
   },
@@ -258,8 +284,12 @@ const projects = [
     metric: "N 3,808",
     metricLabel: "参与者",
     lead: "用 3,808 名参与者的数据，检查血糖与 HDL 的临床和遗传关联。",
-    detail: "BMI 每增加 1 kg/m²，血糖约升高 1.2%，HDL 约降低 1.4%；女性 HDL 约高 20%。分析还发现，SNP 面板与血糖存在整体关联。",
-    opinion: "看到显著结果后，我还会继续检查它是否稳健、能解释多少差异，以及换到样本外还能不能成立。",
+    star: {
+      situation: "临床、生活方式与遗传因素共同影响血糖和 HDL，变量关系复杂。",
+      task: "基于 3,808 名参与者识别稳定关联，并评估 SNP 面板的整体贡献。",
+      action: "结合 HC3、GLM/GAM、Lasso 与 BMA，并通过共线性检查精简候选位点。",
+      result: "BMI 每增加 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%；女性 HDL 约高 20%，并发现 SNP 面板与血糖存在整体关联。",
+    },
     tone: "lavender",
     preview: "metric",
   },
@@ -312,8 +342,9 @@ export default function Home() {
     const canvas = glyphCanvasRef.current;
     const container = wordCloudRef.current;
     if (!canvas || !container) return;
-    const friction = 0.85;
-    const springFactor = 0.08;
+    const friction = 0.82;
+    const returnSpring = 0.045;
+    const scatterSpring = 0.026;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let animationFrame = 0;
     let entryFrame = 0;
@@ -411,13 +442,13 @@ export default function Home() {
           y: old ? old.y * (maskHeight / previousHeight) : spawnY,
           originX: point.x,
           originY: point.y,
-          scatterX: 36 + physicsRandom() * Math.max(1, maskWidth - 72),
-          scatterY: 46 + physicsRandom() * Math.max(1, maskHeight - 92),
+          scatterX: -maskWidth * 0.08 + physicsRandom() * maskWidth * 1.16,
+          scatterY: -maskHeight * 0.06 + physicsRandom() * maskHeight * 1.12,
           vx: old?.vx ?? 0,
           vy: old?.vy ?? 0,
           phase: physicsRandom() * Math.PI * 2,
           breathSpeed: 0.00042 + physicsRandom() * 0.00058,
-          breathAmp: 2 + physicsRandom() * 3,
+          breathAmp: 2.5 + physicsRandom() * 3.5,
         };
         if (reduceMotion) {
           state.x = state.originX;
@@ -449,7 +480,7 @@ export default function Home() {
         if (isOpen && !wasOpen) {
           particleStates.forEach((particle) => {
             const angle = Math.atan2(particle.y - maskHeight / 2, particle.x - maskWidth / 2) + (Math.random() - 0.5) * 1.5;
-            const impulse = 5 + Math.random() * 7;
+            const impulse = 8 + Math.random() * 10;
             particle.vx += Math.cos(angle) * impulse;
             particle.vy += Math.sin(angle) * impulse;
           });
@@ -463,8 +494,9 @@ export default function Home() {
             ? particle.scatterY
             : particle.originY + Math.cos(time * particle.breathSpeed * 0.83 + particle.phase * 1.7) * particle.breathAmp * 0.72;
 
-          particle.vx += (targetX - particle.x) * springFactor * delta;
-          particle.vy += (targetY - particle.y) * springFactor * delta;
+          const spring = isOpen ? scatterSpring : returnSpring;
+          particle.vx += (targetX - particle.x) * spring * delta;
+          particle.vy += (targetY - particle.y) * spring * delta;
 
           if (pointerActive) {
             let dx = particle.x - pointerX;
@@ -476,7 +508,7 @@ export default function Home() {
               distance = 1;
             }
             if (distance < 230) {
-              const force = 9.2 * Math.exp(-distance / 43) * delta;
+              const force = 10.4 * Math.exp(-distance / 48) * delta;
               const nx = dx / distance;
               const ny = dy / distance;
               const curl = Math.sin(time * 0.003 + particle.phase) * force * 0.13;
@@ -779,6 +811,7 @@ export default function Home() {
   const activeProject = projects[openProject];
   const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
   const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
+  const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
   const selectAdjacentProject = (direction: number) => {
     setOpenProject((current) => (current + direction + projects.length) % projects.length);
   };
@@ -886,21 +919,20 @@ export default function Home() {
               onClick={() => setIdentityOpen((current) => !current)}
               aria-label={identityOpen ? "收拢个人关键词" : "炸开个人关键词"}
             >「我」</button>。
+            <span className="identity-trigger-guide" aria-hidden="true"><i />悬停试试</span>
           </h2>
-          <p>移动到左侧「我」或右侧字形上，看看这些词从哪里来。</p>
           <div className="education-list" aria-label="教育背景">
             <p>EDUCATION / 受教育经历</p>
             <article>
               <span>2025.09 - 2026.12</span>
-              <strong>格拉斯哥大学 · 英国</strong>
-              <small>统计学硕士</small>
+              <div><strong>格拉斯哥大学 · 英国</strong><small>统计学硕士</small></div>
             </article>
             <article>
               <span>2020.09 - 2024.07</span>
-              <strong>浙江农林大学</strong>
-              <small>数据科学与大数据技术学士</small>
+              <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
             </article>
           </div>
+          <p>悬停「我」，关键词会散开；移开后，重新拼回字形。</p>
           <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
         </div>
         <div className="self-glyph-stage">
@@ -1014,6 +1046,7 @@ export default function Home() {
                 <small>{index < 3 ? "PRODUCT" : "DATA"} / {String(index + 1).padStart(2, "0")}</small>
                 <strong>{project.title}</strong>
                 <span>{project.metric}</span>
+                {"award" in project && <em className="project-rail-award">AWARD</em>}
               </button>
             ))}
           </div>
@@ -1024,6 +1057,7 @@ export default function Home() {
                 <span>{String(openProject + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}</span>
                 <span>{activeProject.year}</span>
                 <span>{activeProject.subtitle}</span>
+                {activeProjectAward && <strong className="project-award">{activeProjectAward}</strong>}
               </div>
               <h3>{activeProject.title}</h3>
               <p className="project-stage-lead">{activeProject.lead}</p>
@@ -1086,9 +1120,18 @@ export default function Home() {
               )}
             </div>
 
-            <div className="project-stage-detail">
-              <p>{activeProject.detail}</p>
-              <strong>{activeProject.opinion}</strong>
+            <div className="project-star" aria-label={`${activeProject.title} 项目拆解`}>
+              {([
+                ["context", "项目背景", activeProject.star.situation],
+                ["goal", "目标", activeProject.star.task],
+                ["action", "解决方法", activeProject.star.action],
+                ["result", "项目结果", activeProject.star.result],
+              ] as const).map(([key, label, copy]) => (
+                <article className={key === "result" ? "is-result" : ""} key={key}>
+                  <small>{label}</small>
+                  <p>{copy}</p>
+                </article>
+              ))}
             </div>
             <div className="project-stage-controls" aria-label="切换项目">
               <button type="button" onClick={() => selectAdjacentProject(-1)} aria-label="上一个项目">←</button>
