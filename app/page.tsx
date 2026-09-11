@@ -687,6 +687,70 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+    if (reduceMotion || !precisePointer) return;
+
+    const sections = Array.from(document.querySelectorAll<HTMLElement>(".interactive-section"));
+    const states = sections.map((section) => ({
+      section,
+      targetX: section.clientWidth / 2,
+      targetY: section.clientHeight / 2,
+      currentX: section.clientWidth / 2,
+      currentY: section.clientHeight / 2,
+      targetNX: 0,
+      targetNY: 0,
+      currentNX: 0,
+      currentNY: 0,
+    }));
+    let frame = 0;
+
+    const listeners = states.map((state) => {
+      const move = (event: PointerEvent) => {
+        const bounds = state.section.getBoundingClientRect();
+        state.targetX = event.clientX - bounds.left;
+        state.targetY = event.clientY - bounds.top;
+        state.targetNX = ((state.targetX / bounds.width) - 0.5) * 2;
+        state.targetNY = ((state.targetY / bounds.height) - 0.5) * 2;
+        state.section.classList.add("pointer-active");
+      };
+      const leave = () => {
+        state.targetX = state.section.clientWidth / 2;
+        state.targetY = state.section.clientHeight / 2;
+        state.targetNX = 0;
+        state.targetNY = 0;
+        state.section.classList.remove("pointer-active");
+      };
+      state.section.addEventListener("pointermove", move, { passive: true });
+      state.section.addEventListener("pointerleave", leave);
+      return { state, move, leave };
+    });
+
+    const animateSections = () => {
+      states.forEach((state) => {
+        state.currentX += (state.targetX - state.currentX) * 0.1;
+        state.currentY += (state.targetY - state.currentY) * 0.1;
+        state.currentNX += (state.targetNX - state.currentNX) * 0.075;
+        state.currentNY += (state.targetNY - state.currentNY) * 0.075;
+        state.section.style.setProperty("--section-x", `${state.currentX.toFixed(2)}px`);
+        state.section.style.setProperty("--section-y", `${state.currentY.toFixed(2)}px`);
+        state.section.style.setProperty("--section-shift-x", `${(state.currentNX * 4).toFixed(2)}px`);
+        state.section.style.setProperty("--section-shift-y", `${(state.currentNY * 3).toFixed(2)}px`);
+      });
+      frame = window.requestAnimationFrame(animateSections);
+    };
+
+    frame = window.requestAnimationFrame(animateSections);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      listeners.forEach(({ state, move, leave }) => {
+        state.section.removeEventListener("pointermove", move);
+        state.section.removeEventListener("pointerleave", leave);
+      });
+    };
+  }, []);
+
+  useEffect(() => {
     const updateProgress = () => {
       const available = document.documentElement.scrollHeight - window.innerHeight;
       setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
@@ -744,15 +808,8 @@ export default function Home() {
         </div>
       </header>
 
-      <section
-        className="hero"
-        id="top"
-        onPointerMove={(event) => {
-          const bounds = event.currentTarget.getBoundingClientRect();
-          event.currentTarget.style.setProperty("--mx", `${event.clientX - bounds.left}px`);
-          event.currentTarget.style.setProperty("--my", `${event.clientY - bounds.top}px`);
-        }}
-      >
+      <section className="hero interactive-section" id="top">
+        <span className="section-pointer-glow" aria-hidden="true" />
         <div className="hero-copy">
           <p className="eyebrow mono-label" data-scramble>AN YAN / PORTFOLIO · 2026</p>
           <h1 className="hero-name" aria-label="安颜 Yan An">
@@ -814,7 +871,8 @@ export default function Home() {
         </aside>
       )}
 
-      <section className="self-map section" id="self">
+      <section className="self-map section interactive-section" id="self">
+        <span className="section-pointer-glow" aria-hidden="true" />
         <div className="self-map-copy">
           <p className="section-index mono-label" data-scramble>01 / ME · IDENTITY MAP</p>
           <h2>很多关键词，<br />拼成现在的
@@ -878,7 +936,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="fit section" id="fit">
+      <section className="fit section interactive-section" id="fit">
+        <span className="section-pointer-glow" aria-hidden="true" />
         <div className="section-heading">
           <p className="section-index">02 / WHY ME &amp; TOOLS</p>
           <h2>从模糊想法，<br />走到一套<em>可验证的体验。</em></h2>
@@ -929,7 +988,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="work section" id="work">
+      <section className="work section interactive-section" id="work">
+        <span className="section-pointer-glow" aria-hidden="true" />
         <div className="section-heading compact-heading">
           <p className="section-index">03 / SELECTED WORK</p>
           <h2>我的项目</h2>
@@ -1039,7 +1099,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="play section" id="play">
+      <section className="play section interactive-section" id="play">
+        <span className="section-pointer-glow" aria-hidden="true" />
         <div className="play-copy">
           <p className="section-index">04 / PLAY · PROTOTYPE</p>
           <h2>来玩一个<br /><em>AI 灵感实验。</em></h2>
@@ -1065,7 +1126,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="about section" id="about">
+      <section className="about section interactive-section" id="about">
+        <span className="section-pointer-glow" aria-hidden="true" />
         <div className="photo-collage">
           <figure className="portrait-frame"><img src="./photos/athens-portrait.webp" alt="安颜在雅典的旅行照片" /><figcaption>ATHENS / light & structure</figcaption></figure>
           <figure className="landscape-frame"><img src="./photos/london-shadow.webp" alt="安颜拍摄的伦敦街景与人物剪影" /><figcaption>LONDON / people & city</figcaption></figure>
