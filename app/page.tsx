@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import WarpText from "./WarpText";
 
 const fitCards = [
@@ -323,13 +323,16 @@ export default function Home() {
   const [openProject, setOpenProject] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
-  const [guideWalking, setGuideWalking] = useState(false);
+  const [guideDropping, setGuideDropping] = useState(false);
+  const [guideProjectMotion, setGuideProjectMotion] = useState<"left" | "right" | null>(null);
   const glyphCanvasRef = useRef<HTMLCanvasElement>(null);
   const wordCloudRef = useRef<HTMLButtonElement>(null);
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
   const heroPortraitRef = useRef<HTMLElement>(null);
+  const guideRef = useRef<HTMLButtonElement>(null);
+  const guideMotionTimerRef = useRef<number | null>(null);
 
   // Site entrance: a brief curtain-lift on first load before the hero settles in.
   useEffect(() => {
@@ -821,13 +824,34 @@ export default function Home() {
 
   useEffect(() => {
     if (!activeSection || !introLifted) return;
-    const startTimer = window.setTimeout(() => setGuideWalking(true), 0);
-    const stopTimer = window.setTimeout(() => setGuideWalking(false), 2650);
+    const startTimer = window.setTimeout(() => setGuideDropping(true), 0);
+    const stopTimer = window.setTimeout(() => setGuideDropping(false), 1780);
     return () => {
       window.clearTimeout(startTimer);
       window.clearTimeout(stopTimer);
     };
   }, [activeSection, introLifted]);
+
+  useEffect(() => {
+    const followPointer = (event: PointerEvent) => {
+      const guide = guideRef.current;
+      if (!guide) return;
+      const bounds = guide.getBoundingClientRect();
+      const dx = Math.max(-1, Math.min(1, (event.clientX - (bounds.left + bounds.width / 2)) / (window.innerWidth * 0.42)));
+      const dy = Math.max(-1, Math.min(1, (event.clientY - (bounds.top + bounds.height * 0.28)) / (window.innerHeight * 0.55)));
+      guide.style.setProperty("--guide-look-x", `${dx * 1.8}px`);
+      guide.style.setProperty("--guide-look-y", `${dy * 0.8}px`);
+      guide.style.setProperty("--guide-look-r", `${dx * 1.6}deg`);
+      guide.style.setProperty("--guide-gaze-x", `${dx * 2.2}px`);
+      guide.style.setProperty("--guide-gaze-y", `${dy * 1.4}px`);
+    };
+    window.addEventListener("pointermove", followPointer, { passive: true });
+    return () => window.removeEventListener("pointermove", followPointer);
+  }, []);
+
+  useEffect(() => () => {
+    if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
+  }, []);
 
   // Cinematic reveal: each section heading's label + h2 rise through a
   // clip-path curtain once scrolled into view, instead of popping in with
@@ -887,13 +911,27 @@ export default function Home() {
   const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
   const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
   const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
+  const triggerProjectGuide = (direction: "left" | "right") => {
+    if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
+    setGuideProjectMotion(null);
+    window.requestAnimationFrame(() => setGuideProjectMotion(direction));
+    guideMotionTimerRef.current = window.setTimeout(() => setGuideProjectMotion(null), 1180);
+  };
+  const chooseProject = (index: number) => {
+    if (index === openProject) return;
+    triggerProjectGuide(index > openProject ? "right" : "left");
+    setOpenProject(index);
+  };
   const selectAdjacentProject = (direction: number) => {
     const group = projectGroups[projectGroup];
     const currentPosition = Math.max(0, group.indexOf(openProject));
+    triggerProjectGuide(direction > 0 ? "right" : "left");
     setOpenProject(group[(currentPosition + direction + group.length) % group.length]);
   };
 
   const selectProjectGroup = (group: ProjectGroup) => {
+    if (group === projectGroup) return;
+    triggerProjectGuide(group === "data" ? "right" : "left");
     setProjectGroup(group);
     setOpenProject(projectGroups[group][0]);
   };
@@ -902,19 +940,6 @@ export default function Home() {
   const currentGuide = guideSections[guideIndex];
   const nextGuide = guideSections[(guideIndex + 1) % guideSections.length];
   const advanceGuide = () => document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  const guidePointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
-    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
-    event.currentTarget.style.setProperty("--guide-look-x", `${x * 7}px`);
-    event.currentTarget.style.setProperty("--guide-look-y", `${y * 4}px`);
-    event.currentTarget.style.setProperty("--guide-look-r", `${x * 3}deg`);
-  };
-  const resetGuidePointer = (event: ReactPointerEvent<HTMLButtonElement>) => {
-    event.currentTarget.style.setProperty("--guide-look-x", "0px");
-    event.currentTarget.style.setProperty("--guide-look-y", "0px");
-    event.currentTarget.style.setProperty("--guide-look-r", "0deg");
-  };
 
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
@@ -923,16 +948,16 @@ export default function Home() {
         <span className="intro-subtext">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</span>
       </div>
       <button
-        className={`site-guide magnetic${!introLifted ? " is-entering" : ""}${guideWalking ? " is-walking" : ""}`}
+        ref={guideRef}
+        key={currentGuide.id}
+        className={`site-guide magnetic${!introLifted ? " is-entering" : ""}${guideDropping ? " is-section-drop" : ""}${guideProjectMotion ? ` is-project-${guideProjectMotion}` : ""}`}
         data-section={currentGuide.id}
         type="button"
         onClick={advanceGuide}
-        onPointerMove={guidePointerMove}
-        onPointerLeave={resetGuidePointer}
         aria-label={`当前位于${currentGuide.name}，点击前往${nextGuide.name}`}
       >
         <span className="guide-path" aria-hidden="true"><i style={{ "--guide-step": guideIndex } as CSSProperties} /></span>
-        <span className="guide-avatar" aria-hidden="true"><i /></span>
+        <span className="guide-avatar" aria-hidden="true"><i /><span className="guide-eyes"><b /><b /></span></span>
       </button>
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
@@ -1053,9 +1078,9 @@ export default function Home() {
                 type="button"
                 role="tab"
                 aria-selected={openProject === index}
-                onMouseEnter={() => setOpenProject(index)}
-                onFocus={() => setOpenProject(index)}
-                onClick={() => setOpenProject(index)}
+                onMouseEnter={() => chooseProject(index)}
+                onFocus={() => chooseProject(index)}
+                onClick={() => chooseProject(index)}
                 key={project.title}
               >
                 <small>{projectGroup === "ai" ? "AI APP" : "DATA"} / {String(projectGroups[projectGroup].indexOf(index) + 1).padStart(2, "0")}</small>
