@@ -3,6 +3,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
+import WarpText from "./WarpText";
 
 const fitCards = [
   {
@@ -19,9 +20,9 @@ const fitCards = [
   },
   {
     no: "03",
-    title: "指标要说明代价",
-    tag: "DATA FEEDBACK",
-    detail: "统计学训练让我习惯先定义指标。除了准确率，我也会看召回、误判，以及每种错误在真实场景里会造成什么影响。",
+    title: "先分清相关和因果",
+    tag: "CAUSAL INFERENCE",
+    detail: "实验设计是我统计课拿分最高的一门，随机对照和 A/B 实验的设计逻辑我很熟悉。日常先用 SQL 把数据捞对，再用回归或 GLM/GAM 确认是因果还是巧合。",
   },
   {
     no: "04",
@@ -43,33 +44,33 @@ type IdentityWord = {
 
 const identitySeedWords: IdentityWord[] = [
   { label: "ENTP", x: 42, y: 8, dx: -278, dy: -205, rotate: -8, accent: true },
-  { label: "机械设计", x: 56, y: 11, dx: 210, dy: -210, rotate: 6 },
+  { label: "实验设计", x: 56, y: 11, dx: 210, dy: -210, rotate: 6, accent: true },
   { label: "英国", x: 31, y: 18, dx: -330, dy: -120, rotate: -11 },
-  { label: "杭州", x: 60, y: 20, dx: 305, dy: -115, rotate: 9 },
+  { label: "因果推断", x: 60, y: 20, dx: 305, dy: -115, rotate: 9, accent: true },
   { label: "大数据", x: 24, y: 29, dx: -360, dy: -28, rotate: -6 },
   { label: "统计学", x: 47, y: 28, dx: -125, dy: -120, rotate: 5, accent: true },
   { label: "AI 工具", x: 67, y: 31, dx: 355, dy: -34, rotate: 8 },
   { label: "数模竞赛", x: 36, y: 39, dx: -280, dy: 55, rotate: -8 },
-  { label: "探索", x: 57, y: 40, dx: 242, dy: 32, rotate: 5, accent: true },
-  { label: "脑洞", x: 75, y: 42, dx: 365, dy: 72, rotate: 12 },
+  { label: "回归模型", x: 57, y: 40, dx: 242, dy: 32, rotate: 5, accent: true },
+  { label: "时间序列", x: 75, y: 42, dx: 365, dy: 72, rotate: 12 },
   { label: "推理", x: 27, y: 51, dx: -355, dy: 135, rotate: -12 },
   { label: "辩论", x: 50, y: 51, dx: -65, dy: 155, rotate: 7 },
   { label: "产品", x: 69, y: 53, dx: 315, dy: 150, rotate: -7 },
   { label: "摇滚", x: 23, y: 63, dx: -300, dy: 245, rotate: -9, accent: true },
-  { label: "音乐", x: 44, y: 62, dx: -125, dy: 275, rotate: 6 },
+  { label: "数据挖掘", x: 44, y: 62, dx: -125, dy: 275, rotate: 6, accent: true },
   { label: "单机游戏", x: 65, y: 65, dx: 248, dy: 255, rotate: 10 },
   { label: "摄影", x: 38, y: 74, dx: -238, dy: 345, rotate: -6 },
   { label: "RAG", x: 56, y: 75, dx: 105, dy: 342, rotate: 7 },
   { label: "LangChain", x: 45, y: 85, dx: -30, dy: 420, rotate: -3 },
-  { label: "游戏", x: 70, y: 82, dx: 325, dy: 360, rotate: 9 },
+  { label: "预测模型", x: 70, y: 82, dx: 325, dy: 360, rotate: 9, accent: true },
   { label: "数据分析", x: 30, y: 86, dx: -260, dy: 420, rotate: -8, accent: true },
   { label: "Python", x: 50, y: 91, dx: 20, dy: 438, rotate: 4 },
-  { label: "SQL", x: 63, y: 89, dx: 185, dy: 420, rotate: -5 },
+  { label: "SQL", x: 63, y: 89, dx: 185, dy: 420, rotate: -5, accent: true },
   { label: "R", x: 77, y: 72, dx: 385, dy: 285, rotate: 10 },
   { label: "AI 产品", x: 17, y: 73, dx: -390, dy: 295, rotate: -11, accent: true },
-  { label: "创意", x: 81, y: 24, dx: 392, dy: -92, rotate: 8 },
+  { label: "Hadoop", x: 81, y: 24, dx: 392, dy: -92, rotate: 8 },
   { label: "旅行", x: 15, y: 45, dx: -402, dy: 82, rotate: -7 },
-  { label: "电影", x: 84, y: 60, dx: 405, dy: 205, rotate: 12 },
+  { label: "大数据架构", x: 84, y: 60, dx: 405, dy: 205, rotate: 12 },
 ];
 
 const PARTICLE_COUNT = 184;
@@ -196,7 +197,7 @@ const projects = [
     metricLabel: "道题 · 三大模块",
     lead: "把分散的测评题，整理成随时能练、练完有反馈的刷题流程。",
     star: {
-      situation: "727 道测评题分散在三个模块，选题、练习与复盘路径割裂。",
+      situation: "备考校招测评时，我发现 727 道题分散在三个模块，选题、练习与复盘路径割裂。",
       task: "设计一套从选题、答题到错题回看的完整静态刷题流程。",
       action: "用原生 JS 与 LocalStorage 实现快速小测、顺序/随机练习、答题卡、收藏、错题筛选和成绩报告。",
       result: "统一收录言语 321 题、资料 254 题、图形 152 题；学习记录保存在本地，可直接在线使用。",
@@ -233,7 +234,7 @@ const projects = [
     lead: "从一组复杂的飞行参数里，找出值得持续监测的信号。",
     award: "MathorCup 数学建模挑战赛全国二等奖",
     star: {
-      situation: "飞行参数维度高、异常信号分散，难以直接形成稳定的监测规则。",
+      situation: "参赛时我们想挑战一个真正高维、高风险的信号检测问题：飞行参数维度高、异常信号分散，难以直接形成稳定的监测规则。",
       task: "压缩变量、筛选关键指标，并建立航空安全预警模型。",
       action: "用 PCA 将 10 项着陆 G 值数据压缩为 1 个主成分并保留 90% 以上信息，再以随机森林筛出 5 项指标，组合 LOF 与 SVM。",
       result: "预警准确度达到 0.85，项目获 MathorCup 数学建模挑战赛全国二等奖。",
@@ -253,7 +254,7 @@ const projects = [
     star: {
       situation: "新能源市场、能源消费与碳排放指标分散，缺少统一的预测和解释框架。",
       task: "评估新能源汽车增长与双碳目标之间的关系，并推演关键时间节点。",
-      action: "结合 GM(1,1) 与 Cobb-Douglas 岭回归，检验后验差、相对误差和模型拟合表现。",
+      action: "用多元回归识别充电桩、原油产量与居民消费水平等关键驱动因素，再结合 GM(1,1) 与 Cobb-Douglas 岭回归验证预测与拟合表现。",
       result: "后验差比值 0.002、平均相对误差 1.983%、R² 0.973；项目获长三角数学建模竞赛二等奖。",
     },
     tone: "acid",
@@ -285,7 +286,7 @@ const projects = [
     metricLabel: "参与者",
     lead: "用 3,808 名参与者的数据，检查血糖与 HDL 的临床和遗传关联。",
     star: {
-      situation: "临床、生活方式与遗传因素共同影响血糖和 HDL，变量关系复杂。",
+      situation: "硕士论文想研究遗传和生活方式怎么共同影响健康指标：临床、生活方式与遗传因素共同影响血糖和 HDL，变量关系复杂。",
       task: "基于 3,808 名参与者识别稳定关联，并评估 SNP 面板的整体贡献。",
       action: "结合 HC3、GLM/GAM、Lasso 与 BMA，并通过共线性检查精简候选位点。",
       result: "BMI 每增加 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%；女性 HDL 约高 20%，并发现 SNP 面板与血糖存在整体关联。",
@@ -319,7 +320,7 @@ export default function Home() {
       const frame = window.requestAnimationFrame(() => setIntroLifted(true));
       return () => window.cancelAnimationFrame(frame);
     }
-    const timer = window.setTimeout(() => setIntroLifted(true), 850);
+    const timer = window.setTimeout(() => setIntroLifted(true), 1550);
     return () => window.clearTimeout(timer);
   }, []);
 
@@ -772,7 +773,7 @@ export default function Home() {
       const available = document.documentElement.scrollHeight - window.innerHeight;
       setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
     };
-    const sections = ["top", "fit", "work", "about"]
+    const sections = ["top", "work", "fit", "about"]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     const sectionObserver = new IntersectionObserver(
@@ -825,7 +826,7 @@ export default function Home() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const panels = Array.from(document.querySelectorAll<HTMLElement>(".hero, .section"));
     if (!panels.length) return;
-    const thresholds = Array.from({ length: 41 }, (_, i) => i / 40);
+    const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
     const focusObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -858,6 +859,7 @@ export default function Home() {
     <main className={"site" + (photosOn ? " photos-on" : "")}>
       <div className={"site-intro" + (introLifted ? " is-lifted" : "")} aria-hidden="true">
         <span className="site-intro-mark">AY<span>·</span></span>
+        <span className="intro-subtext">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</span>
       </div>
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
@@ -866,8 +868,8 @@ export default function Home() {
         <a className="wordmark magnetic" href="#top" aria-label="返回首页">AY<span>·</span></a>
         <nav aria-label="页面导航">
           <a className={(activeSection === "top" ? "active " : "") + "magnetic"} href="#top" data-scramble>ME</a>
-          <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>WHY / TOOLS</a>
           <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>WORK</a>
+          <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>WHY / TOOLS</a>
           <a className={(activeSection === "about" ? "active " : "") + "magnetic"} href="#about" data-scramble>OFF SCREEN</a>
         </nav>
         <div className="header-actions">
@@ -904,8 +906,8 @@ export default function Home() {
             </span>
           </h1>
           <p className="hero-statement">把想法做成体验。</p>
-          <p className="hero-role">STATISTICS × AI × PRODUCT</p>
-          <p className="intro">用统计理清问题，用 AI 原型把想法落地。</p>
+          <p className="hero-role">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</p>
+          <p className="intro">用统计和因果推断找问题的根因，用 SQL 查证据，用 AI 原型把发现变成能验证的产品。</p>
           <div className="hero-actions">
             <a className="primary-cta magnetic" href="#work">查看作品 <span>↘</span></a>
             <a className="text-link magnetic" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
@@ -925,16 +927,14 @@ export default function Home() {
               </div>
             </div>
             <span className="depth-layer hero-name-depth" data-speed="3" aria-hidden="true">Yan An</span>
+            <span className="hero-role-depth" aria-hidden="true">STATISTICS</span>
             <div className="depth-layer hero-person-layer" data-speed="4" aria-hidden="true">
               <img className="hero-cutout" src="./photos/hero-cutout-v2.webp" alt="" />
             </div>
-            <span className="portrait-cut-line" aria-hidden="true" />
-            <span className="portrait-cut-note" aria-hidden="true">BREAK THE FRAME</span>
           </div>
           <figcaption className="hero-portrait-caption"><span>01 / 02 · PORTRAIT</span><span>LONDON</span></figcaption>
-          <span className="portrait-hint">HOVER / 突破边框 ↗</span>
         </figure>
-        <a className="scroll-note" href="#self">SCROLL / 认识我 ↓</a>
+        <a className="scroll-note" href="#work">SCROLL / 看作品 ↓</a>
       </section>
 
       {musicOpen && (
@@ -947,127 +947,11 @@ export default function Home() {
         </aside>
       )}
 
-      <section className="self-map section interactive-section" id="self">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="self-map-copy curtain-observe">
-          <p className="section-index mono-label" data-scramble>01 / ME · IDENTITY MAP</p>
-          <h2>很多关键词，<br />拼成现在的
-            <button
-              className="identity-trigger magnetic"
-              type="button"
-              onPointerEnter={() => setIdentityOpen(true)}
-              onPointerLeave={() => setIdentityOpen(false)}
-              onFocus={() => setIdentityOpen(true)}
-              onBlur={() => setIdentityOpen(false)}
-              onClick={() => setIdentityOpen((current) => !current)}
-              aria-label={identityOpen ? "收拢个人关键词" : "炸开个人关键词"}
-            >「我」</button>。
-            <span className="identity-trigger-guide" aria-hidden="true"><i />悬停试试</span>
-          </h2>
-          <div className="education-list" aria-label="教育背景">
-            <p>EDUCATION / 受教育经历</p>
-            <article>
-              <span>2025.09 - 2026.12</span>
-              <div><strong>格拉斯哥大学 · 英国</strong><small>统计学硕士</small></div>
-            </article>
-            <article>
-              <span>2020.09 - 2024.07</span>
-              <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
-            </article>
-          </div>
-          <p>悬停「我」，关键词会散开；移开后，重新拼回字形。</p>
-          <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
-        </div>
-        <div className="self-glyph-stage">
-          <button
-            ref={wordCloudRef}
-            id="word-cloud-container"
-            className={`self-glyph magnetic${particlesReady ? " particles-ready" : ""}${identityOpen ? " is-open" : ""}`}
-            type="button"
-            onClick={() => setIdentityOpen(!identityOpen)}
-            aria-pressed={identityOpen}
-            aria-label={identityOpen ? "收拢个人关键词" : "展开个人关键词"}
-          >
-            <canvas ref={glyphCanvasRef} className="particle-mask-canvas" aria-hidden="true" />
-            <span className="glyph-code mono-label" data-scramble aria-hidden="true">{`[SELF::01]\n01001101 01000101\n// assembled, never finished`}</span>
-            <span className="identity-hud" aria-hidden="true">
-              <i className="hud-line hud-line-x" />
-              <i className="hud-line hud-line-y" />
-              <output ref={hudReadoutRef}>[X: 000.00, Y: 000.00]</output>
-            </span>
-            {identityWords.map((word, index) => {
-              const style = {
-                "--r": `${word.rotate}deg`,
-                "--delay": `${Math.min(index * 9, 820)}ms`,
-                "--explode-delay": `${Math.min(index * 1.6, 145)}ms`,
-              } as CSSProperties;
-              return (
-                <span className={"identity-word" + (word.accent ? " accent" : "")} style={style} key={word.key}>
-                  <i>{String(index + 1).padStart(2, "0")}</i>{word.label}
-                </span>
-              );
-            })}
-          </button>
-        </div>
-      </section>
-
-      <section className="fit section interactive-section" id="fit">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="section-heading curtain-observe">
-          <p className="section-index">02 / WHY ME &amp; TOOLS</p>
-          <h2>从模糊想法，<br />走到一套<em>可验证的体验。</em></h2>
-          <p className="section-note">默认只留结论。Hover 后，思考过程会像终端一样逐字出现。</p>
-        </div>
-        <div className="fit-grid">
-          {fitCards.map((card) => (
-            <button
-              className={"reveal-card" + (openFit === card.no ? " is-open" : "")}
-              key={card.no}
-              type="button"
-              aria-expanded={openFit === card.no}
-              onPointerEnter={() => setHoveredFit(card.no)}
-              onPointerLeave={() => setHoveredFit(null)}
-              onFocus={() => setHoveredFit(card.no)}
-              onBlur={() => setHoveredFit(null)}
-              onClick={() => toggleFit(card.no)}
-            >
-              <div className="card-top"><span>{card.no}</span><small>{card.tag}</small></div>
-              <h3>{card.title}</h3>
-              <p className="hover-hint">HOVER TO REVEAL ↗</p>
-              <div className="card-reveal"><TypewriterText text={card.detail} active={hoveredFit === card.no || openFit === card.no} /></div>
-            </button>
-          ))}
-        </div>
-        <div className="tool-circuit" aria-label="AI 工作流">
-          <div className="circuit-heading">
-            <span className="mono-label" data-scramble>[ AI WORKFLOW / LIVE ]</span>
-            <p>工具不是标签，是从信息到原型再到验证的一条工作流。</p>
-          </div>
-          <div className="circuit-track">
-            {[
-              ["01", "XMind", "拆问题"],
-              ["02", "NotebookLM", "找依据"],
-              ["03", "Codex", "搭原型"],
-              ["04", "Claude Code", "迭代"],
-              ["05", "Skills", "复用流程"],
-              ["06", "Data", "验证结果"],
-            ].map(([no, name, note], index) => (
-              <article className="circuit-node magnetic" key={name} style={{ "--node-index": index } as CSSProperties}>
-                <small>{no}</small>
-                <strong>{name}</strong>
-                <span>{note}</span>
-              </article>
-            ))}
-            <span className="circuit-pulse" aria-hidden="true" />
-          </div>
-        </div>
-      </section>
-
       <section className="work section interactive-section" id="work">
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="section-heading compact-heading curtain-observe">
-          <span className="heading-ghost-num" aria-hidden="true">03</span>
-          <p className="section-index">03 / SELECTED WORK</p>
+          <span className="heading-ghost-num" aria-hidden="true">01</span>
+          <p className="section-index">01 / SELECTED WORK</p>
           <h2>我的项目</h2>
         </div>
         <div className="project-showcase">
@@ -1183,6 +1067,145 @@ export default function Home() {
               <button type="button" onClick={() => selectAdjacentProject(1)} aria-label="下一个项目">→</button>
             </div>
           </article>
+        </div>
+      </section>
+
+      <section className="self-map section interactive-section" id="self">
+        <span className="section-pointer-glow" aria-hidden="true" />
+        <div className="self-map-copy curtain-observe">
+          <p className="section-index mono-label" data-scramble>02 / ME · IDENTITY MAP</p>
+          <h2>很多关键词，<br />拼成现在的<span className="identity-bracket">「</span>
+            <button
+              className="identity-trigger magnetic"
+              type="button"
+              onPointerEnter={() => setIdentityOpen(true)}
+              onPointerLeave={() => setIdentityOpen(false)}
+              onFocus={() => setIdentityOpen(true)}
+              onBlur={() => setIdentityOpen(false)}
+              onClick={() => setIdentityOpen((current) => !current)}
+              aria-label={identityOpen ? "收拢个人关键词" : "炸开个人关键词"}
+            >我</button><span className="identity-bracket">」</span>。
+            <span className="identity-trigger-guide" aria-hidden="true"><i />悬停试试</span>
+          </h2>
+          <div className="education-list" aria-label="教育背景">
+            <p>EDUCATION / 受教育经历</p>
+            <article>
+              <span>2025.09 - 2026.12</span>
+              <div><strong>格拉斯哥大学 · 英国</strong><small>统计学硕士</small></div>
+            </article>
+            <article>
+              <span>2020.09 - 2024.07</span>
+              <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
+            </article>
+          </div>
+          <p>悬停「我」，关键词会散开；移开后，重新拼回字形。</p>
+          <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
+        </div>
+        <div className="self-glyph-stage">
+          <button
+            ref={wordCloudRef}
+            id="word-cloud-container"
+            className={`self-glyph magnetic${particlesReady ? " particles-ready" : ""}${identityOpen ? " is-open" : ""}`}
+            type="button"
+            onClick={() => setIdentityOpen(!identityOpen)}
+            aria-pressed={identityOpen}
+            aria-label={identityOpen ? "收拢个人关键词" : "展开个人关键词"}
+          >
+            <canvas ref={glyphCanvasRef} className="particle-mask-canvas" aria-hidden="true" />
+            <span className="glyph-code mono-label" data-scramble aria-hidden="true">{`[SELF::01]\n01001101 01000101\n// assembled, never finished`}</span>
+            <span className="identity-hud" aria-hidden="true">
+              <i className="hud-line hud-line-x" />
+              <i className="hud-line hud-line-y" />
+              <output ref={hudReadoutRef}>[X: 000.00, Y: 000.00]</output>
+            </span>
+            {identityWords.map((word, index) => {
+              const style = {
+                "--r": `${word.rotate}deg`,
+                "--delay": `${Math.min(index * 9, 820)}ms`,
+                "--explode-delay": `${Math.min(index * 1.6, 145)}ms`,
+              } as CSSProperties;
+              return (
+                <span className={"identity-word" + (word.accent ? " accent" : "")} style={style} key={word.key}>
+                  <i>{String(index + 1).padStart(2, "0")}</i>{word.label}
+                </span>
+              );
+            })}
+          </button>
+        </div>
+      </section>
+
+      <section className="fit section interactive-section" id="fit">
+        <span className="section-pointer-glow" aria-hidden="true" />
+        <div className="section-heading curtain-observe">
+          <p className="section-index">03 / WHY ME &amp; TOOLS</p>
+          <h2>从模糊想法，<br />走到一套<em>可验证的体验。</em></h2>
+          <p className="section-note">默认只留结论。Hover 后，思考过程会像终端一样逐字出现。</p>
+        </div>
+        <div className="fit-grid">
+          {fitCards.map((card) => (
+            <button
+              className={"reveal-card" + (openFit === card.no ? " is-open" : "")}
+              key={card.no}
+              type="button"
+              aria-expanded={openFit === card.no}
+              onPointerEnter={() => setHoveredFit(card.no)}
+              onPointerLeave={() => setHoveredFit(null)}
+              onFocus={() => setHoveredFit(card.no)}
+              onBlur={() => setHoveredFit(null)}
+              onClick={() => toggleFit(card.no)}
+            >
+              <div className="card-top"><span>{card.no}</span><small>{card.tag}</small></div>
+              <h3>{card.title}</h3>
+              <p className="hover-hint">HOVER TO REVEAL ↗</p>
+              <div className="card-reveal"><TypewriterText text={card.detail} active={hoveredFit === card.no || openFit === card.no} /></div>
+            </button>
+          ))}
+        </div>
+        <div className="tool-circuit" aria-label="AI 工作流">
+          <div className="circuit-heading">
+            <span className="mono-label" data-scramble>[ AI WORKFLOW / LIVE ]</span>
+            <p>工具不是标签，是从信息到原型再到验证的一条工作流。</p>
+          </div>
+          <div className="circuit-track">
+            {[
+              ["01", "XMind", "拆问题"],
+              ["02", "NotebookLM", "找依据"],
+              ["03", "Codex", "搭原型"],
+              ["04", "Claude Code", "迭代"],
+              ["05", "Skills", "复用流程"],
+              ["06", "Data", "验证结果"],
+            ].map(([no, name, note], index) => (
+              <article className="circuit-node magnetic" key={name} style={{ "--node-index": index } as CSSProperties}>
+                <small>{no}</small>
+                <strong>{name}</strong>
+                <span>{note}</span>
+              </article>
+            ))}
+            <span className="circuit-pulse" aria-hidden="true" />
+          </div>
+        </div>
+        <div className="warp-showcase">
+          <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
+          <div className="warp-stage">
+            <WarpText
+              text="把想法做成体验"
+              color="#f4f4f2"
+              warpStrength={0.09}
+              warpScale={1.6}
+              speed={0.5}
+              pointerInfluence={0.4}
+              pointerStrength={0.4}
+              refraction={0.02}
+              ripple
+              fontSize="clamp(2.2rem, 6.4vw, 5.6rem)"
+              fontWeight={700}
+              fontFamily='"Helvetica Neue", Helvetica, "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif'
+              letterSpacing="-0.04em"
+              lineHeight={1}
+              style={{ height: "260px" }}
+            />
+          </div>
+          <p className="warp-caption">鼠标移到文字上试试——用 WebGL 做的一个小交互实验。</p>
         </div>
       </section>
 
