@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from "react";
 import WarpText from "./WarpText";
 
 const fitCards = [
@@ -216,10 +216,10 @@ const projects = [
     metricLabel: "知识片段召回",
     lead: "先检索依据，再组织答案。",
     star: {
-      situation: "大模型回答本地资料或最新信息时，常会缺少依据。",
-      task: "让回答引用检索结果，并在需要时补充外部信息。",
-      action: "在 Coze 中搭建 5 个节点，分别处理输入、内部知识库、外部检索、生成与输出；召回 Top 3 片段，最低匹配度设为 0.14。",
-      result: "回答会保留检索到的依据；A2 工作流还能按关键词整理 10 条新闻并定时推送。",
+      situation: "通用大模型不了解本地资料，面对新信息时也容易给出没有依据的回答。",
+      task: "搭建一套先找资料、再生成答案的检索流程，并让信息来源可以追溯。",
+      action: "在 Coze 中拆成输入、知识库检索、外部搜索、答案生成和输出 5 个节点；每次召回 Top 3 片段，最低匹配度设为 0.14。",
+      result: "回答会结合内部资料与外部搜索依据；扩展工作流还能按关键词整理 10 条新闻并定时推送。",
     },
     tone: "coral",
     preview: "aybot",
@@ -234,10 +234,10 @@ const projects = [
     lead: "从一组复杂的飞行参数里，找出值得持续监测的信号。",
     award: "MathorCup 数学建模挑战赛全国二等奖",
     star: {
-      situation: "飞行参数维度高，异常信号又很分散，难以直接写成稳定的监测规则。",
-      task: "压缩变量、筛选关键指标，并建立航空安全预警模型。",
-      action: "用 PCA 将 10 项着陆 G 值数据压缩为 1 个主成分并保留 90% 以上信息，再以随机森林筛出 5 项指标，组合 LOF 与 SVM。",
-      result: "预警准确度达到 0.85，项目获 MathorCup 数学建模挑战赛全国二等奖。",
+      situation: "QAR 底层时间序列包含 100+ 项高频飞行参数，数据量大、噪声多，异常信号分散在不同机场与飞行阶段。",
+      task: "完成数据质量治理、关键指标筛选与危险飞行标注，形成可用于飞员评估和实时预警的分析链路。",
+      action: "以箱线图、缺失值处理和 Cronbach’s α 检验清洗数据；PCA 缓解高维计算压力，随机森林筛出着陆 G 值等 5 项核心特征；再用 LOF 无监督标注离群飞行，并训练 Sigmoid 核 SVM。",
+      result: "测试集预警准确率达到 0.85；ADF 检验与超限热力图进一步定位机场、飞行阶段和超限类型的交叉风险，项目获 MathorCup 全国二等奖。",
     },
     tone: "blue",
     preview: "metric",
@@ -263,16 +263,16 @@ const projects = [
   {
     year: "2026",
     title: "电影商业成功预测",
-    subtitle: "数据挖掘项目",
-    tags: ["R", "SVM", "Random Forest", "AUC"],
+    subtitle: "IMDb 数据挖掘小组项目",
+    tags: ["R", "LDA", "SVM", "Random Forest", "kNN"],
     metric: "AUC .769",
     metricLabel: "随机森林",
-    lead: "模型没有统一赢家，关键要看业务更怕漏判还是误判。",
+    lead: "只用上映前信息预测电影表现，再按决策成本选择模型。",
     star: {
-      situation: "电影商业判断只能使用上映前信息，且漏判与误判对应不同的业务成本。",
-      task: "比较多类模型，并为不同决策偏好选择合适指标。",
-      action: "仅保留上映前变量以防止数据泄漏，统一比较 7 类模型，重点评估 SVM 与随机森林。",
-      result: "若优先发现潜在成功影片，SVM 的正类召回率为 45.5%；若更在意整体区分能力，随机森林 AUC 为 0.769。",
+      situation: "IMDb 数据含 2,000 部电影、28 个变量；成功影片仅占训练集的 23.9%，单看准确率容易掩盖漏判。",
+      task: "用上映前可获得的信息构造成功标签，并比较不同模型在‘发现潜力片’与‘减少误判’两类决策中的表现。",
+      action: "结合 IMDb 评分与 ROI 定义目标，剔除上映后变量防止泄漏；完成缺失值填补、偏态变量对数变换和 70/30 分层切分，比较 LDA、决策树、Bagging、随机森林、SVM 与 kNN 等 7 类模型。",
+      result: "随机森林 AUC 0.7685、精确率 68.9%；SVM 召回率 45.5%、F1 0.459，最适合优先捕捉潜在成功影片。上映年份、片长、预算与导演关注度反复进入关键变量。",
     },
     tone: "paper",
     preview: "metric",
@@ -304,11 +304,11 @@ const projectGroups: Record<ProjectGroup, number[]> = {
 };
 
 const guideSections = [
-  { id: "top", label: "先从名字开始。" },
-  { id: "work", label: "这里分成 AI 应用和数据分析。" },
-  { id: "self", label: "这些关键词会拼成「我」。" },
-  { id: "fit", label: "再看做事的方法和常用工具。" },
-  { id: "about", label: "最后，看看屏幕之外。" },
+  { id: "top", name: "首页" },
+  { id: "work", name: "项目" },
+  { id: "self", name: "个人关键词" },
+  { id: "fit", name: "方法与工具" },
+  { id: "about", name: "屏幕之外" },
 ] as const;
 
 export default function Home() {
@@ -821,9 +821,12 @@ export default function Home() {
 
   useEffect(() => {
     if (!activeSection || !introLifted) return;
-    setGuideWalking(true);
-    const timer = window.setTimeout(() => setGuideWalking(false), 820);
-    return () => window.clearTimeout(timer);
+    const startTimer = window.setTimeout(() => setGuideWalking(true), 0);
+    const stopTimer = window.setTimeout(() => setGuideWalking(false), 2650);
+    return () => {
+      window.clearTimeout(startTimer);
+      window.clearTimeout(stopTimer);
+    };
   }, [activeSection, introLifted]);
 
   // Cinematic reveal: each section heading's label + h2 rise through a
@@ -899,6 +902,19 @@ export default function Home() {
   const currentGuide = guideSections[guideIndex];
   const nextGuide = guideSections[(guideIndex + 1) % guideSections.length];
   const advanceGuide = () => document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const guidePointerMove = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    event.currentTarget.style.setProperty("--guide-look-x", `${x * 7}px`);
+    event.currentTarget.style.setProperty("--guide-look-y", `${y * 4}px`);
+    event.currentTarget.style.setProperty("--guide-look-r", `${x * 3}deg`);
+  };
+  const resetGuidePointer = (event: ReactPointerEvent<HTMLButtonElement>) => {
+    event.currentTarget.style.setProperty("--guide-look-x", "0px");
+    event.currentTarget.style.setProperty("--guide-look-y", "0px");
+    event.currentTarget.style.setProperty("--guide-look-r", "0deg");
+  };
 
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
@@ -911,13 +927,11 @@ export default function Home() {
         data-section={currentGuide.id}
         type="button"
         onClick={advanceGuide}
-        aria-label={`${currentGuide.label} 点击前往${nextGuide.id === "top" ? "首页" : "下一部分"}`}
+        onPointerMove={guidePointerMove}
+        onPointerLeave={resetGuidePointer}
+        aria-label={`当前位于${currentGuide.name}，点击前往${nextGuide.name}`}
       >
         <span className="guide-path" aria-hidden="true"><i style={{ "--guide-step": guideIndex } as CSSProperties} /></span>
-        <span className="guide-note">
-          <strong>{currentGuide.label}</strong>
-          <small>{nextGuide.id === "top" ? "回到开头" : "点击继续"} · {String(guideIndex + 1).padStart(2, "0")} / {String(guideSections.length).padStart(2, "0")}</small>
-        </span>
         <span className="guide-avatar" aria-hidden="true"><i /></span>
       </button>
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
@@ -1171,7 +1185,7 @@ export default function Home() {
               <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
             </article>
           </div>
-          <p>悬停时关键词会散开，移开后重新拼回字形。</p>
+          <p>悬停时关键词散开，移开后重新聚合。</p>
           <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
         </div>
         <div className="self-glyph-stage">
@@ -1305,11 +1319,6 @@ export default function Home() {
             <article><span>ENTP</span><h3>辩论与表达</h3><p>曾任学院辩论队队长，带领 10 余人组织赛事。想法拿出来讨论，通常比独自打磨更有效。</p></article>
           </div>
           <div className="offscreen-cta">
-            <p>需要一个能读懂数据，也愿意把想法做出来的人？聊聊。</p>
-            <a className="resume-orbit magnetic" href="./安颜-简历.pdf" download>
-              <span>DOWNLOAD RESUME</span>
-              <small>获取简历 · 2026 届</small>
-            </a>
             <a className="offscreen-mail magnetic" href="mailto:anyan001121@gmail.com">anyan001121@gmail.com ↗</a>
           </div>
         </div>
