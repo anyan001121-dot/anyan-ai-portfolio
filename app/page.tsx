@@ -180,7 +180,22 @@ const projects = [
     detail: "我围绕注意力与任务管理困难，做了 Brain Dump、任务拆解、专注计时、中断暂存和断点恢复。LangGraph 负责控制流程，系统会参考实际用时和预估用时调整后续任务的大小，数据保存在本地 SQLite。",
     opinion: "我把每周成功启动任务数设为核心指标，同时记录启动耗时、完成率和恢复成功率。我希望 AI 少说一点，让用户少费一点力气，尽快开始。",
     tone: "focus",
+    preview: "focusflow",
     url: "https://github.com/anyan001121-dot/focusflow",
+  },
+  {
+    year: "2026",
+    title: "北森刷题台",
+    subtitle: "校招测评练习产品",
+    tags: ["Vanilla JS", "LocalStorage", "Quiz UX", "GitHub Pages"],
+    metric: "727",
+    metricLabel: "道题 · 三大模块",
+    lead: "把分散的测评题，整理成随时能练、练完有反馈的刷题流程。",
+    detail: "收录言语理解 321 题、资料分析 254 题和图形推理 152 题，支持快速小测、顺序或随机练习、错题与收藏筛选，并用答题卡和成绩报告串起完整反馈。学习记录只保存在用户自己的浏览器中。",
+    opinion: "重点不是把题堆在页面上，而是缩短“找到薄弱项—马上练习—看到结果—回看错题”的路径。",
+    tone: "quiz",
+    preview: "quiz",
+    url: "https://github.com/anyan001121-dot/beisen-quiz",
   },
   {
     year: "2024",
@@ -193,6 +208,7 @@ const projects = [
     detail: "A1 用五个节点串起检索与回答，召回知识库 Top 3 片段，再补充 arXiv 的实时信息，最低匹配度设为 0.14。A2 会按关键词整理 10 条新闻并定时推送。",
     opinion: "这个项目让我开始在意回答从哪里来。语气再自然，如果没有可信来源和可追溯的上下文，也很难让人放心。",
     tone: "coral",
+    preview: "aybot",
   },
   {
     year: "2023",
@@ -205,6 +221,7 @@ const projects = [
     detail: "PCA 把着陆 G 值的 10 项数据压缩成 1 个主成分，保留 90% 以上的信息。随机森林筛出 5 项关键指标，LOF 与 SVM 组合后的预警准确度达到 0.85。",
     opinion: "降维让数据更容易计算和解释。最终留下的指标，应该让一线人员看得懂，也知道接下来要做什么。",
     tone: "blue",
+    preview: "metric",
   },
   {
     year: "2023",
@@ -217,6 +234,7 @@ const projects = [
     detail: "GM(1,1) 的后验差比值为 0.002，平均相对误差为 1.983%。Cobb-Douglas 岭回归 R² 为 0.973，模型估计 2025 年达到碳峰值、2055 年实现碳中和。",
     opinion: "一个预测值很难单独支持决策。我更想知道哪些因素推动了变化，以及这个解释是否站得住。",
     tone: "acid",
+    preview: "metric",
   },
   {
     year: "2026",
@@ -229,6 +247,7 @@ const projects = [
     detail: "我只使用上映前变量，避免把未来信息带进模型。比较 7 类模型后，SVM 的正类召回率为 45.5%，随机森林的 AUC 为 0.769，前者更适合寻找机会，后者更适合控制误判。",
     opinion: "漏掉一部可能成功的电影，与错判一部电影的成本不同。选指标之前，得先说清楚更不能接受哪一种错误。",
     tone: "paper",
+    preview: "metric",
   },
   {
     year: "2026",
@@ -241,6 +260,7 @@ const projects = [
     detail: "BMI 每增加 1 kg/m²，血糖约升高 1.2%，HDL 约降低 1.4%；女性 HDL 约高 20%。分析还发现，SNP 面板与血糖存在整体关联。",
     opinion: "看到显著结果后，我还会继续检查它是否稳健、能解释多少差异，以及换到样本外还能不能成立。",
     tone: "lavender",
+    preview: "metric",
   },
 ];
 
@@ -270,7 +290,7 @@ export default function Home() {
   const [particlesReady, setParticlesReady] = useState(false);
   const [openFit, setOpenFit] = useState<string | null>(null);
   const [hoveredFit, setHoveredFit] = useState<string | null>(null);
-  const [openProject, setOpenProject] = useState<number | null>(null);
+  const [openProject, setOpenProject] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
   const glyphCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -581,7 +601,11 @@ export default function Home() {
   }, []);
 
   const toggleFit = (key: string) => setOpenFit((current) => current === key ? null : key);
-  const toggleProject = (index: number) => setOpenProject((current) => current === index ? null : index);
+  const activeProject = projects[openProject];
+  const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
+  const selectAdjacentProject = (direction: number) => {
+    setOpenProject((current) => (current + direction + projects.length) % projects.length);
+  };
 
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
@@ -798,80 +822,100 @@ export default function Home() {
           <p className="section-index">03 / SELECTED WORK</p>
           <h2>我的项目</h2>
         </div>
-        <div className="project-stack">
-          {projects.map((project, index) => {
-            const projectUrl = "url" in project ? project.url : undefined;
+        <div className="project-showcase">
+          <div className="project-rail-head">
+            <p className="mono-label" data-scramble>A / PRODUCT & AI&nbsp;&nbsp;·&nbsp;&nbsp;B / DATA MODELLING</p>
+            <span>HOVER / TAP TO EXPLORE</span>
+          </div>
+          <div className="project-rail" role="tablist" aria-label="选择项目">
+            {projects.map((project, index) => (
+              <button
+                className={openProject === index ? "is-active" : ""}
+                type="button"
+                role="tab"
+                aria-selected={openProject === index}
+                onMouseEnter={() => setOpenProject(index)}
+                onFocus={() => setOpenProject(index)}
+                onClick={() => setOpenProject(index)}
+                key={project.title}
+              >
+                <small>{index < 3 ? "PRODUCT" : "DATA"} / {String(index + 1).padStart(2, "0")}</small>
+                <strong>{project.title}</strong>
+                <span>{project.metric}</span>
+              </button>
+            ))}
+          </div>
 
-            return (
-              <div className="project-entry" key={project.title}>
-                {(index === 0 || index === 2) && (
-                  <p className="project-category mono-label" data-scramble>
-                    {index === 0 ? "A / AI & PRODUCT PROTOTYPES" : "B / DATA MODELLING"}
-                  </p>
-                )}
-                <button
-                  className={`project-card ${project.tone}${index < 2 ? " has-preview" : ""}${openProject === index ? " is-open" : ""}`}
-                  type="button"
-                  aria-expanded={openProject === index}
-                  onClick={() => toggleProject(index)}
-                >
-                  <div className="project-number">{String(index + 1).padStart(2, "0")}</div>
-                  <div className="project-main">
-                    <div className="project-meta"><span>{project.year}</span><span>{project.subtitle}</span></div>
-                    <h3>{project.title}</h3>
-                    <p className="project-lead">{project.lead}</p>
-                    <div className="project-tags">{project.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-                  </div>
-                  {index === 0 && (
-                    <figure className="project-window focusflow-window" aria-label="FocusFlow 产品界面预览">
-                      <div className="project-window-bar" aria-hidden="true">
-                        <span /><span /><span />
-                        <small>focusflow.app</small>
-                      </div>
-                      <div className="project-window-body">
-                        <img src="./photos/focusflow-preview.png" alt="FocusFlow 的 Brain Dump 任务输入界面" />
-                      </div>
-                      <figcaption>PRODUCT UI / STREAMLIT</figcaption>
-                    </figure>
-                  )}
-                  {index === 1 && (
-                    <figure className="project-window aybot-window" aria-label="AYBot 检索增强生成流程预览">
-                      <div className="project-window-bar" aria-hidden="true">
-                        <span /><span /><span />
-                        <small>aybot.flow</small>
-                      </div>
-                      <div className="project-window-body rag-flow" aria-hidden="true">
-                        <div className="rag-query">ASK<br /><b>问题</b></div>
-                        <i>→</i>
-                        <div className="rag-node">SEARCH<br /><b>检索</b></div>
-                        <i>→</i>
-                        <div className="rag-node rag-top">TOP 3<br /><b>召回</b></div>
-                        <i>→</i>
-                        <div className="rag-answer">ANSWER<br /><b>回答</b></div>
-                      </div>
-                      <figcaption>RAG FLOW / TRACEABLE CONTEXT</figcaption>
-                    </figure>
-                  )}
-                  <div className="project-reveal">
-                    <div className="project-metric">
-                      <b>{project.metric}</b>
-                      <span>{project.metricLabel}</span>
-                    </div>
-                    <div className="project-detail">
-                      <p>{project.detail}</p>
-                      <strong>{project.opinion}</strong>
-                    </div>
-                  </div>
-                  <span className="project-arrow">{projectUrl ? "+" : "↗"}</span>
-                </button>
-                {projectUrl && (
-                  <a className="project-link under-preview" href={projectUrl} target="_blank" rel="noreferrer">
-                    github.com/anyan001121-dot/focusflow <span>↗</span>
-                  </a>
-                )}
+          <article className={`project-stage ${activeProject.tone}`} key={activeProject.title}>
+            <div className="project-stage-copy">
+              <div className="project-stage-meta">
+                <span>{String(openProject + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}</span>
+                <span>{activeProject.year}</span>
+                <span>{activeProject.subtitle}</span>
               </div>
-            );
-          })}
+              <h3>{activeProject.title}</h3>
+              <p className="project-stage-lead">{activeProject.lead}</p>
+              <div className="project-tags">{activeProject.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
+              {activeProjectUrl && (
+                <a className="project-link" href={activeProjectUrl} target="_blank" rel="noreferrer">
+                  查看 GitHub <span>↗</span>
+                </a>
+              )}
+            </div>
+
+            <div className="project-stage-visual">
+              {activeProject.preview === "focusflow" && (
+                <figure className="project-window focusflow-window" aria-label="FocusFlow 产品界面预览">
+                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>focusflow.app</small></div>
+                  <div className="project-window-body"><img src="./photos/focusflow-preview.png" alt="FocusFlow 的 Brain Dump 任务输入界面" /></div>
+                  <figcaption>PRODUCT UI / STREAMLIT</figcaption>
+                </figure>
+              )}
+              {activeProject.preview === "quiz" && (
+                <figure className="project-window quiz-window" aria-label="北森刷题台产品界面示意">
+                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>beisen-quiz / practice</small></div>
+                  <div className="project-window-body quiz-preview" aria-hidden="true">
+                    <div className="quiz-preview-top"><b>北森刷题台</b><span>进度 42%</span></div>
+                    <div className="quiz-progress"><i /></div>
+                    <small>资料分析 · 第 18 / 254 题</small>
+                    <p>根据材料，下列判断正确的是？</p>
+                    <div className="quiz-options"><span>A</span><span className="picked">B</span><span>C</span><span>D</span></div>
+                  </div>
+                  <figcaption>QUIZ FLOW / LOCAL PROGRESS</figcaption>
+                </figure>
+              )}
+              {activeProject.preview === "aybot" && (
+                <figure className="project-window aybot-window" aria-label="AYBot 检索增强生成流程预览">
+                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>aybot.flow</small></div>
+                  <div className="project-window-body rag-flow" aria-hidden="true">
+                    <div className="rag-query">ASK<br /><b>问题</b></div><i>→</i>
+                    <div className="rag-node">SEARCH<br /><b>检索</b></div><i>→</i>
+                    <div className="rag-node rag-top">TOP 3<br /><b>召回</b></div><i>→</i>
+                    <div className="rag-answer">ANSWER<br /><b>回答</b></div>
+                  </div>
+                  <figcaption>RAG FLOW / TRACEABLE CONTEXT</figcaption>
+                </figure>
+              )}
+              {activeProject.preview === "metric" && (
+                <div className="data-signal" aria-label={`${activeProject.metric} ${activeProject.metricLabel}`}>
+                  <div className="signal-grid" aria-hidden="true"><i /><i /><i /><i /><i /></div>
+                  <small>MODEL OUTPUT / VALIDATED SIGNAL</small>
+                  <b>{activeProject.metric}</b>
+                  <span>{activeProject.metricLabel}</span>
+                </div>
+              )}
+            </div>
+
+            <div className="project-stage-detail">
+              <p>{activeProject.detail}</p>
+              <strong>{activeProject.opinion}</strong>
+            </div>
+            <div className="project-stage-controls" aria-label="切换项目">
+              <button type="button" onClick={() => selectAdjacentProject(-1)} aria-label="上一个项目">←</button>
+              <span>{String(openProject + 1).padStart(2, "0")}</span>
+              <button type="button" onClick={() => selectAdjacentProject(1)} aria-label="下一个项目">→</button>
+            </div>
+          </article>
         </div>
       </section>
 
