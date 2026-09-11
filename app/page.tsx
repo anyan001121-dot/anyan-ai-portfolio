@@ -312,7 +312,37 @@ export default function Home() {
     const canvas = glyphCanvasRef.current;
     const container = wordCloudRef.current;
     if (!canvas || !container) return;
+    const friction = 0.85;
+    const springFactor = 0.08;
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    let animationFrame = 0;
     let entryFrame = 0;
+    let inView = reduceMotion;
+    let hasEntered = false;
+    let pointerActive = false;
+    let pointerX = -1000;
+    let pointerY = -1000;
+    let previousTime = performance.now();
+    let wasOpen = false;
+    let maskWidth = 0;
+    let maskHeight = 0;
+
+    type WordParticle = {
+      element: HTMLElement;
+      x: number;
+      y: number;
+      originX: number;
+      originY: number;
+      scatterX: number;
+      scatterY: number;
+      vx: number;
+      vy: number;
+      phase: number;
+      breathSpeed: number;
+      breathAmp: number;
+    };
+
+    let particleStates: WordParticle[] = [];
 
     function seededShuffle<T>(items: T[]) {
       let seed = 20260910;
@@ -332,8 +362,10 @@ export default function Home() {
       const bounds = container.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
 
-      const maskWidth = Math.max(1, Math.round(bounds.width));
-      const maskHeight = Math.max(1, Math.round(bounds.height));
+      const previousWidth = maskWidth || bounds.width;
+      const previousHeight = maskHeight || bounds.height;
+      maskWidth = Math.max(1, Math.round(bounds.width));
+      maskHeight = Math.max(1, Math.round(bounds.height));
       canvas.width = maskWidth;
       canvas.height = maskHeight;
       const context = canvas.getContext("2d", { willReadFrequently: true });
@@ -357,65 +389,143 @@ export default function Home() {
       }
 
       const candidates = seededShuffle(coloredPoints);
-      const particles = Array.from(container.querySelectorAll<HTMLElement>(".identity-word"));
+      const elements = Array.from(container.querySelectorAll<HTMLElement>(".identity-word"));
       const centerX = maskWidth / 2;
       const centerY = maskHeight / 2;
-      let scatterSeed = 0x51f15e;
-      const scatterRandom = () => {
-        scatterSeed = (scatterSeed * 1664525 + 1013904223) >>> 0;
-        return scatterSeed / 4294967296;
+      let physicsSeed = 0x51f15e;
+      const physicsRandom = () => {
+        physicsSeed = (physicsSeed * 1664525 + 1013904223) >>> 0;
+        return physicsSeed / 4294967296;
       };
-      particles.forEach((particle, index) => {
-        const point = candidates[Math.floor((index / particles.length) * candidates.length)] ?? { x: centerX, y: centerY };
-        const angle = scatterRandom() * Math.PI * 2;
-        const force = 90 + scatterRandom() * 210;
-        const explodeX = Math.cos(angle) * force + (scatterRandom() - 0.5) * 390;
-        const explodeY = 95 + scatterRandom() * 310 + Math.sin(angle) * force * 0.28;
-        const burstX = explodeX * (0.22 + scatterRandom() * 0.28);
-        const liftY = -(55 + scatterRandom() * 165);
-        const explodeScale = 0.82 + scatterRandom() * 0.62;
+      const oldStates = particleStates;
+
+      particleStates = elements.map((element, index) => {
+        const point = candidates[Math.floor((index / elements.length) * candidates.length)] ?? { x: centerX, y: centerY };
+        const old = oldStates[index];
         const side = index % 4;
-        const spawnX = side === 0 ? -maskWidth * 0.95 : side === 1 ? maskWidth * 0.95 : ((index * 37) % 180) - 90;
-        const spawnY = side === 2 ? -maskHeight * 0.9 : side === 3 ? maskHeight * 0.9 : ((index * 29) % 160) - 80;
-
-        particle.style.setProperty("--base-x", `${(point.x / maskWidth) * 100}%`);
-        particle.style.setProperty("--base-y", `${(point.y / maskHeight) * 100}%`);
-        particle.style.setProperty("--spawn-x", `${spawnX.toFixed(1)}px`);
-        particle.style.setProperty("--spawn-y", `${spawnY.toFixed(1)}px`);
-        particle.style.setProperty("--explode-x", `${explodeX.toFixed(1)}px`);
-        particle.style.setProperty("--explode-y", `${explodeY.toFixed(1)}px`);
-        particle.style.setProperty("--burst-x", `${burstX.toFixed(1)}px`);
-        particle.style.setProperty("--lift-y", `${liftY.toFixed(1)}px`);
-        const explodeRotation = -118 + scatterRandom() * 236;
-        particle.style.setProperty("--explode-r", `${explodeRotation.toFixed(1)}deg`);
-        particle.style.setProperty("--burst-r", `${(explodeRotation * 0.35).toFixed(1)}deg`);
-        particle.style.setProperty("--explode-scale", explodeScale.toFixed(2));
-        particle.style.setProperty("--fall-duration", `${Math.round(760 + scatterRandom() * 520)}ms`);
-        particle.style.setProperty("--fall-delay", `${Math.round(scatterRandom() * 170)}ms`);
+        const spawnX = side === 0 ? -maskWidth * 0.35 : side === 1 ? maskWidth * 1.35 : centerX + (physicsRandom() - 0.5) * maskWidth;
+        const spawnY = side === 2 ? -maskHeight * 0.25 : side === 3 ? maskHeight * 1.25 : centerY + (physicsRandom() - 0.5) * maskHeight;
+        const state: WordParticle = {
+          element,
+          x: old ? old.x * (maskWidth / previousWidth) : spawnX,
+          y: old ? old.y * (maskHeight / previousHeight) : spawnY,
+          originX: point.x,
+          originY: point.y,
+          scatterX: 36 + physicsRandom() * Math.max(1, maskWidth - 72),
+          scatterY: 46 + physicsRandom() * Math.max(1, maskHeight - 92),
+          vx: old?.vx ?? 0,
+          vy: old?.vy ?? 0,
+          phase: physicsRandom() * Math.PI * 2,
+          breathSpeed: 0.00042 + physicsRandom() * 0.00058,
+          breathAmp: 2 + physicsRandom() * 3,
+        };
+        if (reduceMotion) {
+          state.x = state.originX;
+          state.y = state.originY;
+        }
+        element.style.transform = `translate3d(${state.x.toFixed(2)}px,${state.y.toFixed(2)}px,0) translate(-50%,-50%) rotate(var(--r))`;
+        return state;
       });
+    }
 
+    function updatePointer(event: PointerEvent) {
+      const bounds = container.getBoundingClientRect();
+      pointerX = event.clientX - bounds.left;
+      pointerY = event.clientY - bounds.top;
+      pointerActive = true;
+    }
+
+    function releasePointer() {
+      pointerActive = false;
+    }
+
+    function animate(time: number) {
+      const delta = Math.min(2, Math.max(0.45, (time - previousTime) / 16.667));
+      previousTime = time;
+
+      if (inView && !reduceMotion) {
+        const isOpen = container.classList.contains("is-open");
+
+        if (isOpen && !wasOpen) {
+          particleStates.forEach((particle) => {
+            const angle = Math.atan2(particle.y - maskHeight / 2, particle.x - maskWidth / 2) + (Math.random() - 0.5) * 1.5;
+            const impulse = 5 + Math.random() * 7;
+            particle.vx += Math.cos(angle) * impulse;
+            particle.vy += Math.sin(angle) * impulse;
+          });
+        }
+
+        particleStates.forEach((particle) => {
+          const targetX = isOpen
+            ? particle.scatterX
+            : particle.originX + Math.sin(time * particle.breathSpeed + particle.phase) * particle.breathAmp;
+          const targetY = isOpen
+            ? particle.scatterY
+            : particle.originY + Math.cos(time * particle.breathSpeed * 0.83 + particle.phase * 1.7) * particle.breathAmp * 0.72;
+
+          particle.vx += (targetX - particle.x) * springFactor * delta;
+          particle.vy += (targetY - particle.y) * springFactor * delta;
+
+          if (pointerActive) {
+            let dx = particle.x - pointerX;
+            let dy = particle.y - pointerY;
+            let distance = Math.hypot(dx, dy);
+            if (distance < 0.5) {
+              dx = Math.cos(particle.phase);
+              dy = Math.sin(particle.phase);
+              distance = 1;
+            }
+            if (distance < 230) {
+              const force = 9.2 * Math.exp(-distance / 43) * delta;
+              const nx = dx / distance;
+              const ny = dy / distance;
+              const curl = Math.sin(time * 0.003 + particle.phase) * force * 0.13;
+              particle.vx += nx * force - ny * curl;
+              particle.vy += ny * force + nx * curl;
+            }
+          }
+
+          const damping = Math.pow(friction, delta);
+          particle.vx *= damping;
+          particle.vy *= damping;
+          particle.x += particle.vx * delta;
+          particle.y += particle.vy * delta;
+          particle.element.style.transform = `translate3d(${particle.x.toFixed(2)}px,${particle.y.toFixed(2)}px,0) translate(-50%,-50%) rotate(var(--r))`;
+        });
+
+        wasOpen = isOpen;
+      }
+
+      animationFrame = window.requestAnimationFrame(animate);
     }
 
     initParticles();
     const observer = new ResizeObserver(initParticles);
     observer.observe(container);
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const entranceObserver = new IntersectionObserver((entries) => {
-      if (!entries.some((entry) => entry.isIntersecting)) return;
-      entryFrame = window.requestAnimationFrame(() => {
-        entryFrame = window.requestAnimationFrame(() => setParticlesReady(true));
-      });
-      entranceObserver.disconnect();
+      const entry = entries[0];
+      inView = entry?.isIntersecting ?? false;
+      if (!inView || hasEntered) return;
+      hasEntered = true;
+      entryFrame = window.requestAnimationFrame(() => setParticlesReady(true));
     }, { threshold: reduceMotion ? 0 : 0.22 });
     if (reduceMotion) {
       entryFrame = window.requestAnimationFrame(() => setParticlesReady(true));
     } else {
       entranceObserver.observe(container);
     }
+    container.addEventListener("pointermove", updatePointer, { passive: true });
+    container.addEventListener("pointerenter", updatePointer, { passive: true });
+    container.addEventListener("pointerleave", releasePointer);
+    animationFrame = window.requestAnimationFrame(animate);
     return () => {
+      window.cancelAnimationFrame(animationFrame);
       window.cancelAnimationFrame(entryFrame);
       observer.disconnect();
       entranceObserver.disconnect();
+      container.removeEventListener("pointermove", updatePointer);
+      container.removeEventListener("pointerenter", updatePointer);
+      container.removeEventListener("pointerleave", releasePointer);
     };
   }, []);
 
