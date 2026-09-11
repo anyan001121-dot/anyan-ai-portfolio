@@ -196,6 +196,7 @@ const projects = [
     tone: "quiz",
     preview: "quiz",
     url: "https://github.com/anyan001121-dot/beisen-quiz",
+    liveUrl: "https://anyan001121-dot.github.io/beisen-quiz/",
   },
   {
     year: "2024",
@@ -603,6 +604,7 @@ export default function Home() {
   const toggleFit = (key: string) => setOpenFit((current) => current === key ? null : key);
   const activeProject = projects[openProject];
   const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
+  const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
   const selectAdjacentProject = (direction: number) => {
     setOpenProject((current) => (current + direction + projects.length) % projects.length);
   };
@@ -856,10 +858,19 @@ export default function Home() {
               <h3>{activeProject.title}</h3>
               <p className="project-stage-lead">{activeProject.lead}</p>
               <div className="project-tags">{activeProject.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-              {activeProjectUrl && (
-                <a className="project-link" href={activeProjectUrl} target="_blank" rel="noreferrer">
-                  查看 GitHub <span>↗</span>
-                </a>
+              {(activeProjectLiveUrl || activeProjectUrl) && (
+                <div className="project-links">
+                  {activeProjectLiveUrl && (
+                    <a className="project-link primary" href={activeProjectLiveUrl} target="_blank" rel="noreferrer">
+                      打开题库 <span>↗</span>
+                    </a>
+                  )}
+                  {activeProjectUrl && (
+                    <a className="project-link" href={activeProjectUrl} target="_blank" rel="noreferrer">
+                      查看 GitHub <span>↗</span>
+                    </a>
+                  )}
+                </div>
               )}
             </div>
 
@@ -872,16 +883,15 @@ export default function Home() {
                 </figure>
               )}
               {activeProject.preview === "quiz" && (
-                <figure className="project-window quiz-window" aria-label="北森刷题台产品界面示意">
-                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>beisen-quiz / practice</small></div>
-                  <div className="project-window-body quiz-preview" aria-hidden="true">
-                    <div className="quiz-preview-top"><b>北森刷题台</b><span>进度 42%</span></div>
-                    <div className="quiz-progress"><i /></div>
-                    <small>资料分析 · 第 18 / 254 题</small>
-                    <p>根据材料，下列判断正确的是？</p>
-                    <div className="quiz-options"><span>A</span><span className="picked">B</span><span>C</span><span>D</span></div>
-                  </div>
-                  <figcaption>QUIZ FLOW / LOCAL PROGRESS</figcaption>
+                <figure className="project-window quiz-window" aria-label="北森刷题台真实产品界面">
+                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>anyan001121-dot.github.io/beisen-quiz</small></div>
+                  <a className="project-window-body project-window-click" href={activeProjectLiveUrl} target="_blank" rel="noreferrer" aria-label="打开北森刷题台">
+                    <img className="quiz-shot quiz-shot-home" src="./photos/beisen-quiz-home.png" alt="北森刷题台首页，包含快速练习、三个题型模块及练习数据" />
+                    <img className="quiz-shot quiz-shot-practice" src="./photos/beisen-quiz-practice.png" alt="北森刷题台答题页，包含题目、选项、计时器与答题卡" />
+                    <small className="quiz-view-hint" aria-hidden="true">HOVER / PRACTICE VIEW</small>
+                    <span className="project-window-open">进入真实题库 ↗</span>
+                  </a>
+                  <figcaption>REAL PRODUCT UI / 727 QUESTIONS</figcaption>
                 </figure>
               )}
               {activeProject.preview === "aybot" && (
