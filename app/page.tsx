@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 const fitCards = [
   {
@@ -295,26 +295,8 @@ const projects = [
   },
 ];
 
-const ideas: Record<string, string[]> = {
-  知识: [
-    "先检索可信材料，再生成带来源的回答。证据不够时，直接说明还缺什么，请用户补充上下文。",
-    "把长文档整理成主题卡片和追问线索。用户可以先看结论，也可以随时回到原文核对。",
-  ],
-  数据: [
-    "把异常波动解释成三个问题：发生了什么，可能是什么原因，下一步该看哪里。指标口径和计算路径始终保留。",
-    "根据业务目标推荐指标，同时摆出误判与漏判的代价，让团队知道这个模型为什么值得选。",
-  ],
-  出行: [
-    "参考日历、路况和用户状态，只在合适的时候给出提醒。每条主动推荐都能解释，也能关闭。",
-    "把路线、天气和兴趣点整理成一份可修改的行程建议，最后怎么走仍由用户决定。",
-  ],
-  创作: [
-    "从一句模糊灵感生成几种方向不同的初稿，同时写出各自的假设，方便用户比较和修改。",
-    "把文字、图片和音乐偏好整理成风格板，再根据每轮反馈慢慢收窄方向，直到页面或内容可以制作。",
-  ],
-};
-
 export default function Home() {
+  const [introLifted, setIntroLifted] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
   const [photosOn, setPhotosOn] = useState(true);
   const [identityOpen, setIdentityOpen] = useState(false);
@@ -330,13 +312,16 @@ export default function Home() {
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
   const heroPortraitRef = useRef<HTMLElement>(null);
-  const [scene, setScene] = useState("知识");
-  const [ideaIndex, setIdeaIndex] = useState(0);
 
-  const currentIdea = useMemo(() => {
-    const pool = ideas[scene];
-    return pool[ideaIndex % pool.length];
-  }, [scene, ideaIndex]);
+  // Site entrance: a brief curtain-lift on first load before the hero settles in.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      const frame = window.requestAnimationFrame(() => setIntroLifted(true));
+      return () => window.cancelAnimationFrame(frame);
+    }
+    const timer = window.setTimeout(() => setIntroLifted(true), 850);
+    return () => window.clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const canvas = glyphCanvasRef.current;
@@ -442,8 +427,8 @@ export default function Home() {
           y: old ? old.y * (maskHeight / previousHeight) : spawnY,
           originX: point.x,
           originY: point.y,
-          scatterX: -maskWidth * 0.08 + physicsRandom() * maskWidth * 1.16,
-          scatterY: -maskHeight * 0.06 + physicsRandom() * maskHeight * 1.12,
+          scatterX: -maskWidth * 0.55 + physicsRandom() * maskWidth * 2.1,
+          scatterY: -maskHeight * 0.45 + physicsRandom() * maskHeight * 1.9,
           vx: old?.vx ?? 0,
           vy: old?.vy ?? 0,
           phase: physicsRandom() * Math.PI * 2,
@@ -480,7 +465,7 @@ export default function Home() {
         if (isOpen && !wasOpen) {
           particleStates.forEach((particle) => {
             const angle = Math.atan2(particle.y - maskHeight / 2, particle.x - maskWidth / 2) + (Math.random() - 0.5) * 1.5;
-            const impulse = 8 + Math.random() * 10;
+            const impulse = 12 + Math.random() * 14;
             particle.vx += Math.cos(angle) * impulse;
             particle.vy += Math.sin(angle) * impulse;
           });
@@ -787,7 +772,7 @@ export default function Home() {
       const available = document.documentElement.scrollHeight - window.innerHeight;
       setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
     };
-    const sections = ["top", "fit", "work", "play", "about"]
+    const sections = ["top", "fit", "work", "about"]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     const sectionObserver = new IntersectionObserver(
@@ -807,6 +792,59 @@ export default function Home() {
     };
   }, []);
 
+  // Cinematic reveal: each section heading's label + h2 rise through a
+  // clip-path curtain once scrolled into view, instead of popping in with
+  // everything else. See .curtain-observe / .is-revealed in globals.css.
+  useEffect(() => {
+    const targets = Array.from(document.querySelectorAll<HTMLElement>(".curtain-observe"));
+    if (!targets.length) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      targets.forEach((target) => target.classList.add("is-revealed"));
+      return;
+    }
+    const curtainObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) return;
+          entry.target.classList.add("is-revealed");
+          curtainObserver.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.2 },
+    );
+    targets.forEach((target) => curtainObserver.observe(target));
+    return () => curtainObserver.disconnect();
+  }, []);
+
+  // Page-to-page transition: each section continuously reports how much of
+  // itself is visible via --in-view (0-1), and CSS uses that to settle the
+  // section into focus (scale/blur/opacity) as it crosses into place instead
+  // of just appearing. Not a one-shot reveal -- this tracks scroll position
+  // the whole time, so scrolling back and forth replays it both ways.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const panels = Array.from(document.querySelectorAll<HTMLElement>(".hero, .section"));
+    if (!panels.length) return;
+    const thresholds = Array.from({ length: 41 }, (_, i) => i / 40);
+    const focusObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          // Ratio relative to the viewport, not the section's own height --
+          // otherwise a section taller than the viewport (e.g. the last one)
+          // can never reach 1 and stays permanently blurred/dim.
+          const viewportHeight = entry.rootBounds?.height || window.innerHeight;
+          const ratio = viewportHeight > 0
+            ? Math.min(1, entry.intersectionRect.height / viewportHeight)
+            : entry.intersectionRatio;
+          (entry.target as HTMLElement).style.setProperty("--in-view", ratio.toFixed(3));
+        });
+      },
+      { threshold: thresholds },
+    );
+    panels.forEach((panel) => focusObserver.observe(panel));
+    return () => focusObserver.disconnect();
+  }, []);
+
   const toggleFit = (key: string) => setOpenFit((current) => current === key ? null : key);
   const activeProject = projects[openProject];
   const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
@@ -818,6 +856,9 @@ export default function Home() {
 
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
+      <div className={"site-intro" + (introLifted ? " is-lifted" : "")} aria-hidden="true">
+        <span className="site-intro-mark">AY<span>·</span></span>
+      </div>
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
       <header className="topbar">
@@ -827,7 +868,6 @@ export default function Home() {
           <a className={(activeSection === "top" ? "active " : "") + "magnetic"} href="#top" data-scramble>ME</a>
           <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>WHY / TOOLS</a>
           <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>WORK</a>
-          <a className={(activeSection === "play" ? "active " : "") + "magnetic"} href="#play" data-scramble>PLAY</a>
           <a className={(activeSection === "about" ? "active " : "") + "magnetic"} href="#about" data-scramble>OFF SCREEN</a>
         </nav>
         <div className="header-actions">
@@ -843,6 +883,8 @@ export default function Home() {
 
       <section className="hero interactive-section" id="top">
         <span className="section-pointer-glow" aria-hidden="true" />
+        <span className="hero-pulse-field" aria-hidden="true" />
+        <span className="hero-ghost-mark" aria-hidden="true">AY</span>
         <div className="hero-copy">
           <p className="eyebrow mono-label" data-scramble>AN YAN / PORTFOLIO · 2026</p>
           <h1 className="hero-name" aria-label="安颜 Yan An">
@@ -882,6 +924,7 @@ export default function Home() {
                 <img className="hero-scene" src="./photos/london-shadow.webp" alt="安颜拍摄的伦敦街景与人物剪影" />
               </div>
             </div>
+            <span className="depth-layer hero-name-depth" data-speed="3" aria-hidden="true">Yan An</span>
             <div className="depth-layer hero-person-layer" data-speed="4" aria-hidden="true">
               <img className="hero-cutout" src="./photos/hero-cutout-v2.webp" alt="" />
             </div>
@@ -906,7 +949,7 @@ export default function Home() {
 
       <section className="self-map section interactive-section" id="self">
         <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="self-map-copy">
+        <div className="self-map-copy curtain-observe">
           <p className="section-index mono-label" data-scramble>01 / ME · IDENTITY MAP</p>
           <h2>很多关键词，<br />拼成现在的
             <button
@@ -970,7 +1013,7 @@ export default function Home() {
 
       <section className="fit section interactive-section" id="fit">
         <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="section-heading">
+        <div className="section-heading curtain-observe">
           <p className="section-index">02 / WHY ME &amp; TOOLS</p>
           <h2>从模糊想法，<br />走到一套<em>可验证的体验。</em></h2>
           <p className="section-note">默认只留结论。Hover 后，思考过程会像终端一样逐字出现。</p>
@@ -1022,7 +1065,8 @@ export default function Home() {
 
       <section className="work section interactive-section" id="work">
         <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="section-heading compact-heading">
+        <div className="section-heading compact-heading curtain-observe">
+          <span className="heading-ghost-num" aria-hidden="true">03</span>
           <p className="section-index">03 / SELECTED WORK</p>
           <h2>我的项目</h2>
         </div>
@@ -1142,45 +1186,22 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="play section interactive-section" id="play">
+      <section className="offscreen section interactive-section" id="about">
         <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="play-copy">
-          <p className="section-index">04 / PLAY · PROTOTYPE</p>
-          <h2>来玩一个<br /><em>AI 灵感实验。</em></h2>
-          <p>选一个场景。我会把抽象的 AI 能力整理成一条可以继续讨论和验证的产品思路。</p>
-          <div className="scene-options" role="group" aria-label="选择 AI 应用场景">
-            {Object.keys(ideas).map((item) => (
-              <button className={scene === item ? "active" : ""} onClick={() => { setScene(item); setIdeaIndex(0); }} key={item}>{item}</button>
-            ))}
+        <div className="offscreen-stage">
+          <div className="offscreen-heading curtain-observe">
+            <p className="section-index">04 / OFF SCREEN &amp; TALK</p>
+            <h2>屏幕之外，我喜欢<em>响一点、怪一点、真一点。</em></h2>
           </div>
-          <button className="generate-button" onClick={() => setIdeaIndex(ideaIndex + 1)}>再生成一个灵感 <span>✦</span></button>
-        </div>
-        <div className="prototype-shell">
-          <div className="prototype-top"><span>AI IDEA LAB</span><i /><i /><i /></div>
-          <div className="prototype-screen">
-            <p className="screen-label">SCENE / {scene}</p>
-            <blockquote>{currentIdea}</blockquote>
-            <div className="screen-foot">
-              <span>输入：场景 × 意图 × 上下文</span>
-              <span>输出：可控、可解释、可退出</span>
-            </div>
+          <div className="offscreen-gallery">
+            <figure className="offscreen-photo"><img src="./photos/athens-portrait.webp" alt="安颜在雅典的旅行照片" /><figcaption>ATHENS / light & structure</figcaption></figure>
+            <figure className="offscreen-photo"><img src="./photos/york-minster.jpg" alt="安颜拍摄的约克大教堂尖塔" /><figcaption>YORK MINSTER / spires & sky</figcaption></figure>
+            <figure className="offscreen-photo"><img src="./photos/pantheon-dome.jpg" alt="安颜拍摄的罗马万神殿穹顶" /><figcaption>PANTHEON / structure & light</figcaption></figure>
+            <figure className="offscreen-photo"><img src="./photos/winter-coast-portrait.jpg" alt="安颜在冬日海岸的侧面人像" /><figcaption>WINTER COAST / wind & silence</figcaption></figure>
+            <figure className="offscreen-photo"><img src="./photos/winter-coast-camera.jpg" alt="安颜在海岸拍摄的背影" /><figcaption>BEHIND THE LENS / looking closely</figcaption></figure>
           </div>
-          <p className="prototype-note">每条灵感都可以继续写成 PRD、画成流程，再配上验证指标。</p>
         </div>
-      </section>
-
-      <section className="about section interactive-section" id="about">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="photo-collage">
-          <figure className="portrait-frame"><img src="./photos/athens-portrait.webp" alt="安颜在雅典的旅行照片" /><figcaption>ATHENS / light & structure</figcaption></figure>
-          <figure className="landscape-frame"><img src="./photos/london-shadow.webp" alt="安颜拍摄的伦敦街景与人物剪影" /><figcaption>LONDON / people & city</figcaption></figure>
-          <figure className="eye-frame"><img src="./photos/london-eye.webp" alt="安颜拍摄的伦敦眼与蓝天" /><figcaption>LONDON EYE / system & motion</figcaption></figure>
-          <figure className="winter-portrait-frame"><img src="./photos/winter-coast-portrait.jpg" alt="安颜在冬日海岸的侧面人像" /><figcaption>WINTER COAST / wind & silence</figcaption></figure>
-          <figure className="camera-frame"><img src="./photos/winter-coast-camera.jpg" alt="安颜在海岸拍摄的背影" /><figcaption>BEHIND THE LENS / looking closely</figcaption></figure>
-        </div>
-        <div className="about-copy">
-          <p className="section-index">05 / OFF SCREEN &amp; TALK</p>
-          <h2>屏幕之外，<br />我喜欢<em>响一点、怪一点、真一点。</em></h2>
+        <div className="offscreen-body">
           <div className="interest-list">
             <article><span>ROCK</span><h3>摇滚</h3><p>我喜欢摇滚的直白和张力。Blur 的 Tender 是我想放进这个页面的歌，温柔，但不软弱。</p></article>
             <article><span>ART</span><h3>艺术与建筑</h3><p>看建筑时，我会注意材质、比例和光线。做页面时，这些观察常常会自己跑回来。</p></article>
