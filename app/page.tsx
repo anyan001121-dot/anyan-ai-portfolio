@@ -8,27 +8,27 @@ import WarpText from "./WarpText";
 const fitCards = [
   {
     no: "01",
-    title: "先把问题问对",
+    title: "先把问题问清楚",
     tag: "PRODUCT LOGIC",
-    detail: "拿到一句模糊需求时，我会先用 XMind 理清用户是谁、在什么情况下使用、结果怎么验证，再决定往下做什么。",
+    detail: "模糊需求先拆成四件事：谁在用、什么时候用、需要什么结果、怎么验证。XMind 用来理清这条线。",
   },
   {
     no: "02",
-    title: "先把 AI 做出来",
+    title: "先做一个能用的版本",
     tag: "AI × EXPERIENCE",
-    detail: "我做过 RAG 知识助手，也会用 Codex 和 Claude Code 快速搭出可交互的原型。检索为什么有效、幻觉怎么减少，我都能讲清楚。",
+    detail: "RAG 知识助手、FocusFlow 和刷题台都从可交互版本开始。Codex 与 Claude Code 加快实现，关键判断和结果仍由人工核对。",
   },
   {
     no: "03",
-    title: "先分清相关和因果",
+    title: "相关不等于因果",
     tag: "CAUSAL INFERENCE",
-    detail: "实验设计是我统计课拿分最高的一门，随机对照和 A/B 实验的设计逻辑我很熟悉。日常先用 SQL 把数据捞对，再用回归或 GLM/GAM 确认是因果还是巧合。",
+    detail: "实验设计课程成绩 A2。分析时先用 SQL 核对口径，再用回归、GLM 或 GAM 检查关系，避免把同时发生误当成因果。",
   },
   {
     no: "04",
-    title: "让团队听懂同一件事",
+    title: "把分歧说清楚",
     tag: "COMMUNICATION",
-    detail: "做辩论队队长时，我练得最多的是听、追问和当场总结。讨论项目也一样，先找到分歧，再确定下一步由谁做什么。",
+    detail: "辩论队经历练出来的是听、追问和现场总结。项目讨论中先确认分歧，再把下一步和负责人说清楚。",
   },
 ];
 
@@ -84,7 +84,7 @@ const identityWords = Array.from({ length: PARTICLE_COUNT }, (_, index) => {
   };
 });
 
-const SCRAMBLE_CHARS = "!<>-_\\/[]{}—=+*^?#_";
+const SCRAMBLE_CHARS = "!<>-_\\/[]{}=+*^?#_";
 
 class TextScramble {
   element: HTMLElement;
@@ -177,12 +177,12 @@ const projects = [
     tags: ["LangGraph", "Streamlit", "SQLite", "LLM"],
     metric: "≤ 3",
     metricLabel: "即时优先项",
-    lead: "把一团乱麻的任务，整理成几分钟内就能动手的第一步。",
+    lead: "把杂乱任务整理成三件以内、可以马上开始的小事。",
     star: {
-      situation: "注意力与任务管理困难时，大任务常让“开始”本身变得很难。",
+      situation: "任务一多，最难的往往不是完成，而是不知道先做哪一步。",
       task: "把杂乱输入转成少量、可立即执行的步骤，并支持中断后继续。",
-      action: "用 LangGraph 串联 Brain Dump、任务拆解、专注计时、暂存与恢复；用 SQLite 保存本地记录，并按实际与预计用时调整任务粒度。",
-      result: "每轮最多给出 3 个即时优先项，并建立启动耗时、完成率和恢复成功率等验证指标。",
+      action: "LangGraph 负责 Brain Dump、任务拆解、计时、暂存和恢复；SQLite 保存本地记录，任务时长会按实际用时继续调整。",
+      result: "每轮只给 3 个以内的优先项，并记录启动耗时、完成率和恢复成功率，用来判断产品是否真的有用。",
     },
     tone: "focus",
     preview: "focusflow",
@@ -195,12 +195,12 @@ const projects = [
     tags: ["Vanilla JS", "LocalStorage", "Quiz UX", "GitHub Pages"],
     metric: "727",
     metricLabel: "道题 · 三大模块",
-    lead: "把分散的测评题，整理成随时能练、练完有反馈的刷题流程。",
+    lead: "727 道测评题，放进一套随时能练、练完能复盘的流程。",
     star: {
-      situation: "备考校招测评时，我发现 727 道题分散在三个模块，选题、练习与复盘路径割裂。",
-      task: "设计一套从选题、答题到错题回看的完整静态刷题流程。",
+      situation: "备考校招测评时，727 道题分散在三个模块，练习和复盘需要来回切换。",
+      task: "做一套从选题、答题到错题回看的完整刷题流程。",
       action: "用原生 JS 与 LocalStorage 实现快速小测、顺序/随机练习、答题卡、收藏、错题筛选和成绩报告。",
-      result: "统一收录言语 321 题、资料 254 题、图形 152 题；学习记录保存在本地，可直接在线使用。",
+      result: "收录言语 321 题、资料 254 题、图形 152 题；进度、错题和收藏均保存在本地，可直接在线使用。",
     },
     tone: "quiz",
     preview: "quiz",
@@ -214,12 +214,12 @@ const projects = [
     tags: ["LangChain", "Coze", "LLM", "API"],
     metric: "TOP 3",
     metricLabel: "知识片段召回",
-    lead: "让知识助手先找依据，再回答问题。",
+    lead: "先检索依据，再组织答案。",
     star: {
-      situation: "通用大模型面对本地资料和最新信息时，容易生成缺少依据的回答。",
-      task: "让知识助手先检索证据，再生成可追溯的回答。",
-      action: "用 LangChain 与 Coze 搭建五节点流程，召回 Top 3 知识片段并补充 arXiv 实时信息，最低匹配度设为 0.14。",
-      result: "形成“检索—筛选—生成—溯源”闭环；扩展模块可按关键词整理并定时推送 10 条新闻。",
+      situation: "大模型回答本地资料或最新信息时，常会缺少依据。",
+      task: "让回答引用检索结果，并在需要时补充外部信息。",
+      action: "在 Coze 中搭建 5 个节点，分别处理输入、内部知识库、外部检索、生成与输出；召回 Top 3 片段，最低匹配度设为 0.14。",
+      result: "回答会保留检索到的依据；A2 工作流还能按关键词整理 10 条新闻并定时推送。",
     },
     tone: "coral",
     preview: "aybot",
@@ -234,7 +234,7 @@ const projects = [
     lead: "从一组复杂的飞行参数里，找出值得持续监测的信号。",
     award: "MathorCup 数学建模挑战赛全国二等奖",
     star: {
-      situation: "参赛时我们想挑战一个真正高维、高风险的信号检测问题：飞行参数维度高、异常信号分散，难以直接形成稳定的监测规则。",
+      situation: "飞行参数维度高，异常信号又很分散，难以直接写成稳定的监测规则。",
       task: "压缩变量、筛选关键指标，并建立航空安全预警模型。",
       action: "用 PCA 将 10 项着陆 G 值数据压缩为 1 个主成分并保留 90% 以上信息，再以随机森林筛出 5 项指标，组合 LOF 与 SVM。",
       result: "预警准确度达到 0.85，项目获 MathorCup 数学建模挑战赛全国二等奖。",
@@ -249,10 +249,10 @@ const projects = [
     tags: ["GM(1,1)", "Regression", "Ridge"],
     metric: "R² .973",
     metricLabel: "岭回归拟合",
-    lead: "把分散的数据放到同一个框架里，研究市场增长和双碳目标。",
+    lead: "把市场、能源和碳排放数据放在一起，看清增长来自哪里。",
     award: "长三角数学建模竞赛二等奖",
     star: {
-      situation: "新能源市场、能源消费与碳排放指标分散，缺少统一的预测和解释框架。",
+      situation: "新能源市场、能源消费与碳排放数据来自不同口径，难以直接比较。",
       task: "评估新能源汽车增长与双碳目标之间的关系，并推演关键时间节点。",
       action: "用多元回归识别充电桩、原油产量与居民消费水平等关键驱动因素，再结合 GM(1,1) 与 Cobb-Douglas 岭回归验证预测与拟合表现。",
       result: "后验差比值 0.002、平均相对误差 1.983%、R² 0.973；项目获长三角数学建模竞赛二等奖。",
@@ -267,12 +267,12 @@ const projects = [
     tags: ["R", "SVM", "Random Forest", "AUC"],
     metric: "AUC .769",
     metricLabel: "随机森林",
-    lead: "同一批数据，在不同业务目标下需要不同的模型。",
+    lead: "模型没有统一赢家，关键要看业务更怕漏判还是误判。",
     star: {
       situation: "电影商业判断只能使用上映前信息，且漏判与误判对应不同的业务成本。",
       task: "比较多类模型，并为不同决策偏好选择合适指标。",
       action: "仅保留上映前变量以防止数据泄漏，统一比较 7 类模型，重点评估 SVM 与随机森林。",
-      result: "SVM 正类召回率 45.5%，随机森林 AUC 0.769，形成面向机会发现与误判控制的差异化建议。",
+      result: "若优先发现潜在成功影片，SVM 的正类召回率为 45.5%；若更在意整体区分能力，随机森林 AUC 为 0.769。",
     },
     tone: "paper",
     preview: "metric",
@@ -286,7 +286,7 @@ const projects = [
     metricLabel: "参与者",
     lead: "用 3,808 名参与者的数据，检查血糖与 HDL 的临床和遗传关联。",
     star: {
-      situation: "硕士论文想研究遗传和生活方式怎么共同影响健康指标：临床、生活方式与遗传因素共同影响血糖和 HDL，变量关系复杂。",
+      situation: "血糖和 HDL 同时受到临床、生活方式与遗传因素影响，变量之间也存在相关性。",
       task: "基于 3,808 名参与者识别稳定关联，并评估 SNP 面板的整体贡献。",
       action: "结合 HC3、GLM/GAM、Lasso 与 BMA，并通过共线性检查精简候选位点。",
       result: "BMI 每增加 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%；女性 HDL 约高 20%，并发现 SNP 面板与血糖存在整体关联。",
@@ -296,6 +296,13 @@ const projects = [
   },
 ];
 
+type ProjectGroup = "ai" | "data";
+
+const projectGroups: Record<ProjectGroup, number[]> = {
+  ai: [0, 1, 2],
+  data: [3, 4, 5, 6],
+};
+
 export default function Home() {
   const [introLifted, setIntroLifted] = useState(false);
   const [musicOpen, setMusicOpen] = useState(false);
@@ -304,6 +311,7 @@ export default function Home() {
   const [particlesReady, setParticlesReady] = useState(false);
   const [openFit, setOpenFit] = useState<string | null>(null);
   const [hoveredFit, setHoveredFit] = useState<string | null>(null);
+  const [projectGroup, setProjectGroup] = useState<ProjectGroup>("ai");
   const [openProject, setOpenProject] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
@@ -328,6 +336,8 @@ export default function Home() {
     const canvas = glyphCanvasRef.current;
     const container = wordCloudRef.current;
     if (!canvas || !container) return;
+    const glyphCanvas = canvas;
+    const wordCloud = container;
     const friction = 0.82;
     const returnSpring = 0.045;
     const scatterSpring = 0.026;
@@ -375,17 +385,16 @@ export default function Home() {
     }
 
     function initParticles() {
-      if (!canvas || !container) return;
-      const bounds = container.getBoundingClientRect();
+      const bounds = wordCloud.getBoundingClientRect();
       if (!bounds.width || !bounds.height) return;
 
       const previousWidth = maskWidth || bounds.width;
       const previousHeight = maskHeight || bounds.height;
       maskWidth = Math.max(1, Math.round(bounds.width));
       maskHeight = Math.max(1, Math.round(bounds.height));
-      canvas.width = maskWidth;
-      canvas.height = maskHeight;
-      const context = canvas.getContext("2d", { willReadFrequently: true });
+      glyphCanvas.width = maskWidth;
+      glyphCanvas.height = maskHeight;
+      const context = glyphCanvas.getContext("2d", { willReadFrequently: true });
       if (!context) return;
 
       context.clearRect(0, 0, maskWidth, maskHeight);
@@ -406,7 +415,7 @@ export default function Home() {
       }
 
       const candidates = seededShuffle(coloredPoints);
-      const elements = Array.from(container.querySelectorAll<HTMLElement>(".identity-word"));
+      const elements = Array.from(wordCloud.querySelectorAll<HTMLElement>(".identity-word"));
       const centerX = maskWidth / 2;
       const centerY = maskHeight / 2;
       let physicsSeed = 0x51f15e;
@@ -446,7 +455,7 @@ export default function Home() {
     }
 
     function updatePointer(event: PointerEvent) {
-      const bounds = container.getBoundingClientRect();
+      const bounds = wordCloud.getBoundingClientRect();
       pointerX = event.clientX - bounds.left;
       pointerY = event.clientY - bounds.top;
       pointerActive = true;
@@ -461,7 +470,7 @@ export default function Home() {
       previousTime = time;
 
       if (inView && !reduceMotion) {
-        const isOpen = container.classList.contains("is-open");
+        const isOpen = wordCloud.classList.contains("is-open");
 
         if (isOpen && !wasOpen) {
           particleStates.forEach((particle) => {
@@ -519,7 +528,7 @@ export default function Home() {
 
     initParticles();
     const observer = new ResizeObserver(initParticles);
-    observer.observe(container);
+    observer.observe(wordCloud);
     const entranceObserver = new IntersectionObserver((entries) => {
       const entry = entries[0];
       inView = entry?.isIntersecting ?? false;
@@ -530,20 +539,20 @@ export default function Home() {
     if (reduceMotion) {
       entryFrame = window.requestAnimationFrame(() => setParticlesReady(true));
     } else {
-      entranceObserver.observe(container);
+      entranceObserver.observe(wordCloud);
     }
-    container.addEventListener("pointermove", updatePointer, { passive: true });
-    container.addEventListener("pointerenter", updatePointer, { passive: true });
-    container.addEventListener("pointerleave", releasePointer);
+    wordCloud.addEventListener("pointermove", updatePointer, { passive: true });
+    wordCloud.addEventListener("pointerenter", updatePointer, { passive: true });
+    wordCloud.addEventListener("pointerleave", releasePointer);
     animationFrame = window.requestAnimationFrame(animate);
     return () => {
       window.cancelAnimationFrame(animationFrame);
       window.cancelAnimationFrame(entryFrame);
       observer.disconnect();
       entranceObserver.disconnect();
-      container.removeEventListener("pointermove", updatePointer);
-      container.removeEventListener("pointerenter", updatePointer);
-      container.removeEventListener("pointerleave", releasePointer);
+      wordCloud.removeEventListener("pointermove", updatePointer);
+      wordCloud.removeEventListener("pointerenter", updatePointer);
+      wordCloud.removeEventListener("pointerleave", releasePointer);
     };
   }, []);
 
@@ -852,7 +861,14 @@ export default function Home() {
   const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
   const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
   const selectAdjacentProject = (direction: number) => {
-    setOpenProject((current) => (current + direction + projects.length) % projects.length);
+    const group = projectGroups[projectGroup];
+    const currentPosition = Math.max(0, group.indexOf(openProject));
+    setOpenProject(group[(currentPosition + direction + group.length) % group.length]);
+  };
+
+  const selectProjectGroup = (group: ProjectGroup) => {
+    setProjectGroup(group);
+    setOpenProject(projectGroups[group][0]);
   };
 
   return (
@@ -905,9 +921,9 @@ export default function Home() {
               ))}
             </span>
           </h1>
-          <p className="hero-statement">把想法做成体验。</p>
+          <p className="hero-statement">把问题想清楚，把东西做出来。</p>
           <p className="hero-role">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</p>
-          <p className="intro">用统计和因果推断找问题的根因，用 SQL 查证据，用 AI 原型把发现变成能验证的产品。</p>
+          <p className="intro">从统计与因果推断出发，用 SQL 核对证据，再把结论做成可以验证的 AI 原型。</p>
           <div className="hero-actions">
             <a className="primary-cta magnetic" href="#work">查看作品 <span>↘</span></a>
             <a className="text-link magnetic" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
@@ -942,7 +958,7 @@ export default function Home() {
           <button onClick={() => setMusicOpen(false)} aria-label="关闭音乐卡片">×</button>
           <p>NOW PLAYING IN MY HEAD</p>
           <strong>Tender / Blur</strong>
-          <span>浏览器不会自动播放。点击可前往正版音源。</span>
+          <span>页面不会自动播放，点击可前往正版音源。</span>
           <a href="https://open.spotify.com/search/Blur%20Tender" target="_blank" rel="noreferrer">在 Spotify 打开 ↗</a>
         </aside>
       )}
@@ -955,12 +971,26 @@ export default function Home() {
           <h2>我的项目</h2>
         </div>
         <div className="project-showcase">
+          <div className="project-modules" aria-label="项目分类">
+            <button className={projectGroup === "ai" ? "is-active" : ""} type="button" onClick={() => selectProjectGroup("ai")}>
+              <small>MODULE A / 03</small>
+              <strong>AI 应用</strong>
+              <span>从问题到可交互原型</span>
+            </button>
+            <button className={projectGroup === "data" ? "is-active" : ""} type="button" onClick={() => selectProjectGroup("data")}>
+              <small>MODULE B / 04</small>
+              <strong>数据分析</strong>
+              <span>从数据到可解释结论</span>
+            </button>
+          </div>
           <div className="project-rail-head">
-            <p className="mono-label" data-scramble>A / PRODUCT & AI&nbsp;&nbsp;·&nbsp;&nbsp;B / DATA MODELLING</p>
-            <span>HOVER / TAP TO EXPLORE</span>
+            <p className="mono-label" data-scramble>{projectGroup === "ai" ? "AI APPLICATIONS / 交互原型" : "DATA ANALYSIS / 建模与验证"}</p>
+            <span>悬停或点击切换项目</span>
           </div>
           <div className="project-rail" role="tablist" aria-label="选择项目">
-            {projects.map((project, index) => (
+            {projectGroups[projectGroup].map((index) => {
+              const project = projects[index];
+              return (
               <button
                 className={openProject === index ? "is-active" : ""}
                 type="button"
@@ -971,18 +1001,18 @@ export default function Home() {
                 onClick={() => setOpenProject(index)}
                 key={project.title}
               >
-                <small>{index < 3 ? "PRODUCT" : "DATA"} / {String(index + 1).padStart(2, "0")}</small>
+                <small>{projectGroup === "ai" ? "AI APP" : "DATA"} / {String(projectGroups[projectGroup].indexOf(index) + 1).padStart(2, "0")}</small>
                 <strong>{project.title}</strong>
                 <span>{project.metric}</span>
                 {"award" in project && <em className="project-rail-award">AWARD</em>}
               </button>
-            ))}
+            )})}
           </div>
 
           <article className={`project-stage ${activeProject.tone}`} key={activeProject.title}>
             <div className="project-stage-copy">
               <div className="project-stage-meta">
-                <span>{String(openProject + 1).padStart(2, "0")} / {String(projects.length).padStart(2, "0")}</span>
+                <span>{String(projectGroups[projectGroup].indexOf(openProject) + 1).padStart(2, "0")} / {String(projectGroups[projectGroup].length).padStart(2, "0")}</span>
                 <span>{activeProject.year}</span>
                 <span>{activeProject.subtitle}</span>
                 {activeProjectAward && <strong className="project-award">{activeProjectAward}</strong>}
@@ -1027,15 +1057,15 @@ export default function Home() {
                 </figure>
               )}
               {activeProject.preview === "aybot" && (
-                <figure className="project-window aybot-window" aria-label="AYBot 检索增强生成流程预览">
+                <figure className="project-window aybot-window" aria-label="AYBot 论文中的系统架构、Coze 工作流和回答界面">
                   <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>aybot.flow</small></div>
-                  <div className="project-window-body rag-flow" aria-hidden="true">
-                    <div className="rag-query">ASK<br /><b>问题</b></div><i>→</i>
-                    <div className="rag-node">SEARCH<br /><b>检索</b></div><i>→</i>
-                    <div className="rag-node rag-top">TOP 3<br /><b>召回</b></div><i>→</i>
-                    <div className="rag-answer">ANSWER<br /><b>回答</b></div>
+                  <div className="project-window-body aybot-evidence">
+                    <img className="aybot-shot aybot-shot-flow" src="./photos/aybot-architecture.png" alt="AYBot 的检索增强生成架构图" />
+                    <img className="aybot-shot aybot-shot-workflow" src="./photos/aybot-coze-workflow.jpg" alt="AYBot 在 Coze 中搭建的五节点工作流" />
+                    <img className="aybot-shot aybot-shot-answer" src="./photos/aybot-answer.png" alt="AYBot 结合外部检索结果生成的带来源回答" />
+                    <span className="aybot-view-note" aria-hidden="true">HOVER / 查看论文原图</span>
                   </div>
-                  <figcaption>RAG FLOW / TRACEABLE CONTEXT</figcaption>
+                  <figcaption>THESIS EVIDENCE / ARCHITECTURE · WORKFLOW · ANSWER</figcaption>
                 </figure>
               )}
               {activeProject.preview === "metric" && (
@@ -1063,7 +1093,7 @@ export default function Home() {
             </div>
             <div className="project-stage-controls" aria-label="切换项目">
               <button type="button" onClick={() => selectAdjacentProject(-1)} aria-label="上一个项目">←</button>
-              <span>{String(openProject + 1).padStart(2, "0")}</span>
+              <span>{String(projectGroups[projectGroup].indexOf(openProject) + 1).padStart(2, "0")} / {String(projectGroups[projectGroup].length).padStart(2, "0")}</span>
               <button type="button" onClick={() => selectAdjacentProject(1)} aria-label="下一个项目">→</button>
             </div>
           </article>
@@ -1074,7 +1104,7 @@ export default function Home() {
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="self-map-copy curtain-observe">
           <p className="section-index mono-label" data-scramble>02 / ME · IDENTITY MAP</p>
-          <h2>很多关键词，<br />拼成现在的<span className="identity-bracket">「</span>
+          <h2>这些关键词，<br />拼成现在的<span className="identity-bracket">「</span>
             <button
               className="identity-trigger magnetic"
               type="button"
@@ -1085,7 +1115,7 @@ export default function Home() {
               onClick={() => setIdentityOpen((current) => !current)}
               aria-label={identityOpen ? "收拢个人关键词" : "炸开个人关键词"}
             >我</button><span className="identity-bracket">」</span>。
-            <span className="identity-trigger-guide" aria-hidden="true"><i />悬停试试</span>
+            <span className="identity-trigger-guide" aria-hidden="true"><i />悬停看看</span>
           </h2>
           <div className="education-list" aria-label="教育背景">
             <p>EDUCATION / 受教育经历</p>
@@ -1098,7 +1128,7 @@ export default function Home() {
               <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
             </article>
           </div>
-          <p>悬停「我」，关键词会散开；移开后，重新拼回字形。</p>
+          <p>悬停时关键词会散开，移开后重新拼回字形。</p>
           <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
         </div>
         <div className="self-glyph-stage">
@@ -1138,8 +1168,8 @@ export default function Home() {
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="section-heading curtain-observe">
           <p className="section-index">03 / WHY ME &amp; TOOLS</p>
-          <h2>从模糊想法，<br />走到一套<em>可验证的体验。</em></h2>
-          <p className="section-note">默认只留结论。Hover 后，思考过程会像终端一样逐字出现。</p>
+          <h2>想法先拆清楚，<br />再做出来<em>验证。</em></h2>
+          <p className="section-note">卡片只保留结论。悬停后，可以看到具体做法。</p>
         </div>
         <div className="fit-grid">
           {fitCards.map((card) => (
@@ -1164,7 +1194,7 @@ export default function Home() {
         <div className="tool-circuit" aria-label="AI 工作流">
           <div className="circuit-heading">
             <span className="mono-label" data-scramble>[ AI WORKFLOW / LIVE ]</span>
-            <p>工具不是标签，是从信息到原型再到验证的一条工作流。</p>
+            <p>先理清问题，再找依据、搭原型、看结果。工具服务于这条路径。</p>
           </div>
           <div className="circuit-track">
             {[
@@ -1188,7 +1218,7 @@ export default function Home() {
           <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
           <div className="warp-stage">
             <WarpText
-              text="把想法做成体验"
+              text="问题 / 证据 / 原型"
               color="#f4f4f2"
               warpStrength={0.09}
               warpScale={1.6}
@@ -1205,7 +1235,7 @@ export default function Home() {
               style={{ height: "260px" }}
             />
           </div>
-          <p className="warp-caption">鼠标移到文字上试试——用 WebGL 做的一个小交互实验。</p>
+          <p className="warp-caption">鼠标移到文字上，看看它怎么变形。这是一个 WebGL 小实验。</p>
         </div>
       </section>
 
@@ -1214,7 +1244,7 @@ export default function Home() {
         <div className="offscreen-stage">
           <div className="offscreen-heading curtain-observe">
             <p className="section-index">04 / OFF SCREEN &amp; TALK</p>
-            <h2>屏幕之外，我喜欢<em>响一点、怪一点、真一点。</em></h2>
+            <h2>屏幕之外，<em>有声音，也有留白。</em></h2>
           </div>
           <div className="offscreen-gallery">
             <figure className="offscreen-photo"><img src="./photos/athens-portrait.webp" alt="安颜在雅典的旅行照片" /><figcaption>ATHENS / light & structure</figcaption></figure>
@@ -1226,13 +1256,13 @@ export default function Home() {
         </div>
         <div className="offscreen-body">
           <div className="interest-list">
-            <article><span>ROCK</span><h3>摇滚</h3><p>我喜欢摇滚的直白和张力。Blur 的 Tender 是我想放进这个页面的歌，温柔，但不软弱。</p></article>
-            <article><span>ART</span><h3>艺术与建筑</h3><p>看建筑时，我会注意材质、比例和光线。做页面时，这些观察常常会自己跑回来。</p></article>
-            <article><span>PHOTO</span><h3>摄影</h3><p>页面里的照片都由我拍摄或出镜。旅行时，我喜欢找画面里的结构和留白，也看人怎么待在环境里。</p></article>
-            <article><span>ENTP</span><h3>辩论与表达</h3><p>我做过学院辩论队队长，带领 10 余人组织赛事。一个想法先拿出来讨论，通常比自己闷头打磨更有意思。</p></article>
+            <article><span>ROCK</span><h3>摇滚</h3><p>喜欢摇滚的直白和张力。Blur 的 Tender 温柔，但不软弱。</p></article>
+            <article><span>ART</span><h3>艺术与建筑</h3><p>看建筑，常先注意材质、比例和光线。这些观察也会回到页面设计里。</p></article>
+            <article><span>PHOTO</span><h3>摄影</h3><p>这里的照片都由本人拍摄或出镜。旅行时更在意结构、留白，以及人与环境的距离。</p></article>
+            <article><span>ENTP</span><h3>辩论与表达</h3><p>曾任学院辩论队队长，带领 10 余人组织赛事。想法拿出来讨论，通常比独自打磨更有效。</p></article>
           </div>
           <div className="offscreen-cta">
-            <p>如果你也在寻找一个能把分析、创意与行动连起来的人。</p>
+            <p>需要一个能读懂数据，也愿意把想法做出来的人？聊聊。</p>
             <a className="resume-orbit magnetic" href="./安颜-简历.pdf" download>
               <span>DOWNLOAD RESUME</span>
               <small>获取简历 · 2026 届</small>
