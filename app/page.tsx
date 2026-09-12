@@ -333,6 +333,7 @@ export default function Home() {
   const heroPortraitRef = useRef<HTMLElement>(null);
   const guideRef = useRef<HTMLButtonElement>(null);
   const guideMotionTimerRef = useRef<number | null>(null);
+  const guideSectionRef = useRef("");
 
   // Site entrance: a brief curtain-lift on first load before the hero settles in.
   useEffect(() => {
@@ -823,7 +824,16 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!activeSection || !introLifted) return;
+    if (!activeSection) return;
+    if (!introLifted) {
+      guideSectionRef.current = activeSection;
+      return;
+    }
+    if (!guideSectionRef.current || guideSectionRef.current === activeSection) {
+      guideSectionRef.current = activeSection;
+      return;
+    }
+    guideSectionRef.current = activeSection;
     const startTimer = window.setTimeout(() => setGuideDropping(true), 0);
     const stopTimer = window.setTimeout(() => setGuideDropping(false), 1780);
     return () => {
