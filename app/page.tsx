@@ -10,25 +10,25 @@ const fitCards = [
     no: "01",
     title: "先把问题问清楚",
     tag: "PRODUCT LOGIC",
-    detail: "模糊需求先拆成四件事：谁在用、什么时候用、需要什么结果、怎么验证。XMind 用来理清这条线。",
+    detail: "面对模糊需求，先明确用户、场景、目标与验证方式，再用 XMind 梳理需求与决策路径。",
   },
   {
     no: "02",
-    title: "先做一个能用的版本",
+    title: "先做可验证的原型",
     tag: "AI × EXPERIENCE",
-    detail: "RAG 知识助手、FocusFlow 和刷题台都从可交互版本开始。Codex 与 Claude Code 加快实现，关键判断和结果仍由人工核对。",
+    detail: "RAG 助手、FocusFlow 和刷题台均从可交互原型开始，使用 Codex 与 Claude Code 加速开发，并通过人工核验保证关键逻辑与结果可靠。",
   },
   {
     no: "03",
     title: "相关不等于因果",
     tag: "CAUSAL INFERENCE",
-    detail: "实验设计课程成绩 A2。分析时先用 SQL 核对口径，再用回归、GLM 或 GAM 检查关系，避免把同时发生误当成因果。",
+    detail: "分析前先用 SQL 统一数据口径，再根据问题选择回归、GLM、GAM 等统计模型，并明确区分相关关系与因果解释。",
   },
   {
     no: "04",
     title: "把分歧说清楚",
     tag: "COMMUNICATION",
-    detail: "辩论队经历练出来的是听、追问和现场总结。项目讨论中先确认分歧，再把下一步和负责人说清楚。",
+    detail: "辩论队经历练出了倾听、追问和现场总结的能力。项目讨论中先定位分歧，再明确下一步行动、责任人与交付标准。",
   },
 ];
 
@@ -173,14 +173,14 @@ const projects = [
   {
     year: "2026",
     title: "FocusFlow",
-    subtitle: "AI 执行功能助手",
+    subtitle: "面向 ADHD 场景的 AI 任务执行助手",
     tags: ["LangGraph", "Streamlit", "SQLite", "LLM"],
     metric: "≤ 3",
     metricLabel: "即时优先项",
-    lead: "把杂乱任务整理成三件以内、可以马上开始的小事。",
+    lead: "将杂乱任务压缩为不超过三项、可立即执行的下一步。",
     star: {
       situation: "任务一多，最难的往往不是完成，而是不知道先做哪一步。",
-      task: "把杂乱输入转成少量、可立即执行的步骤，并支持中断后继续。",
+      task: "将模糊、杂乱的任务输入拆解为少量可执行步骤，并支持中断后的状态恢复。",
       action: "LangGraph 负责 Brain Dump、任务拆解、计时、暂存和恢复；SQLite 保存本地记录，任务时长会按实际用时继续调整。",
       result: "每轮只给 3 个以内的优先项，并记录启动耗时、完成率和恢复成功率，用来判断产品是否真的有用。",
     },
@@ -195,7 +195,7 @@ const projects = [
     tags: ["Vanilla JS", "LocalStorage", "Quiz UX", "GitHub Pages"],
     metric: "727",
     metricLabel: "道题 · 三大模块",
-    lead: "727 道测评题，放进一套随时能练、练完能复盘的流程。",
+    lead: "将 727 道测评题整合为一套可练习、可追踪、可复盘的在线系统。",
     star: {
       situation: "备考校招测评时，727 道题分散在三个模块，练习和复盘需要来回切换。",
       task: "做一套从选题、答题到错题回看的完整刷题流程。",
@@ -231,7 +231,7 @@ const projects = [
     tags: ["PCA", "Random Forest", "LOF", "SVM"],
     metric: "0.85",
     metricLabel: "预警准确度",
-    lead: "从一组复杂的飞行参数里，找出值得持续监测的信号。",
+    lead: "从 100+ 项高频飞行参数中识别关键风险信号。",
     award: "MathorCup 数学建模挑战赛全国二等奖",
     star: {
       situation: "QAR 底层时间序列包含 100+ 项高频飞行参数，数据量大、噪声多，异常信号分散在不同机场与飞行阶段。",
@@ -249,7 +249,7 @@ const projects = [
     tags: ["GM(1,1)", "Regression", "Ridge"],
     metric: "R² .973",
     metricLabel: "岭回归拟合",
-    lead: "把市场、能源和碳排放数据放在一起，看清增长来自哪里。",
+    lead: "结合市场、能源与碳排放数据，识别新能源汽车增长的关键驱动因素。",
     award: "长三角数学建模竞赛二等奖",
     star: {
       situation: "新能源市场、能源消费与碳排放数据来自不同口径，难以直接比较。",
@@ -284,7 +284,7 @@ const projects = [
     tags: ["HC3", "GAM", "Lasso", "BMA"],
     metric: "N 3,808",
     metricLabel: "参与者",
-    lead: "用 3,808 名参与者的数据，检查血糖与 HDL 的临床和遗传关联。",
+    lead: "基于 3,808 名参与者的数据，评估血糖与 HDL 的临床、生活方式及遗传关联。",
     star: {
       situation: "血糖和 HDL 同时受到临床、生活方式与遗传因素影响，变量之间也存在相关性。",
       task: "基于 3,808 名参与者识别稳定关联，并评估 SNP 面板的整体贡献。",
@@ -1249,7 +1249,7 @@ export default function Home() {
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="self-map-copy curtain-observe">
           <p className="section-index mono-label" data-scramble>02 / ME · IDENTITY MAP</p>
-          <h2>这些关键词，<br />拼成现在的<span className="identity-bracket">「</span>
+          <h2>
             <button
               className="identity-trigger magnetic"
               type="button"
@@ -1259,8 +1259,9 @@ export default function Home() {
               onBlur={() => setIdentityOpen(false)}
               onClick={() => setIdentityOpen((current) => !current)}
               aria-label={identityOpen ? "收拢个人关键词" : "炸开个人关键词"}
-            >我</button><span className="identity-bracket">」</span>。
+            >我</button>
             <span className="identity-trigger-guide" aria-hidden="true"><i />悬停看看</span>
+            <br /><span className="identity-title-rest">不止一个标签。</span>
           </h2>
           <div className="education-list" aria-label="教育背景">
             <p>EDUCATION / 受教育经历</p>
@@ -1313,7 +1314,7 @@ export default function Home() {
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="section-heading curtain-observe">
           <p className="section-index">03 / WHY ME &amp; TOOLS</p>
-          <h2>想法先拆清楚，<br />再做出来<em>验证。</em></h2>
+          <h2>先定义问题，<br />再用数据和原型<em>验证。</em></h2>
           <p className="section-note">卡片只保留结论。悬停后，可以看到具体做法。</p>
         </div>
         <div className="fit-grid">
@@ -1363,7 +1364,7 @@ export default function Home() {
           <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
           <div className="warp-stage">
             <WarpText
-              text={"想法先拆清楚，\n再做出来验证。"}
+              text={"先定义问题，\n再用数据和原型验证。"}
               color="#171918"
               warpStrength={0.09}
               warpScale={1.6}
