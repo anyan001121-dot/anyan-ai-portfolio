@@ -1421,7 +1421,12 @@ export default function Home() {
             </article>
           </div>
           <div className="offscreen-cta">
-            <a className="offscreen-mail magnetic" href="mailto:anyan001121@gmail.com">anyan001121@gmail.com ↗</a>
+            <a className="offscreen-mail magnetic" href="mailto:anyan001121@gmail.com" aria-label="发送邮件给安颜">
+              <span>LET&apos;S TALK</span>
+              <strong>发邮件<br />给我</strong>
+              <small>anyan001121@gmail.com</small>
+              <i aria-hidden="true">↗</i>
+            </a>
           </div>
         </div>
       </section>
