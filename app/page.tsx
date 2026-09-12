@@ -227,7 +227,7 @@ const projects = [
   {
     year: "2023",
     title: "QAR 航空安全模型",
-    subtitle: "MathorCup 全国二等奖",
+    subtitle: "高维飞行数据风险识别与预警",
     tags: ["PCA", "Random Forest", "LOF", "SVM"],
     metric: "0.85",
     metricLabel: "预警准确度",
@@ -245,7 +245,7 @@ const projects = [
   {
     year: "2023",
     title: "新能源汽车与双碳",
-    subtitle: "长三角数学建模二等奖",
+    subtitle: "市场增长与双碳目标建模",
     tags: ["GM(1,1)", "Regression", "Ridge"],
     metric: "R² .973",
     metricLabel: "岭回归拟合",
@@ -1159,10 +1159,10 @@ export default function Home() {
               <div className="project-stage-meta">
                 <span>{String(projectGroups[projectGroup].indexOf(openProject) + 1).padStart(2, "0")} / {String(projectGroups[projectGroup].length).padStart(2, "0")}</span>
                 <span>{activeProject.year}</span>
-                <span>{activeProject.subtitle}</span>
                 {activeProjectAward && <strong className="project-award">{activeProjectAward}</strong>}
               </div>
               <h3>{activeProject.title}</h3>
+              <p className="project-stage-subtitle">{activeProject.subtitle}</p>
               <p className="project-stage-lead">{activeProject.lead}</p>
               <div className="project-tags">{activeProject.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
               {(activeProjectLiveUrl || activeProjectUrl) && (
@@ -1344,15 +1344,15 @@ export default function Home() {
           </div>
           <div className="circuit-track">
             {[
-              ["01", "XMind", "拆问题"],
-              ["02", "NotebookLM", "找依据"],
-              ["03", "Codex", "搭原型"],
-              ["04", "Claude Code", "迭代"],
-              ["05", "Skills", "复用流程"],
-              ["06", "Data", "验证结果"],
-            ].map(([no, name, note], index) => (
-              <article className="circuit-node magnetic" key={name} style={{ "--node-index": index } as CSSProperties}>
-                <small>{no}</small>
+              ["01", "DEFINE", "定义问题", "Business question · success metric · constraints"],
+              ["02", "EVIDENCE", "建立证据", "Literature · domain context · data evidence"],
+              ["03", "ANALYZE", "分析建模", "SQL · Python · R · statistical modelling"],
+              ["04", "CROSS-VALIDATE", "交叉验证", "Multiple models · sensitivity analysis · robustness checks"],
+              ["05", "PROTOTYPE", "实现原型", "LLM · RAG · Tool Calling · AI Workflow"],
+              ["06", "EVALUATE", "评估迭代", "Metrics · human review · error analysis · iteration"],
+            ].map(([no, phase, name, note], index) => (
+              <article className="circuit-node magnetic" key={phase} style={{ "--node-index": index } as CSSProperties}>
+                <small>{no} / {phase}</small>
                 <strong>{name}</strong>
                 <span>{note}</span>
               </article>
@@ -1405,7 +1405,19 @@ export default function Home() {
             <article><span>ROCK</span><h3>摇滚</h3><p>喜欢摇滚的直白和张力。Blur 的 Tender 温柔，但不软弱。</p></article>
             <article><span>ART</span><h3>艺术与建筑</h3><p>看建筑，常先注意材质、比例和光线。这些观察也会回到页面设计里。</p></article>
             <article><span>PHOTO</span><h3>摄影</h3><p>这里的照片都由本人拍摄或出镜。旅行时更在意结构、留白，以及人与环境的距离。</p></article>
-            <article><span>ENTP</span><h3>辩论与表达</h3><p>曾任学院辩论队队长，带领 10 余人组织赛事。想法拿出来讨论，通常比独自打磨更有效。</p></article>
+            <article className="interest-debate">
+              <span>ENTP</span>
+              <h3>辩论与表达</h3>
+              <div className="debate-copy">
+                <p>曾任学院辩论队队长，带领 10 余人组织赛事，并担任三辩、四辩及赛事评委。训练出的不只是表达，更是快速识别分歧、追问关键假设、重组证据，并把讨论收束为下一步行动。</p>
+                <ul aria-label="辩论经历形成的能力">
+                  <li>拆解观点</li>
+                  <li>追问假设</li>
+                  <li>归纳证据</li>
+                  <li>推动共识</li>
+                </ul>
+              </div>
+            </article>
           </div>
           <div className="offscreen-cta">
             <a className="offscreen-mail magnetic" href="mailto:anyan001121@gmail.com">anyan001121@gmail.com ↗</a>
