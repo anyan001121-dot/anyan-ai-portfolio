@@ -1366,7 +1366,7 @@ export default function Home() {
           <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
           <div className="warp-stage">
             <WarpText
-              text={"先定义问题，\n再用数据和原型验证。"}
+              text={"想法先拆清楚，\n再做出来验证。"}
               color="#171918"
               warpStrength={0.09}
               warpScale={1.6}
