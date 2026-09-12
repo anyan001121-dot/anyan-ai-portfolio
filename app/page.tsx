@@ -4,6 +4,7 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import WarpText from "./WarpText";
+import LetterSwap3D from "./LetterSwap3D";
 
 const fitCards = [
   {
@@ -1409,14 +1410,19 @@ export default function Home() {
             <article><span>PHOTO</span><h3>摄影</h3><p>这里的照片都由本人拍摄或出镜。旅行时更在意结构、留白，以及人与环境的距离。</p></article>
             <article className="interest-debate">
               <span>ENTP</span>
-              <h3>辩论与表达</h3>
+              <h3>
+                <button className="debate-trigger" type="button" aria-label="播放辩论与表达文字动画">
+                  <LetterSwap3D text="辩论与" origin="center" />
+                  <LetterSwap3D text="表达" origin="last" />
+                </button>
+              </h3>
               <div className="debate-copy">
-                <p>曾任学院辩论队队长，带领 10 余人组织赛事，并担任三辩、四辩及赛事评委。训练出的不只是表达，更是快速识别分歧、追问关键假设、重组证据，并把讨论收束为下一步行动。</p>
+                <p>曾任学院辩论队队长，带领 10 余人团队并组织百人规模赛事。长期的辩论与组织经历，让我习惯拆解复杂问题、检验证据与假设，也能在多人协作中快速识别分歧、推动共识与行动。</p>
                 <ul aria-label="辩论经历形成的能力">
-                  <li>拆解观点</li>
-                  <li>追问假设</li>
-                  <li>归纳证据</li>
-                  <li>推动共识</li>
+                  <li><LetterSwap3D text="拆解复杂问题" stagger={0.022} /></li>
+                  <li><LetterSwap3D text="检验证据与假设" stagger={0.022} origin="last" /></li>
+                  <li><LetterSwap3D text="识别协作分歧" stagger={0.022} /></li>
+                  <li><LetterSwap3D text="推动共识与行动" stagger={0.022} origin="last" /></li>
                 </ul>
               </div>
             </article>
