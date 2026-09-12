@@ -81,12 +81,13 @@ button { color: inherit; font: inherit; }
 .site-guide:active .guide-avatar { transform: translate(var(--guide-look-x),calc(var(--guide-look-y) - 15px)) rotate(calc(var(--guide-look-r) + 2deg)) scale(.94); }
 .site-guide:focus-visible { outline: none; }
 .site-guide:focus-visible .guide-avatar { filter: drop-shadow(0 10px 10px rgba(17,17,17,.14)) drop-shadow(0 0 1px var(--ink)); }
-.site-guide.is-entering { animation: guide-intro-drop 1.44s cubic-bezier(.3,.05,.2,1) .04s both; }
-.site-guide.is-entering .guide-avatar > i { animation: guide-intro-sprite 1.44s steps(1,end) .04s both; }
-.site-guide.is-section-drop .guide-avatar > i { animation: guide-drop-sprite 1.72s steps(1,end) both; }
-.site-guide.is-section-drop { animation: guide-drop 1.72s cubic-bezier(.3,.05,.2,1) both; }
-.site-guide.is-section-drop .guide-path::after { animation: guide-shadow-land 1.72s ease-out both; }
-.site-guide.is-section-drop .guide-eyes { animation: guide-eyes-land 1.72s ease-out both; }
+.site-guide.is-entering { animation: guide-intro-drop 2.45s cubic-bezier(.3,.05,.2,1) .06s both; }
+.site-guide.is-entering .guide-avatar > i { animation: guide-intro-sprite 2.45s steps(1,end) .06s both; }
+.site-guide.is-entering .guide-path { animation: guide-path-intro 2.45s ease-out .06s both; }
+.site-guide.is-section-drop .guide-avatar > i { animation: guide-drop-sprite 2.1s steps(1,end) both; }
+.site-guide.is-section-drop { animation: guide-drop 2.1s cubic-bezier(.3,.05,.2,1) both; }
+.site-guide.is-section-drop .guide-path::after { animation: guide-shadow-land 2.1s ease-out both; }
+.site-guide.is-section-drop .guide-eyes { animation: guide-eyes-land 2.1s ease-out both; }
 .site-guide.is-project-left .guide-eyes,.site-guide.is-project-right .guide-eyes { opacity: 0; }
 .site-guide.is-project-left .guide-avatar,.site-guide.is-project-right .guide-avatar { animation-duration: 1.14s; animation-timing-function: cubic-bezier(.36,.05,.2,1); animation-fill-mode: both; }
 .site-guide.is-project-left .guide-avatar { animation-name: guide-project-left; }
@@ -102,10 +103,10 @@ button { color: inherit; font: inherit; }
   100% { transform: translateX(-50%) translateY(0) rotate(0); }
 }
 @keyframes guide-intro-drop {
-  0%,23% { transform: translateX(-50%) translateY(calc(-100vh + 164px)) rotate(0); }
-  31% { transform: translateX(-50%) translateY(calc(-100vh + 150px)) rotate(-4deg); }
-  68% { transform: translateX(-50%) translateY(10px) rotate(2deg); }
-  80% { transform: translateX(-50%) translateY(-14px) rotate(-1deg); }
+  0%,28% { transform: translateX(-50%) translateY(calc(-100vh + 205px)) rotate(0) scale(1.65); }
+  34% { transform: translateX(-50%) translateY(calc(-100vh + 170px)) rotate(-4deg) scale(1.5); }
+  70% { transform: translateX(-50%) translateY(10px) rotate(2deg) scale(1); }
+  83% { transform: translateX(-50%) translateY(-14px) rotate(-1deg) scale(1); }
   91% { transform: translateX(-50%) translateY(4px) rotate(.5deg); }
   100% { transform: translateX(-50%) translateY(0) rotate(0); }
 }
@@ -124,11 +125,12 @@ button { color: inherit; font: inherit; }
   89%,100% { background-image: url("../public/photos/guide-actions-v2/stand.png"); }
 }
 @keyframes guide-intro-sprite {
-  0%,23% { background-image: url("../public/photos/guide-actions-v2/peek.png"); }
-  24%,69% { background-image: url("../public/photos/guide-actions-v2/jump.png"); }
-  70%,88% { background-image: url("../public/photos/guide-actions-v2/land.png"); }
-  89%,100% { background-image: url("../public/photos/guide-actions-v2/stand.png"); }
+  0%,28% { background-image: url("../public/photos/guide-actions-v2/peek.png"); }
+  29%,69% { background-image: url("../public/photos/guide-actions-v2/jump.png"); }
+  70%,90% { background-image: url("../public/photos/guide-actions-v2/land.png"); }
+  91%,100% { background-image: url("../public/photos/guide-actions-v2/stand.png"); }
 }
+@keyframes guide-path-intro { 0%,66% { opacity: 0; } 78%,100% { opacity: 1; } }
 @keyframes guide-eyes-land { 0%,84% { opacity: 0; } 100% { opacity: 1; } }
 @keyframes guide-shadow-land { 0%,58% { opacity: 0; transform: translateX(-50%) scale(.25); } 76% { opacity: .22; transform: translateX(-50%) scale(1.18); } 100% { opacity: .15; transform: translateX(-50%) scale(1); } }
 @keyframes guide-step-dot { 0%,16% { left: 0; opacity: .2; } 48% { opacity: 1; } 84%,100% { left: calc(100% - 4px); opacity: .2; } }

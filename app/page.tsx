@@ -2,7 +2,7 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import WarpText from "./WarpText";
 
 const fitCards = [
@@ -334,6 +334,32 @@ export default function Home() {
   const guideRef = useRef<HTMLButtonElement>(null);
   const guideMotionTimerRef = useRef<number | null>(null);
   const guideSectionRef = useRef("");
+  const guideAudioRef = useRef<AudioContext | null>(null);
+  const guideAudioUnlockedRef = useRef(false);
+
+  const playGuideSfx = useCallback((kind: "hop" | "land") => {
+    if (!guideAudioUnlockedRef.current || typeof window.AudioContext === "undefined") return;
+    const context = guideAudioRef.current ?? new window.AudioContext();
+    guideAudioRef.current = context;
+    if (context.state === "suspended") void context.resume();
+
+    const startedAt = context.currentTime + 0.01;
+    const notes = kind === "land" ? [523.25, 659.25, 783.99] : [659.25, 880];
+    notes.forEach((frequency, index) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const noteStart = startedAt + index * 0.055;
+      oscillator.type = index === notes.length - 1 ? "sine" : "triangle";
+      oscillator.frequency.setValueAtTime(frequency, noteStart);
+      oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.045, noteStart + 0.12);
+      gain.gain.setValueAtTime(0.0001, noteStart);
+      gain.gain.exponentialRampToValueAtTime(kind === "land" ? 0.028 : 0.022, noteStart + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.2);
+      oscillator.connect(gain).connect(context.destination);
+      oscillator.start(noteStart);
+      oscillator.stop(noteStart + 0.22);
+    });
+  }, []);
 
   // Site entrance: a brief curtain-lift on first load before the hero settles in.
   useEffect(() => {
@@ -341,8 +367,33 @@ export default function Home() {
       const frame = window.requestAnimationFrame(() => setIntroLifted(true));
       return () => window.cancelAnimationFrame(frame);
     }
-    const timer = window.setTimeout(() => setIntroLifted(true), 1550);
-    return () => window.clearTimeout(timer);
+    const soundTimer = window.setTimeout(() => playGuideSfx("land"), 1810);
+    const timer = window.setTimeout(() => setIntroLifted(true), 2650);
+    return () => {
+      window.clearTimeout(soundTimer);
+      window.clearTimeout(timer);
+    };
+  }, [playGuideSfx]);
+
+  useEffect(() => {
+    const unlockGuideAudio = () => {
+      guideAudioUnlockedRef.current = true;
+      if (typeof window.AudioContext !== "undefined") {
+        const context = guideAudioRef.current ?? new window.AudioContext();
+        guideAudioRef.current = context;
+        if (context.state === "suspended") void context.resume();
+      }
+      window.removeEventListener("pointerdown", unlockGuideAudio);
+      window.removeEventListener("keydown", unlockGuideAudio);
+    };
+    window.addEventListener("pointerdown", unlockGuideAudio, { passive: true });
+    window.addEventListener("keydown", unlockGuideAudio);
+    return () => {
+      window.removeEventListener("pointerdown", unlockGuideAudio);
+      window.removeEventListener("keydown", unlockGuideAudio);
+      if (guideAudioRef.current) void guideAudioRef.current.close();
+      guideAudioRef.current = null;
+    };
   }, []);
 
   useEffect(() => {
@@ -835,12 +886,14 @@ export default function Home() {
     }
     guideSectionRef.current = activeSection;
     const startTimer = window.setTimeout(() => setGuideDropping(true), 0);
-    const stopTimer = window.setTimeout(() => setGuideDropping(false), 1780);
+    const soundTimer = window.setTimeout(() => playGuideSfx("land"), 1450);
+    const stopTimer = window.setTimeout(() => setGuideDropping(false), 2260);
     return () => {
       window.clearTimeout(startTimer);
+      window.clearTimeout(soundTimer);
       window.clearTimeout(stopTimer);
     };
-  }, [activeSection, introLifted]);
+  }, [activeSection, introLifted, playGuideSfx]);
 
   useEffect(() => {
     const followPointer = (event: PointerEvent) => {
@@ -949,7 +1002,10 @@ export default function Home() {
   const guideIndex = Math.max(0, guideSections.findIndex((section) => section.id === activeSection));
   const currentGuide = guideSections[guideIndex];
   const nextGuide = guideSections[(guideIndex + 1) % guideSections.length];
-  const advanceGuide = () => document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const advanceGuide = () => {
+    playGuideSfx("hop");
+    document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
@@ -964,6 +1020,7 @@ export default function Home() {
         data-section={currentGuide.id}
         type="button"
         onClick={advanceGuide}
+        onPointerEnter={() => playGuideSfx("hop")}
         aria-label={`当前位于${currentGuide.name}，点击前往${nextGuide.name}`}
       >
         <span className="guide-path" aria-hidden="true"><i style={{ "--guide-step": guideIndex } as CSSProperties} /></span>
