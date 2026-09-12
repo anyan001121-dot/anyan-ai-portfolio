@@ -437,7 +437,7 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 @keyframes circuit-run { 0% { left: 4%; opacity: 0; } 8%,92% { opacity: 1; } 100% { left: 95%; opacity: 0; } }
 
 .warp-showcase { position: relative; z-index: 2; margin-top: 70px; }
-.warp-stage { margin-top: 20px; padding: 8px; border-radius: 20px; background: #0e1013; box-shadow: 0 30px 64px rgba(0,0,0,.3); overflow: hidden; }
+.warp-stage { margin-top: 20px; padding: 8px; border: 1px solid rgba(24,20,15,.09); border-radius: 20px; background: rgba(247,246,242,.82); box-shadow: 0 24px 58px rgba(35,39,38,.12); overflow: hidden; }
 .warp-caption { margin: 14px 0 0; color: rgba(24,20,15,.5); font-size: 11px; }
 
 .tools { min-height: 900px; display: grid; grid-template-columns: minmax(280px,.8fr) 1.2fr; gap: 8vw; background: var(--paper-3); color: var(--ink); }

@@ -337,14 +337,14 @@ export default function Home() {
   const guideAudioRef = useRef<AudioContext | null>(null);
   const guideAudioUnlockedRef = useRef(false);
 
-  const playGuideSfx = useCallback((kind: "hop" | "land") => {
+  const playEntranceSfx = useCallback(() => {
     if (!guideAudioUnlockedRef.current || typeof window.AudioContext === "undefined") return;
     const context = guideAudioRef.current ?? new window.AudioContext();
     guideAudioRef.current = context;
     if (context.state === "suspended") void context.resume();
 
     const startedAt = context.currentTime + 0.01;
-    const notes = kind === "land" ? [523.25, 659.25, 783.99] : [659.25, 880];
+    const notes = [523.25, 659.25, 783.99];
     notes.forEach((frequency, index) => {
       const oscillator = context.createOscillator();
       const gain = context.createGain();
@@ -353,7 +353,7 @@ export default function Home() {
       oscillator.frequency.setValueAtTime(frequency, noteStart);
       oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.045, noteStart + 0.12);
       gain.gain.setValueAtTime(0.0001, noteStart);
-      gain.gain.exponentialRampToValueAtTime(kind === "land" ? 0.028 : 0.022, noteStart + 0.018);
+      gain.gain.exponentialRampToValueAtTime(0.028, noteStart + 0.018);
       gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.2);
       oscillator.connect(gain).connect(context.destination);
       oscillator.start(noteStart);
@@ -367,13 +367,13 @@ export default function Home() {
       const frame = window.requestAnimationFrame(() => setIntroLifted(true));
       return () => window.cancelAnimationFrame(frame);
     }
-    const soundTimer = window.setTimeout(() => playGuideSfx("land"), 1810);
+    const soundTimer = window.setTimeout(playEntranceSfx, 1810);
     const timer = window.setTimeout(() => setIntroLifted(true), 2650);
     return () => {
       window.clearTimeout(soundTimer);
       window.clearTimeout(timer);
     };
-  }, [playGuideSfx]);
+  }, [playEntranceSfx]);
 
   useEffect(() => {
     const unlockGuideAudio = () => {
@@ -886,14 +886,12 @@ export default function Home() {
     }
     guideSectionRef.current = activeSection;
     const startTimer = window.setTimeout(() => setGuideDropping(true), 0);
-    const soundTimer = window.setTimeout(() => playGuideSfx("land"), 1450);
     const stopTimer = window.setTimeout(() => setGuideDropping(false), 2260);
     return () => {
       window.clearTimeout(startTimer);
-      window.clearTimeout(soundTimer);
       window.clearTimeout(stopTimer);
     };
-  }, [activeSection, introLifted, playGuideSfx]);
+  }, [activeSection, introLifted]);
 
   useEffect(() => {
     const followPointer = (event: PointerEvent) => {
@@ -1003,7 +1001,6 @@ export default function Home() {
   const currentGuide = guideSections[guideIndex];
   const nextGuide = guideSections[(guideIndex + 1) % guideSections.length];
   const advanceGuide = () => {
-    playGuideSfx("hop");
     document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
@@ -1020,7 +1017,6 @@ export default function Home() {
         data-section={currentGuide.id}
         type="button"
         onClick={advanceGuide}
-        onPointerEnter={() => playGuideSfx("hop")}
         aria-label={`当前位于${currentGuide.name}，点击前往${nextGuide.name}`}
       >
         <span className="guide-path" aria-hidden="true"><i style={{ "--guide-step": guideIndex } as CSSProperties} /></span>
@@ -1367,8 +1363,8 @@ export default function Home() {
           <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
           <div className="warp-stage">
             <WarpText
-              text="问题 / 证据 / 原型"
-              color="#f4f4f2"
+              text={"想法先拆清楚，\n再做出来验证。"}
+              color="#171918"
               warpStrength={0.09}
               warpScale={1.6}
               speed={0.5}
