@@ -605,7 +605,7 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 .interest-list article:hover p,.interest-list article:focus-within p { visibility: visible; opacity: 1; transform: translateX(0); transition-delay: 0s; }
 .interest-list article:focus-within { background: color-mix(in srgb,var(--paper-2) 62%,transparent); }
 .interest-list .interest-debate { grid-template-columns: 60px minmax(190px,.55fr) minmax(360px,1.45fr); align-items: start; margin-top: 10px; padding: 30px 24px 32px 0; background: transparent; }
-.interest-list .interest-debate h3 { font-size: clamp(29px,3.3vw,46px); line-height: 1.02; }
+.interest-list .interest-debate h3 { font-size: 23px; line-height: 1.02; }
 .interest-list .interest-debate .debate-copy { max-width: 650px; visibility: hidden; opacity: 0; transform: translateX(14px); transition: opacity .28s,transform .32s,visibility 0s linear .32s; }
 .interest-list .interest-debate:hover .debate-copy,.interest-list .interest-debate:focus-within .debate-copy { visibility: visible; opacity: 1; transform: translateX(0); transition-delay: 0s; }
 .interest-list .interest-debate p { visibility: inherit; margin: 0; font-size: 14px; line-height: 1.8; opacity: 1; transform: none; }
@@ -747,7 +747,7 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
   .offscreen-body { grid-template-columns: 1fr; gap: 44px; padding: 32px 22px 0; }
   .interest-list p { visibility: visible; opacity: 1; transform: none; grid-column: 2 / 4; }
   .interest-list .interest-debate { grid-template-columns: 56px 1fr; padding: 26px 18px 28px 0; }
-  .interest-list .interest-debate h3 { font-size: 30px; }
+  .interest-list .interest-debate h3 { font-size: 23px; }
   .interest-list .interest-debate .debate-copy { grid-column: 2 / 3; }
   .offscreen-cta { place-items: start center; }
   .offscreen-mail { width: min(82vw,320px); }
