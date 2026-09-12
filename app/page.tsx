@@ -8,27 +8,27 @@ import WarpText from "./WarpText";
 const fitCards = [
   {
     no: "01",
-    title: "先把问题问清楚",
-    tag: "PRODUCT LOGIC",
-    detail: "面对模糊需求，先明确用户、场景、目标与验证方式，再用 XMind 梳理需求与决策路径。",
+    title: "从业务问题到数据问题",
+    tag: "PRODUCT × ANALYTICS",
+    detail: "从业务目标出发拆解用户、场景与核心指标，将模糊需求转化为可量化、可验证的数据问题，并明确分析口径与成功标准。",
   },
   {
     no: "02",
-    title: "先做可验证的原型",
-    tag: "AI × EXPERIENCE",
-    detail: "RAG 助手、FocusFlow 和刷题台均从可交互原型开始，使用 Codex 与 Claude Code 加速开发，并通过人工核验保证关键逻辑与结果可靠。",
+    title: "让数据口径先对齐",
+    tag: "SQL × DATA ANALYSIS",
+    detail: "使用 SQL 完成多表关联、聚合、窗口计算与指标构建，结合 Python / R 进行数据清洗、EDA 与异常归因，为后续分析建立一致、可复现的数据基础。",
   },
   {
     no: "03",
-    title: "相关不等于因果",
-    tag: "CAUSAL INFERENCE",
-    detail: "分析前先用 SQL 统一数据口径，再根据问题选择回归、GLM、GAM 等统计模型，并明确区分相关关系与因果解释。",
+    title: "用实验回答“有没有用”",
+    tag: "A/B TESTING",
+    detail: "从业务目标定义核心指标与护栏指标，通过 A/B Test、假设检验与置信区间评估策略效果，同时关注效应量、统计显著性与实际业务价值。",
   },
   {
     no: "04",
-    title: "把分歧说清楚",
-    tag: "COMMUNICATION",
-    detail: "辩论队经历练出了倾听、追问和现场总结的能力。项目讨论中先定位分歧，再明确下一步行动、责任人与交付标准。",
+    title: "相关不等于因果",
+    tag: "CAUSAL INFERENCE",
+    detail: "识别并合理控制关键混杂因素，根据研究设计选择回归调整、匹配等因果推断方法，并通过敏感性分析与稳健性检验验证结论。",
   },
 ];
 
@@ -361,7 +361,7 @@ export default function Home() {
     });
   }, []);
 
-  // Site entrance: a brief curtain-lift on first load before the hero settles in.
+  // Site entrance: a soft focus dissolve on first load before the hero settles in.
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       const frame = window.requestAnimationFrame(() => setIntroLifted(true));
@@ -1339,26 +1339,28 @@ export default function Home() {
         </div>
         <div className="tool-circuit" aria-label="AI 工作流">
           <div className="circuit-heading">
-            <span className="mono-label" data-scramble>[ AI WORKFLOW / LIVE ]</span>
-            <p>先理清问题，再找依据、搭原型、看结果。工具服务于这条路径。</p>
+            <span className="mono-label" data-scramble>EVIDENCE-DRIVEN AI WORKFLOW</span>
+            <p>从问题定义到结果交付，将数据分析、跨方法验证与 AI 开发串成完整闭环；关键结论不依赖单一模型，而通过独立方法与结果复核提高可靠性。</p>
           </div>
           <div className="circuit-track">
             {[
-              ["01", "DEFINE", "定义问题", "Business question · success metric · constraints"],
-              ["02", "EVIDENCE", "建立证据", "Literature · domain context · data evidence"],
-              ["03", "ANALYZE", "分析建模", "SQL · Python · R · statistical modelling"],
-              ["04", "CROSS-VALIDATE", "交叉验证", "Multiple models · sensitivity analysis · robustness checks"],
-              ["05", "PROTOTYPE", "实现原型", "LLM · RAG · Tool Calling · AI Workflow"],
-              ["06", "EVALUATE", "评估迭代", "Metrics · human review · error analysis · iteration"],
-            ].map(([no, phase, name, note], index) => (
-              <article className="circuit-node magnetic" key={phase} style={{ "--node-index": index } as CSSProperties}>
+              ["01", "DEFINE", "问题定义", "Business Goal · Metrics · XMind", "将业务需求转化为明确的问题、指标、约束条件与验证标准。"],
+              ["02", "QUERY", "数据构建", "SQL · Data Cleaning · Feature Engineering", "完成数据提取、多表关联、指标构建、数据清洗与分析样本准备。"],
+              ["03", "ANALYZE", "统计分析", "R · Python · Regression · ML", "根据问题选择合适的统计或机器学习方法，从探索性分析、统计推断到预测建模形成分析结果。"],
+              ["04", "VALIDATE", "交叉验证", "A/B Test · Robustness · Sensitivity", "通过实验结果、不同统计与机器学习方法、敏感性分析及独立证据复核关键结论，避免单一模型或单一假设主导最终判断。"],
+              ["05", "BUILD", "AI 实现", "LLM · RAG · Tool Calling · Workflow", "将经过验证的分析逻辑和业务规则转化为可交互的 AI Workflow 或产品原型，并通过模块化工具调用完成实际任务。"],
+              ["06", "EVALUATE", "评估迭代", "Metrics · Error Analysis · Human Review", "结合量化指标、错误分析、人工核验与实际使用反馈定位问题，并将评估结果反馈到前序步骤持续迭代。"],
+            ].map(([no, phase, name, keywords, note], index) => (
+              <article className={`circuit-node magnetic${phase === "VALIDATE" ? " is-validation" : ""}`} key={phase} style={{ "--node-index": index } as CSSProperties}>
                 <small>{no} / {phase}</small>
                 <strong>{name}</strong>
-                <span>{note}</span>
+                <span>{keywords}</span>
+                <p>{note}</p>
               </article>
             ))}
             <span className="circuit-pulse" aria-hidden="true" />
           </div>
+          <p className="method-annotation">Evidence before generation. <span>Validation before conclusion.</span> Evaluation after deployment. <b>↺ Return to DEFINE</b></p>
         </div>
         <div className="warp-showcase">
           <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
