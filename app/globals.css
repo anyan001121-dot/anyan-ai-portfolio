@@ -606,28 +606,29 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 .interest-list article > span { font: 700 9px/1 var(--type); color: var(--accent); }
 .interest-list h3 { margin: 0; font-family: var(--display); font-size: 23px; letter-spacing: -.01em; font-weight: 700; }
 .interest-list p { margin: 0; visibility: hidden; font-size: 12px; line-height: 1.65; color: rgba(24,20,15,.72); opacity: 0; transform: translateX(12px); transition: opacity .25s,transform .25s,visibility 0s linear .25s; }
-.interest-list article:hover p,.interest-list article:focus-visible p { visibility: visible; opacity: 1; transform: translateX(0); transition-delay: 0s; }
-.interest-list article:focus-visible { outline: none; background: color-mix(in srgb,var(--paper-2) 62%,transparent); }
+.interest-list article:hover p,.interest-list article:focus-within p { visibility: visible; opacity: 1; transform: translateX(0); transition-delay: 0s; }
+.interest-list article:focus-within { background: color-mix(in srgb,var(--paper-2) 62%,transparent); }
 .interest-list .interest-debate { grid-template-columns: 60px minmax(190px,.55fr) minmax(360px,1.45fr); align-items: start; margin-top: 10px; padding: 30px 24px 32px 0; background: color-mix(in srgb,var(--paper-2) 72%,transparent); }
 .interest-list .interest-debate h3 { font-size: clamp(29px,3.3vw,46px); line-height: 1.02; }
-.interest-list .interest-debate .debate-copy { max-width: 650px; }
-.interest-list .interest-debate p { visibility: visible; margin: 0; font-size: 14px; line-height: 1.8; opacity: 1; transform: none; }
-.debate-trigger { display: grid; justify-items: start; gap: .06em; margin: 0; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
+.interest-list .interest-debate .debate-copy { max-width: 650px; visibility: hidden; opacity: 0; transform: translateX(14px); transition: opacity .28s,transform .32s,visibility 0s linear .32s; }
+.interest-list .interest-debate:hover .debate-copy,.interest-list .interest-debate:focus-within .debate-copy { visibility: visible; opacity: 1; transform: translateX(0); transition-delay: 0s; }
+.interest-list .interest-debate p { visibility: inherit; margin: 0; font-size: 14px; line-height: 1.8; opacity: 1; transform: none; }
+.interest-title-trigger { display: grid; justify-items: start; gap: .06em; margin: 0; padding: 0; border: 0; background: transparent; text-align: left; cursor: pointer; }
 .letter-swap-3d { display: inline-flex; align-items: baseline; perspective: 700px; }
 .letter-swap-3d-char { position: relative; display: inline-block; height: 1em; line-height: 1; perspective: 380px; }
 .letter-swap-3d-inner { position: relative; display: block; height: 1em; transform-style: preserve-3d; transform: rotateX(0deg); transition: transform .62s cubic-bezier(.2,.72,.2,1); transition-delay: var(--letter-delay); }
 .letter-swap-3d-face { display: block; height: 1em; line-height: 1; backface-visibility: hidden; -webkit-backface-visibility: hidden; }
 .letter-swap-3d-front { transform: translateZ(.42em); }
 .letter-swap-3d-back { position: absolute; inset: 0; color: var(--accent); transform: rotateX(-90deg) translateZ(.42em); }
-.interest-debate:hover .letter-swap-3d-inner,.interest-debate:focus-within .letter-swap-3d-inner { transform: rotateX(90deg); }
-.debate-trigger:focus-visible { outline: 1px solid color-mix(in srgb,var(--accent) 50%,transparent); outline-offset: 8px; }
+.interest-list article:hover .letter-swap-3d-inner,.interest-list article:focus-within .letter-swap-3d-inner { transform: rotateX(90deg); }
+.interest-title-trigger:focus-visible { outline: 1px solid color-mix(in srgb,var(--accent) 50%,transparent); outline-offset: 8px; }
 .debate-copy ul { display: flex; flex-wrap: wrap; gap: 7px; margin: 18px 0 0; padding: 0; list-style: none; }
 .debate-copy li { padding: 8px 11px; border: 1px solid rgba(24,20,15,.16); border-radius: 99px; color: rgba(24,20,15,.74); font: 650 9px/1 var(--sans); letter-spacing: .04em; transition: border-color .3s,background .3s; }
 .interest-debate:hover .debate-copy li,.interest-debate:focus-within .debate-copy li { border-color: color-mix(in srgb,var(--accent) 38%,transparent); background: color-mix(in srgb,var(--accent) 5%,transparent); }
 
 @media (prefers-reduced-motion: reduce) {
   .letter-swap-3d-inner { transition: none; }
-  .interest-debate:hover .letter-swap-3d-inner,.interest-debate:focus-within .letter-swap-3d-inner { transform: none; }
+  .interest-list article:hover .letter-swap-3d-inner,.interest-list article:focus-within .letter-swap-3d-inner { transform: none; }
 }
 
 .offscreen-cta { margin-top: 56px; display: flex; justify-content: flex-end; }

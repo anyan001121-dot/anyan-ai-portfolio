@@ -1405,13 +1405,30 @@ export default function Home() {
         </div>
         <div className="offscreen-body">
           <div className="interest-list">
-            <article><span>ROCK</span><h3>摇滚</h3><p>喜欢摇滚的直白和张力。Blur 的 Tender 温柔，但不软弱。</p></article>
-            <article><span>ART</span><h3>艺术与建筑</h3><p>看建筑，常先注意材质、比例和光线。这些观察也会回到页面设计里。</p></article>
-            <article><span>PHOTO</span><h3>摄影</h3><p>这里的照片都由本人拍摄或出镜。旅行时更在意结构、留白，以及人与环境的距离。</p></article>
+            <article>
+              <span>ROCK</span>
+              <h3><button className="interest-title-trigger" type="button" aria-label="显示摇滚相关内容"><LetterSwap3D text="摇滚" origin="center" /></button></h3>
+              <p>喜欢摇滚的直白和张力。Blur 的 Tender 温柔，但不软弱。</p>
+            </article>
+            <article>
+              <span>ART</span>
+              <h3>
+                <button className="interest-title-trigger" type="button" aria-label="显示艺术与建筑相关内容">
+                  <LetterSwap3D text="艺术与" origin="center" />
+                  <LetterSwap3D text="建筑" origin="last" />
+                </button>
+              </h3>
+              <p>看建筑，常先注意材质、比例和光线。这些观察也会回到页面设计里。</p>
+            </article>
+            <article>
+              <span>PHOTO</span>
+              <h3><button className="interest-title-trigger" type="button" aria-label="显示摄影相关内容"><LetterSwap3D text="摄影" origin="center" /></button></h3>
+              <p>这里的照片都由本人拍摄或出镜。旅行时更在意结构、留白，以及人与环境的距离。</p>
+            </article>
             <article className="interest-debate">
               <span>ENTP</span>
               <h3>
-                <button className="debate-trigger" type="button" aria-label="播放辩论与表达文字动画">
+                <button className="interest-title-trigger debate-trigger" type="button" aria-label="显示辩论与表达相关内容">
                   <LetterSwap3D text="辩论与" origin="center" />
                   <LetterSwap3D text="表达" origin="last" />
                 </button>
