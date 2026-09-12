@@ -3,7 +3,6 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
-import WarpText from "./WarpText";
 import LetterSwap3D from "./LetterSwap3D";
 
 const fitCards = [
@@ -1363,29 +1362,6 @@ export default function Home() {
           </div>
           <p className="method-annotation">Evidence before generation. <span>Validation before conclusion.</span> Evaluation after deployment. <b>↺ Return to DEFINE</b></p>
         </div>
-        <div className="warp-showcase">
-          <span className="mono-label" data-scramble>[ WEBGL / INTERACTIVE ]</span>
-          <div className="warp-stage">
-            <WarpText
-              text={"想法先拆清楚，\n再做出来验证。"}
-              color="#171918"
-              warpStrength={0.09}
-              warpScale={1.6}
-              speed={0.5}
-              pointerInfluence={0.4}
-              pointerStrength={0.4}
-              refraction={0.02}
-              ripple
-              fontSize="clamp(2.2rem, 6.4vw, 5.6rem)"
-              fontWeight={700}
-              fontFamily='"Helvetica Neue", Helvetica, "PingFang SC", "Noto Sans CJK SC", Arial, sans-serif'
-              letterSpacing="-0.04em"
-              lineHeight={1}
-              style={{ height: "260px" }}
-            />
-          </div>
-          <p className="warp-caption">鼠标移到文字上，看看它怎么变形。这是一个 WebGL 小实验。</p>
-        </div>
       </section>
 
       <section className="offscreen section interactive-section" id="about">
@@ -1418,12 +1394,12 @@ export default function Home() {
                   <LetterSwap3D text="建筑" origin="last" />
                 </button>
               </h3>
-              <p>看建筑，常先注意材质、比例和光线。这些观察也会回到页面设计里。</p>
+              <p>喜欢高迪建筑里自由的曲线、色彩与想象力，也喜欢高更画作中大胆而直接的色彩表达。比起追随某一种风格，我更喜欢观察不同创作者如何用自己的方式理解和表达世界。</p>
             </article>
             <article>
               <span>PHOTO</span>
               <h3><button className="interest-title-trigger" type="button" aria-label="显示摄影相关内容"><LetterSwap3D text="摄影" origin="center" /></button></h3>
-              <p>这里的照片都由本人拍摄或出镜。旅行时更在意结构、留白，以及人与环境的距离。</p>
+              <p>摄影像是我观察世界的另一双眼睛。旅行时，我喜欢记录偶然出现的光线、人与环境的关系，以及那些很容易被忽略的瞬间。</p>
             </article>
             <article className="interest-debate">
               <span>ENTP</span>

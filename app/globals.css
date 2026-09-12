@@ -442,10 +442,6 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 .method-annotation span { margin: 0 10px; color: rgba(24,20,15,.64); }
 .method-annotation b { margin-left: 14px; color: var(--accent); font-weight: 700; }
 
-.warp-showcase { position: relative; z-index: 2; margin-top: 70px; }
-.warp-stage { margin-top: 20px; padding: 8px; border: 1px solid rgba(24,20,15,.09); border-radius: 20px; background: rgba(247,246,242,.82); box-shadow: 0 24px 58px rgba(35,39,38,.12); overflow: hidden; }
-.warp-caption { margin: 14px 0 0; color: rgba(24,20,15,.5); font-size: 11px; }
-
 .tools { min-height: 900px; display: grid; grid-template-columns: minmax(280px,.8fr) 1.2fr; gap: 8vw; background: var(--paper-3); color: var(--ink); }
 .tools-intro { position: relative; z-index: 2; align-self: start; }
 .tools-intro p:last-child { max-width: 440px; font-size: 15px; line-height: 1.9; color: rgba(24,20,15,.72); }
