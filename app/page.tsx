@@ -1070,9 +1070,9 @@ export default function Home() {
               ))}
             </span>
           </h1>
-          <p className="hero-statement">把问题想清楚，把东西做出来。</p>
+          <p className="hero-statement">从数据中寻找答案</p>
           <p className="hero-role">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</p>
-          <p className="intro">从统计与因果推断出发，用 SQL 核对证据，再把结论做成可以验证的 AI 原型。</p>
+          <p className="intro">用统计理解问题，用数据验证判断</p>
           <div className="hero-actions">
             <a className="primary-cta magnetic" href="#work">查看作品 <span>↘</span></a>
             <a className="text-link magnetic" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
