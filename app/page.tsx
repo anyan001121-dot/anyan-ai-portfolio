@@ -32,6 +32,37 @@ const fitCards = [
   },
 ];
 
+const gameLenses = [
+  {
+    no: "01",
+    label: "TIME & BOND",
+    title: "时间与陪伴感",
+    games: "P5R · 轨迹系列",
+    detail: "关注日历、角色关系与持续变化的世界如何制造机会成本，让玩家产生真正“生活过一段时间”的感受。",
+  },
+  {
+    no: "02",
+    label: "NARRATIVE",
+    title: "互动如何参与叙事",
+    games: "Ever17 · 逆转裁判 · 428",
+    detail: "观察玩家身份、叙事视角、信息差与行动选择如何改变理解过程，而不只是把故事搬进可操作的界面。",
+  },
+  {
+    no: "03",
+    label: "SYSTEM LOOP",
+    title: "系统如何生成故事",
+    games: "模拟人生 · 开罗游戏 · 模拟经营",
+    detail: "拆解资源投入、成长、解锁与再投入的循环，也关注职业、关系、需求和随机事件共同形成的涌现叙事。",
+  },
+  {
+    no: "04",
+    label: "PLAYER BEHAVIOR",
+    title: "玩家为什么继续下一步",
+    games: "MOBA · 自走棋 · 女性向",
+    detail: "从信息缺口、阵容与经济、版本变化、角色投入、活动和卡池机制理解留存、付费与风险收益选择。",
+  },
+];
+
 type IdentityWord = {
   label: string;
   x: number;
@@ -59,6 +90,12 @@ const identitySeedWords: IdentityWord[] = [
   { label: "摇滚", x: 23, y: 63, dx: -300, dy: 245, rotate: -9, accent: true },
   { label: "数据挖掘", x: 44, y: 62, dx: -125, dy: 275, rotate: 6, accent: true },
   { label: "单机游戏", x: 65, y: 65, dx: 248, dy: 255, rotate: 10 },
+  { label: "玩家研究", x: 72, y: 67, dx: 312, dy: 275, rotate: -8, accent: true },
+  { label: "叙事设计", x: 20, y: 79, dx: -372, dy: 352, rotate: 8 },
+  { label: "用户行为", x: 33, y: 69, dx: -264, dy: 308, rotate: -5, accent: true },
+  { label: "JRPG", x: 79, y: 51, dx: 390, dy: 138, rotate: 9 },
+  { label: "AVG", x: 18, y: 57, dx: -398, dy: 188, rotate: -10 },
+  { label: "模拟经营", x: 58, y: 86, dx: 118, dy: 414, rotate: 5 },
   { label: "摄影", x: 38, y: 74, dx: -238, dy: 345, rotate: -6 },
   { label: "RAG", x: 56, y: 75, dx: 105, dy: 342, rotate: 7 },
   { label: "LangChain", x: 45, y: 85, dx: -30, dy: 420, rotate: -3 },
@@ -306,6 +343,7 @@ const projectGroups: Record<ProjectGroup, number[]> = {
 const guideSections = [
   { id: "top", name: "首页" },
   { id: "work", name: "项目" },
+  { id: "games", name: "游戏理解" },
   { id: "self", name: "个人关键词" },
   { id: "fit", name: "方法与工具" },
   { id: "about", name: "屏幕之外" },
@@ -854,7 +892,7 @@ export default function Home() {
       const available = document.documentElement.scrollHeight - window.innerHeight;
       setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
     };
-    const sections = ["top", "work", "self", "fit", "about"]
+    const sections = ["top", "work", "games", "self", "fit", "about"]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     const sectionObserver = new IntersectionObserver(
@@ -1030,6 +1068,7 @@ export default function Home() {
         <nav aria-label="页面导航">
           <a className={(activeSection === "top" ? "active " : "") + "magnetic"} href="#top" data-scramble>ME</a>
           <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>WORK</a>
+          <a className={(activeSection === "games" ? "active " : "") + "magnetic"} href="#games" data-scramble>PLAY</a>
           <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>WHY / TOOLS</a>
           <a className={(activeSection === "about" ? "active " : "") + "magnetic"} href="#about" data-scramble>OFF SCREEN</a>
         </nav>
@@ -1245,10 +1284,46 @@ export default function Home() {
         </div>
       </section>
 
+      <section className="game-profile section interactive-section" id="games">
+        <span className="section-pointer-glow" aria-hidden="true" />
+        <div className="game-profile-heading curtain-observe">
+          <p className="section-index mono-label" data-scramble>02 / PLAY · RESEARCH LENS</p>
+          <h2>玩得广，<br />也追问<em>为什么。</em></h2>
+          <p>长期游玩 PC、主机、掌机与移动端作品。比起罗列通关数量，更关注叙事如何利用交互媒介、系统如何推动下一步，以及玩家为什么愿意留下。</p>
+        </div>
+
+        <div className="game-profile-grid">
+          <aside className="game-spectrum" aria-label="主要游戏品类">
+            <span>PLAYED ACROSS</span>
+            <strong>04</strong>
+            <p>PC / CONSOLE<br />HANDHELD / MOBILE</p>
+            <div className="game-genre-cloud">
+              {["JRPG / RPG", "AVG / ADV", "SIMULATION", "SRPG", "OPEN WORLD", "MOBA", "AUTO CHESS", "OTOME"].map((genre) => <i key={genre}>{genre}</i>)}
+            </div>
+          </aside>
+
+          <div className="game-lens-list">
+            {gameLenses.map((lens) => (
+              <button className="game-lens magnetic" type="button" key={lens.no}>
+                <span>{lens.no}</span>
+                <div>
+                  <small>{lens.label}</small>
+                  <h3>{lens.title}</h3>
+                </div>
+                <p>{lens.detail}</p>
+                <strong>{lens.games}</strong>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <p className="game-profile-note">关注的不只是“玩家喜欢什么”，也包括喜欢从何而来，以及体验能否被观察、衡量与验证。</p>
+      </section>
+
       <section className="self-map section interactive-section" id="self">
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="self-map-copy curtain-observe">
-          <p className="section-index mono-label" data-scramble>02 / ME · IDENTITY MAP</p>
+          <p className="section-index mono-label" data-scramble>03 / ME · IDENTITY MAP</p>
           <h2>
             <button
               className="identity-trigger magnetic"
@@ -1313,7 +1388,7 @@ export default function Home() {
       <section className="fit section interactive-section" id="fit">
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="section-heading curtain-observe">
-          <p className="section-index">03 / WHY ME &amp; TOOLS</p>
+          <p className="section-index">04 / WHY ME &amp; TOOLS</p>
           <h2>先定义问题，<br />再用数据和原型<em>验证。</em></h2>
           <p className="section-note">卡片只保留结论。悬停后，可以看到具体做法。</p>
         </div>
@@ -1368,7 +1443,7 @@ export default function Home() {
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="offscreen-stage">
           <div className="offscreen-heading curtain-observe">
-            <p className="section-index">04 / OFF SCREEN &amp; TALK</p>
+            <p className="section-index">05 / OFF SCREEN &amp; TALK</p>
             <h2>屏幕之外，<em>有声音，也有留白。</em></h2>
           </div>
           <div className="offscreen-gallery">
