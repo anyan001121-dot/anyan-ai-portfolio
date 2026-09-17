@@ -285,6 +285,25 @@ const projects = [
   },
   {
     year: "2026",
+    title: "Olist 履约质量分析",
+    subtitle: "巴西电商履约与差评归因",
+    tags: ["SQL", "PSM/IPW", "因果推断", "风险预警模型"],
+    metric: "+45.05pp",
+    metricLabel: "延迟对差评率的净效应（PSM 验证）",
+    lead: "从数据质量陷阱到因果验证，再到可执行的资源投向建议。",
+    star: {
+      situation: "Olist 公开数据集（9 张表、9.8 万订单、10 万条评论）差评率 13.7%，朴素对比显示延迟订单差评率高出 44.9 个百分点，但延迟订单本身构成就不同，直接下结论有偏差风险。",
+      task: "先排掉数据口径陷阱，再验证延迟是否真的导致差评，最后定位问题主要出在卖家还是物流，并给出可执行的资源投向建议。",
+      action: "用倾向得分匹配、逆概率加权和回归调整三种方法交叉验证因果效应；再拆解订单全链路时长，对比不同规模卖家的延迟率；最后训练一个只用下单时特征的预警模型，并修复了一处会让归因结论完全反转的时间穿越泄漏。",
+      result: "PSM 验证延迟对差评率的净效应为 +45.05pp，选择偏差仅 0.13pp；85.5% 的超时时长来自运输段而非卖家；预警模型 TOP 10% 订单差评率达基线 2.43 倍，可支撑主动干预。",
+    },
+    tone: "steel",
+    preview: "metric",
+    liveUrl: "https://claude.ai/artifact/BHLyhhHL68UPTpoqz7vkge",
+    linkLabel: "查看分析报告",
+  },
+  {
+    year: "2026",
     title: "血糖与 HDL 关联因素",
     subtitle: "统计学硕士论文",
     tags: ["HC3", "GAM", "Lasso", "BMA"],
@@ -306,7 +325,7 @@ type ProjectGroup = "ai" | "data";
 
 const projectGroups: Record<ProjectGroup, number[]> = {
   ai: [0, 1, 2],
-  data: [3, 4, 5, 6],
+  data: [3, 4, 5, 6, 7],
 };
 
 const guideSections = [
@@ -978,6 +997,7 @@ export default function Home() {
   const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
   const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
   const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
+  const activeProjectLinkLabel = "linkLabel" in activeProject ? activeProject.linkLabel : "打开题库";
   const triggerProjectGuide = (direction: "left" | "right") => {
     if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
     setGuideProjectMotion(null);
@@ -1175,7 +1195,7 @@ export default function Home() {
                 <div className="project-links">
                   {activeProjectLiveUrl && (
                     <a className="project-link primary" href={activeProjectLiveUrl} target="_blank" rel="noreferrer">
-                      打开题库 <span>↗</span>
+                      {activeProjectLinkLabel} <span>↗</span>
                     </a>
                   )}
                   {activeProjectUrl && (
