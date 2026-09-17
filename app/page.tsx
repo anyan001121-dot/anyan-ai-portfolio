@@ -299,6 +299,7 @@ const projects = [
     },
     tone: "steel",
     preview: "metric",
+    url: "https://github.com/anyan001121-dot/olist-analysis",
     liveUrl: "https://claude.ai/artifact/BHLyhhHL68UPTpoqz7vkge",
     linkLabel: "查看分析报告",
   },
