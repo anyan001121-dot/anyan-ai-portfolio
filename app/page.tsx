@@ -32,6 +32,8 @@ const fitCards = [
   },
 ];
 
+type IdentityCategory = "data" | "product" | "expression" | "observe";
+
 type IdentityWord = {
   label: string;
   x: number;
@@ -40,43 +42,51 @@ type IdentityWord = {
   dy: number;
   rotate: number;
   accent?: boolean;
+  category: IdentityCategory;
 };
 
+const identityCategories: { key: IdentityCategory; label: string; hint: string }[] = [
+  { key: "data", label: "数据", hint: "统计方法与建模相关作品" },
+  { key: "product", label: "产品", hint: "AI 应用与产品类作品" },
+  { key: "expression", label: "表达", hint: "辩论与结构化表达经历" },
+  { key: "observe", label: "观察", hint: "摄影与生活观察" },
+];
+
 const identitySeedWords: IdentityWord[] = [
-  { label: "ENTP", x: 42, y: 8, dx: -278, dy: -205, rotate: -8, accent: true },
-  { label: "实验设计", x: 56, y: 11, dx: 210, dy: -210, rotate: 6, accent: true },
-  { label: "英国", x: 31, y: 18, dx: -330, dy: -120, rotate: -11 },
-  { label: "因果推断", x: 60, y: 20, dx: 305, dy: -115, rotate: 9, accent: true },
-  { label: "大数据", x: 24, y: 29, dx: -360, dy: -28, rotate: -6 },
-  { label: "统计学", x: 47, y: 28, dx: -125, dy: -120, rotate: 5, accent: true },
-  { label: "AI 工具", x: 67, y: 31, dx: 355, dy: -34, rotate: 8 },
-  { label: "数模竞赛", x: 36, y: 39, dx: -280, dy: 55, rotate: -8 },
-  { label: "回归模型", x: 57, y: 40, dx: 242, dy: 32, rotate: 5, accent: true },
-  { label: "时间序列", x: 75, y: 42, dx: 365, dy: 72, rotate: 12 },
-  { label: "推理", x: 27, y: 51, dx: -355, dy: 135, rotate: -12 },
-  { label: "辩论", x: 50, y: 51, dx: -65, dy: 155, rotate: 7 },
-  { label: "产品", x: 69, y: 53, dx: 315, dy: 150, rotate: -7 },
-  { label: "摇滚", x: 23, y: 63, dx: -300, dy: 245, rotate: -9, accent: true },
-  { label: "数据挖掘", x: 44, y: 62, dx: -125, dy: 275, rotate: 6, accent: true },
-  { label: "单机游戏", x: 65, y: 65, dx: 248, dy: 255, rotate: 10 },
-  { label: "玩家研究", x: 72, y: 67, dx: 312, dy: 275, rotate: -8, accent: true },
-  { label: "叙事设计", x: 20, y: 79, dx: -372, dy: 352, rotate: 8 },
-  { label: "用户行为", x: 33, y: 69, dx: -264, dy: 308, rotate: -5, accent: true },
-  { label: "JRPG", x: 79, y: 51, dx: 390, dy: 138, rotate: 9 },
-  { label: "AVG", x: 18, y: 57, dx: -398, dy: 188, rotate: -10 },
-  { label: "模拟经营", x: 58, y: 86, dx: 118, dy: 414, rotate: 5 },
-  { label: "摄影", x: 38, y: 74, dx: -238, dy: 345, rotate: -6 },
-  { label: "RAG", x: 56, y: 75, dx: 105, dy: 342, rotate: 7 },
-  { label: "LangChain", x: 45, y: 85, dx: -30, dy: 420, rotate: -3 },
-  { label: "预测模型", x: 70, y: 82, dx: 325, dy: 360, rotate: 9, accent: true },
-  { label: "数据分析", x: 30, y: 86, dx: -260, dy: 420, rotate: -8, accent: true },
-  { label: "Python", x: 50, y: 91, dx: 20, dy: 438, rotate: 4 },
-  { label: "SQL", x: 63, y: 89, dx: 185, dy: 420, rotate: -5, accent: true },
-  { label: "R", x: 77, y: 72, dx: 385, dy: 285, rotate: 10 },
-  { label: "AI 产品", x: 17, y: 73, dx: -390, dy: 295, rotate: -11, accent: true },
-  { label: "Hadoop", x: 81, y: 24, dx: 392, dy: -92, rotate: 8 },
-  { label: "旅行", x: 15, y: 45, dx: -402, dy: 82, rotate: -7 },
-  { label: "大数据架构", x: 84, y: 60, dx: 405, dy: 205, rotate: 12 },
+  { label: "ENTP", x: 42, y: 8, dx: -278, dy: -205, rotate: -8, accent: true, category: "expression" },
+  { label: "实验设计", x: 56, y: 11, dx: 210, dy: -210, rotate: 6, accent: true, category: "data" },
+  { label: "英国", x: 31, y: 18, dx: -330, dy: -120, rotate: -11, category: "observe" },
+  { label: "因果推断", x: 60, y: 20, dx: 305, dy: -115, rotate: 9, accent: true, category: "data" },
+  { label: "大数据", x: 24, y: 29, dx: -360, dy: -28, rotate: -6, category: "data" },
+  { label: "统计学", x: 47, y: 28, dx: -125, dy: -120, rotate: 5, accent: true, category: "data" },
+  { label: "AI 工具", x: 67, y: 31, dx: 355, dy: -34, rotate: 8, category: "product" },
+  { label: "数模竞赛", x: 36, y: 39, dx: -280, dy: 55, rotate: -8, category: "data" },
+  { label: "回归模型", x: 57, y: 40, dx: 242, dy: 32, rotate: 5, accent: true, category: "data" },
+  { label: "时间序列", x: 75, y: 42, dx: 365, dy: 72, rotate: 12, category: "data" },
+  { label: "推理", x: 27, y: 51, dx: -355, dy: 135, rotate: -12, category: "expression" },
+  { label: "辩论", x: 50, y: 51, dx: -65, dy: 155, rotate: 7, category: "expression" },
+  { label: "产品", x: 69, y: 53, dx: 315, dy: 150, rotate: -7, category: "product" },
+  { label: "摇滚", x: 23, y: 63, dx: -300, dy: 245, rotate: -9, accent: true, category: "observe" },
+  { label: "数据挖掘", x: 44, y: 62, dx: -125, dy: 275, rotate: 6, accent: true, category: "data" },
+  { label: "单机游戏", x: 65, y: 65, dx: 248, dy: 255, rotate: 10, category: "observe" },
+  { label: "玩家研究", x: 72, y: 67, dx: 312, dy: 275, rotate: -8, accent: true, category: "product" },
+  { label: "叙事设计", x: 20, y: 79, dx: -372, dy: 352, rotate: 8, category: "observe" },
+  { label: "用户行为", x: 33, y: 69, dx: -264, dy: 308, rotate: -5, accent: true, category: "product" },
+  { label: "JRPG", x: 79, y: 51, dx: 390, dy: 138, rotate: 9, category: "observe" },
+  { label: "AVG", x: 18, y: 57, dx: -398, dy: 188, rotate: -10, category: "observe" },
+  { label: "模拟经营", x: 58, y: 86, dx: 118, dy: 414, rotate: 5, category: "observe" },
+  { label: "摄影", x: 38, y: 74, dx: -238, dy: 345, rotate: -6, category: "observe" },
+  { label: "RAG", x: 56, y: 75, dx: 105, dy: 342, rotate: 7, category: "product" },
+  { label: "LangChain", x: 45, y: 85, dx: -30, dy: 420, rotate: -3, category: "product" },
+  { label: "预测模型", x: 70, y: 82, dx: 325, dy: 360, rotate: 9, accent: true, category: "data" },
+  { label: "数据分析", x: 30, y: 86, dx: -260, dy: 420, rotate: -8, accent: true, category: "data" },
+  { label: "Python", x: 50, y: 91, dx: 20, dy: 438, rotate: 4, category: "data" },
+  { label: "SQL", x: 63, y: 89, dx: 185, dy: 420, rotate: -5, accent: true, category: "data" },
+  { label: "R", x: 77, y: 72, dx: 385, dy: 285, rotate: 10, category: "data" },
+  { label: "AI 产品", x: 17, y: 73, dx: -390, dy: 295, rotate: -11, accent: true, category: "product" },
+  { label: "Hadoop", x: 81, y: 24, dx: 392, dy: -92, rotate: 8, category: "data" },
+  { label: "旅行", x: 15, y: 45, dx: -402, dy: 82, rotate: -7, category: "observe" },
+  { label: "大数据架构", x: 84, y: 60, dx: 405, dy: 205, rotate: 12, category: "data" },
 ];
 
 const PARTICLE_COUNT = 184;
@@ -190,6 +200,11 @@ const projects = [
       action: "LangGraph 负责 Brain Dump、任务拆解、计时、暂存和恢复；SQLite 保存本地记录，任务时长会按实际用时继续调整。",
       result: "每轮只给 3 个以内的优先项，并记录启动耗时、完成率和恢复成功率，用来判断产品是否真的有用。",
     },
+    steps: [
+      { label: "杂乱输入", description: "把脑子里所有的任务一股脑倒出来，不用管顺序、不用管轻重。" },
+      { label: "拆解为 3 步", description: "LangGraph 把杂乱输入压缩成不超过 3 个可以立即执行的下一步。" },
+      { label: "开始执行", description: "选一项开始计时；中断后可以恢复，时长会按实际用时继续调整。" },
+    ],
     tone: "focus",
     preview: "focusflow",
     url: "https://github.com/anyan001121-dot/focusflow",
@@ -208,6 +223,11 @@ const projects = [
       action: "用原生 JS 与 LocalStorage 实现快速小测、顺序/随机练习、答题卡、收藏、错题筛选和成绩报告。",
       result: "收录言语 321 题、资料 254 题、图形 152 题；进度、错题和收藏均保存在本地，可直接在线使用。",
     },
+    steps: [
+      { label: "抽题", description: "从言语、资料、图形三大模块里随机抽一题，也可以按模块顺序练习。" },
+      { label: "作答", description: "答题卡实时记录进度，不确定的题目可以先收藏，稍后回头看。" },
+      { label: "查看反馈", description: "提交后立即看到正误和正确率，答错的题会自动进入错题筛选。" },
+    ],
     tone: "quiz",
     preview: "quiz",
     url: "https://github.com/anyan001121-dot/beisen-quiz",
@@ -302,6 +322,11 @@ const projects = [
       evidence: "排查特征口径才发现问题：卖家历史表现用的是“全期平均值”，混进了预测那一刻还没发生的未来订单信息，是一次时间穿越泄漏。",
       after: "把卖家历史特征改成只用“下单当下已经发生”的扩展窗口统计重新训练，AUC 回落到真实可信的 0.636——数字变难看了，但这才是能真正部署的模型。",
     },
+    steps: [
+      { label: "散乱记录", description: "9 张表、9.8 万订单、10 万条评论，指标口径还没对齐，复购率、GMV 都是脏数据。" },
+      { label: "修正口径", description: "修正三处数据陷阱：customer_id 误判复购率为 0、同日拆单使复购率虚高、一对多 JOIN 使 GMV 虚高 4.57%。" },
+      { label: "验证证据", description: "倾向得分匹配 110 维协变量，匹配后 SMD 全部 < 0.045，估计延迟对差评率的净效应 +45.05pp。" },
+    ],
     tone: "steel",
     preview: "metric",
     url: "https://github.com/anyan001121-dot/olist-analysis",
@@ -357,10 +382,13 @@ export default function Home() {
   const [hoveredFit, setHoveredFit] = useState<string | null>(null);
   const [projectGroup, setProjectGroup] = useState<ProjectGroup>("ai");
   const [openProject, setOpenProject] = useState(0);
+  const [activeStep, setActiveStep] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
   const [guideDropping, setGuideDropping] = useState(false);
   const [guideProjectMotion, setGuideProjectMotion] = useState<"left" | "right" | null>(null);
+  const [activeIdentityCategory, setActiveIdentityCategory] = useState<IdentityCategory | null>(null);
+  const [pinnedInterest, setPinnedInterest] = useState<"debate" | "photo" | null>(null);
   const glyphCanvasRef = useRef<HTMLCanvasElement>(null);
   const wordCloudRef = useRef<HTMLButtonElement>(null);
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
@@ -1010,6 +1038,8 @@ export default function Home() {
   const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
   const activeProjectLinkLabel = "linkLabel" in activeProject ? activeProject.linkLabel : "打开题库";
   const activeProjectOverturn = "overturn" in activeProject ? activeProject.overturn : undefined;
+  const activeProjectSteps = "steps" in activeProject ? activeProject.steps : undefined;
+  useEffect(() => { setActiveStep(0); }, [openProject]);
   const triggerProjectGuide = (direction: "left" | "right") => {
     if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
     setGuideProjectMotion(null);
@@ -1033,6 +1063,29 @@ export default function Home() {
     triggerProjectGuide(group === "data" ? "right" : "left");
     setProjectGroup(group);
     setOpenProject(projectGroups[group][0]);
+  };
+
+  const focusIdentityCategory = (key: IdentityCategory) => {
+    if (activeIdentityCategory === key) {
+      setActiveIdentityCategory(null);
+      return;
+    }
+    setActiveIdentityCategory(key);
+    setIdentityOpen(true);
+    // 先留半秒看清关键词高亮，再跳转——否则高亮效果会被滚动直接盖过去，等于白做。
+    window.setTimeout(() => {
+      if (key === "data" || key === "product") {
+        setPinnedInterest(null);
+        selectProjectGroup(key === "data" ? "data" : "ai");
+        document.getElementById("work")?.scrollIntoView({ behavior: "smooth", block: "start" });
+      } else if (key === "expression") {
+        setPinnedInterest("debate");
+        document.getElementById("interest-debate")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      } else if (key === "observe") {
+        setPinnedInterest("photo");
+        document.getElementById("offscreen-gallery")?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }, 550);
   };
 
   const guideIndex = Math.max(0, guideSections.findIndex((section) => section.id === activeSection));
@@ -1261,6 +1314,34 @@ export default function Home() {
               )}
             </div>
 
+            {activeProjectSteps && (
+              <div className="project-steps" aria-label={`${activeProject.title} 交互步骤`}>
+                <small className="project-steps-label">体验一次我的思考过程</small>
+                <div className="project-steps-track" role="tablist" aria-label="步骤">
+                  {activeProjectSteps.map((step, index) => (
+                    <button
+                      key={step.label}
+                      type="button"
+                      role="tab"
+                      aria-selected={index === activeStep}
+                      className={"project-step" + (index === activeStep ? " is-active" : "") + (index < activeStep ? " is-done" : "")}
+                      onClick={() => setActiveStep(index)}
+                    >
+                      <span className="project-step-index">{String(index + 1).padStart(2, "0")}</span>
+                      <span className="project-step-label">{step.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="project-step-panel">
+                  <p>{activeProjectSteps[activeStep].description}</p>
+                </div>
+                <div className="project-step-nav">
+                  <button type="button" disabled={activeStep === 0} onClick={() => setActiveStep((s) => Math.max(0, s - 1))}>← 上一步</button>
+                  <button type="button" disabled={activeStep === activeProjectSteps.length - 1} onClick={() => setActiveStep((s) => Math.min(activeProjectSteps.length - 1, s + 1))}>下一步 →</button>
+                </div>
+              </div>
+            )}
+
             <div className="project-star" aria-label={`${activeProject.title} 项目拆解`}>
               {([
                 ["context", "项目背景", activeProject.star.situation],
@@ -1335,6 +1416,20 @@ export default function Home() {
           </div>
           <p>悬停时关键词散开，移开后重新聚合。</p>
           <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
+          <div className="identity-categories" role="group" aria-label="按分类探索关键词">
+            {identityCategories.map((cat) => (
+              <button
+                key={cat.key}
+                type="button"
+                className={"identity-category-btn" + (activeIdentityCategory === cat.key ? " is-active" : "")}
+                aria-pressed={activeIdentityCategory === cat.key}
+                title={cat.hint}
+                onClick={() => focusIdentityCategory(cat.key)}
+              >
+                {cat.label}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="self-glyph-stage">
           <button
@@ -1342,6 +1437,7 @@ export default function Home() {
             id="word-cloud-container"
             className={`self-glyph magnetic${particlesReady ? " particles-ready" : ""}${identityOpen ? " is-open" : ""}`}
             type="button"
+            data-active-category={activeIdentityCategory ?? undefined}
             onClick={() => setIdentityOpen(!identityOpen)}
             aria-pressed={identityOpen}
             aria-label={identityOpen ? "收拢个人关键词" : "展开个人关键词"}
@@ -1360,7 +1456,12 @@ export default function Home() {
                 "--explode-delay": `${Math.min(index * 1.6, 145)}ms`,
               } as CSSProperties;
               return (
-                <span className={"identity-word" + (word.accent ? " accent" : "")} style={style} key={word.key}>
+                <span
+                  className={"identity-word" + (word.accent ? " accent" : "")}
+                  style={style}
+                  data-category={word.category}
+                  key={word.key}
+                >
                   <i>{String(index + 1).padStart(2, "0")}</i>{word.label}
                 </span>
               );
@@ -1430,7 +1531,7 @@ export default function Home() {
             <p className="section-index">04 / OFF SCREEN &amp; TALK</p>
             <h2>屏幕之外，<em>有声音，也有留白。</em></h2>
           </div>
-          <div className="offscreen-gallery">
+          <div className="offscreen-gallery" id="offscreen-gallery">
             <figure className="offscreen-photo"><img src="./photos/athens-portrait.webp" alt="安颜在雅典的旅行照片" /><figcaption>ATHENS / light & structure</figcaption></figure>
             <figure className="offscreen-photo"><img src="./photos/york-minster.jpg" alt="安颜拍摄的约克大教堂尖塔" /><figcaption>YORK MINSTER / spires & sky</figcaption></figure>
             <figure className="offscreen-photo"><img src="./photos/pantheon-dome.jpg" alt="安颜拍摄的罗马万神殿穹顶" /><figcaption>PANTHEON / structure & light</figcaption></figure>
@@ -1455,9 +1556,18 @@ export default function Home() {
               </h3>
               <p>喜欢高迪建筑里自由的曲线、色彩与想象力，也喜欢高更画作中大胆而直接的色彩表达。比起追随某一种风格，我更喜欢观察不同创作者如何用自己的方式理解和表达世界。</p>
             </article>
-            <article>
+            <article className={pinnedInterest === "photo" ? "is-pinned" : ""}>
               <span>PHOTO</span>
-              <h3><button className="interest-title-trigger" type="button" aria-label="显示摄影相关内容"><LetterSwap3D text="摄影" origin="center" /></button></h3>
+              <h3>
+                <button
+                  className="interest-title-trigger"
+                  type="button"
+                  aria-label="显示摄影相关内容"
+                  onClick={() => setPinnedInterest((current) => current === "photo" ? null : "photo")}
+                >
+                  <LetterSwap3D text="摄影" origin="center" />
+                </button>
+              </h3>
               <p>摄影像是我观察世界的另一双眼睛。旅行时，我喜欢记录偶然出现的光线、人与环境的关系，以及那些很容易被忽略的瞬间。</p>
             </article>
             <article>
@@ -1465,10 +1575,18 @@ export default function Home() {
               <h3><button className="interest-title-trigger" type="button" aria-label="显示游戏相关内容"><LetterSwap3D text="游戏" origin="center" /></button></h3>
               <p>玩得比较杂，主机、掌机、手游都有涉猎，比起通关数量，更喜欢琢磨故事怎么讲、系统怎么设计。</p>
             </article>
-            <article className="interest-debate">
+            <article
+              className={"interest-debate" + (pinnedInterest === "debate" ? " is-pinned" : "")}
+              id="interest-debate"
+            >
               <span>ENTP</span>
               <h3>
-                <button className="interest-title-trigger debate-trigger" type="button" aria-label="显示辩论与表达相关内容">
+                <button
+                  className="interest-title-trigger debate-trigger"
+                  type="button"
+                  aria-label="显示辩论与表达相关内容"
+                  onClick={() => setPinnedInterest((current) => current === "debate" ? null : "debate")}
+                >
                   <LetterSwap3D text="辩论与" origin="center" />
                   <LetterSwap3D text="表达" origin="last" />
                 </button>
