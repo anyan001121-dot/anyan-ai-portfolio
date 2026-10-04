@@ -297,6 +297,11 @@ const projects = [
       action: "延迟订单差评率 54.0% vs 按时 9.2%，剂量反应分析显示伤害呈断崖式（延迟 1-3 天差评率即从 11.7% 跳至 32.2%）；用倾向得分匹配（110 维协变量，匹配后 SMD 全部 < 0.045）估计 ATT +45.05pp，经 IPW 与回归调整交叉验证（四法极差 0.67pp），选择偏差仅 0.3%；将延迟责任拆解至运输段（85.5%）与卖家备货段（14.5%），卖家分层数据显示四档延迟率仅 7.3%~8.1%，排除卖家治理假设；构建 LightGBM 下单时差评预警模型，排查修复时间穿越泄漏（卖家历史特征由全期均值改为扩展窗口），AUC 由虚高的 0.932 回落至真实的 0.636。",
       result: "推翻“偏远地区差评不可避免”与“延迟主要是卖家问题”两个内部假设，论证问题在物流网络而非卖家治理；据剂量反应结果提出“提升时效确定性优先于压缩平均时效”；预警模型 TOP 10% 订单差评概率提升 2.43 倍。",
     },
+    overturn: {
+      before: "下单时差评预警模型测试集 AUC 一度跑到 0.932，看起来已经可以直接上线。",
+      evidence: "排查特征口径才发现问题：卖家历史表现用的是“全期平均值”，混进了预测那一刻还没发生的未来订单信息，是一次时间穿越泄漏。",
+      after: "把卖家历史特征改成只用“下单当下已经发生”的扩展窗口统计重新训练，AUC 回落到真实可信的 0.636——数字变难看了，但这才是能真正部署的模型。",
+    },
     tone: "steel",
     preview: "metric",
     url: "https://github.com/anyan001121-dot/olist-analysis",
@@ -316,6 +321,11 @@ const projects = [
       task: "基于 3,808 名参与者识别稳定关联，并评估 SNP 面板的整体贡献。",
       action: "结合 HC3、GLM/GAM、Lasso 与 BMA，并通过共线性检查精简候选位点。",
       result: "BMI 每增加 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%；女性 HDL 约高 20%，并发现 SNP 面板与血糖存在整体关联。",
+    },
+    overturn: {
+      before: "本以为遗传位点（SNP）会是这篇论文最亮眼的发现，是血糖和 HDL 的重要解释变量。",
+      evidence: "多重比较校正之后，单个位点的证据非常有限，SNP 面板对预测效果的整体增益也很小。",
+      after: "没有为了让结论“更好看”而夸大遗传效应，而是把论文重心放回 BMI、吸烟等效应清晰、稳定的生活方式因素上，对遗传部分的表述也写得更保守克制。",
     },
     tone: "lavender",
     preview: "metric",
@@ -999,6 +1009,7 @@ export default function Home() {
   const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
   const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
   const activeProjectLinkLabel = "linkLabel" in activeProject ? activeProject.linkLabel : "打开题库";
+  const activeProjectOverturn = "overturn" in activeProject ? activeProject.overturn : undefined;
   const triggerProjectGuide = (direction: "left" | "right") => {
     if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
     setGuideProjectMotion(null);
@@ -1263,6 +1274,27 @@ export default function Home() {
                 </article>
               ))}
             </div>
+            {activeProjectOverturn && (
+              <div className="project-overturn" aria-label={`${activeProject.title} 一个被我推翻的判断`}>
+                <small className="project-overturn-label">一个被我推翻的判断</small>
+                <div className="project-overturn-grid">
+                  <article>
+                    <small>原以为</small>
+                    <p>{activeProjectOverturn.before}</p>
+                  </article>
+                  <span className="project-overturn-arrow" aria-hidden="true">→</span>
+                  <article>
+                    <small>证据显示</small>
+                    <p>{activeProjectOverturn.evidence}</p>
+                  </article>
+                  <span className="project-overturn-arrow" aria-hidden="true">→</span>
+                  <article className="is-after">
+                    <small>因此我改成</small>
+                    <p>{activeProjectOverturn.after}</p>
+                  </article>
+                </div>
+              </div>
+            )}
             <div className="project-stage-controls" aria-label="切换项目">
               <button type="button" onClick={() => selectAdjacentProject(-1)} aria-label="上一个项目">←</button>
               <span>{String(projectGroups[projectGroup].indexOf(openProject) + 1).padStart(2, "0")} / {String(projectGroups[projectGroup].length).padStart(2, "0")}</span>
