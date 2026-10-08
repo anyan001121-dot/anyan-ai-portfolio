@@ -1,0 +1,106 @@
+.impact-hero {
+  --poster: #ff6b40;
+  --poster-ink: #171814;
+  --poster-cream: #f7f1df;
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  padding-top: 64px;
+  overflow: clip;
+  background: var(--poster);
+  color: var(--poster-ink);
+  scroll-margin-top: 64px;
+}
+.impact-hero button { cursor: pointer; }
+.impact-hero button:focus-visible,.impact-hero a:focus-visible { outline: 2px solid currentColor; outline-offset: 5px; }
+.impact-stage { position: relative; isolation: isolate; height: clamp(570px,calc(100svh - 142px),790px); }
+.impact-name { position: absolute; z-index: 0; inset: 8px 3% auto; display: flex; justify-content: space-between; margin: 0; padding-right: .045em; font: 850 clamp(190px,35cqw,500px)/1.05 var(--display); letter-spacing: -.08em; user-select: none; }
+.impact-name > span { display: block; }
+.impact-portrait { position: absolute; z-index: 2; left: 50%; bottom: 0; width: 53%; height: 103%; margin: 0; transform: translateX(-50%); }
+.impact-portrait-motion { width: 100%; height: 100%; transform: translate(var(--poster-x,0px),var(--poster-y,0px)); transition: transform .7s cubic-bezier(.2,.7,.2,1); }
+.impact-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transition: opacity .45s ease,transform .65s cubic-bezier(.16,.84,.2,1); }
+.impact-cartoon { opacity: 0; transform: translateY(14px) rotate(2deg); }
+.impact-hero[data-portrait="cartoon"] .impact-photo { opacity: 0; transform: translateY(14px) rotate(-2deg); }
+.impact-hero[data-portrait="cartoon"] .impact-cartoon { opacity: 1; transform: translateY(0) rotate(0); }
+.impact-copy { position: absolute; z-index: 4; left: clamp(26px,3.5vw,60px); bottom: 100px; max-width: 280px; }
+.impact-eyebrow { width: fit-content; margin: 0 0 20px; padding: 7px 0; background: var(--poster); font: 11px/1.7 var(--type); letter-spacing: .04em; }
+.impact-statement { margin: 0; font: 500 clamp(30px,3.2vw,46px)/1.25 var(--editorial); letter-spacing: -.045em; }
+.impact-contact { display: inline-block; padding: 10px 0; margin-top: 8px; font-size: 12px; text-decoration: underline; text-underline-offset: 5px; }
+.impact-switch { position: absolute; z-index: 4; right: clamp(26px,4vw,70px); bottom: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 118px; height: 118px; border: 1px solid currentColor; border-radius: 50%; background: var(--poster); transition: transform .3s,background .3s; }
+.impact-switch:hover { transform: rotate(-7deg); background: #ff815c; }
+.impact-switch small { font: 10px/1.4 var(--type); letter-spacing: .07em; }
+.impact-switch strong { font-size: 16px; font-weight: 500; }
+.impact-switch > span { font: 26px/1 var(--editorial); }
+.impact-mascot { position: absolute; z-index: 5; right: clamp(38px,5vw,85px); bottom: 191px; width: 91px; height: 166px; padding: 0; border: 0; background: transparent; transform-origin: center bottom; }
+.impact-mascot img { width: 100%; height: 100%; object-fit: contain; object-position: center bottom; }
+.impact-hello { position: absolute; left: -64px; top: 0; padding: 9px 12px; color: var(--poster-ink); background: var(--poster-cream); font-size: 12px; white-space: nowrap; opacity: 0; transform: rotate(-7deg); transition: opacity .2s; }
+.impact-mascot:hover .impact-hello,.impact-mascot:focus-visible .impact-hello,.impact-mascot.is-greeting .impact-hello { opacity: 1; }
+.impact-mascot.is-greeting { animation: poster-greet .85s cubic-bezier(.2,.8,.2,1) both; }
+.impact-caption { position: absolute; z-index: 4; bottom: 25px; left: clamp(26px,3.5vw,60px); display: grid; gap: 4px; margin: 0; font: 11px/1.5 var(--type); letter-spacing: .05em; }
+.impact-foot { position: relative; z-index: 5; min-height: 78px; display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 18px clamp(26px,3.5vw,60px); color: var(--poster-cream); background: var(--poster-ink); }
+.impact-foot > div { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; }
+.impact-foot em { font: italic 24px/1.2 Georgia,serif; }
+.impact-foot > div > span { font-size: 11px; opacity: .65; }
+.impact-foot a { padding: 10px 0; border-bottom: 1px solid #f7f1df70; font-size: 13px; }
+.impact-replay { min-height: 44px; padding: 10px 0; color: inherit; border: 0; background: transparent; font-size: 12px; white-space: nowrap; }
+.impact-replay:disabled { opacity: .6; }
+.impact-shutter { position: absolute; z-index: 20; left: 0; right: 0; height: 50.15%; background: var(--poster-ink); pointer-events: none; }
+.impact-shutter-top { top: 0; border-bottom: 1px solid #ff6b4070; animation: poster-open-top 2.1s cubic-bezier(.76,0,.24,1) both; }
+.impact-shutter-bottom { bottom: 0; animation: poster-open-bottom 2.1s cubic-bezier(.76,0,.24,1) both; }
+.impact-intro-mark { position: absolute; z-index: 22; inset: 0; display: flex; justify-content: center; align-items: center; color: var(--poster-cream); font: 850 clamp(130px,24cqw,360px)/1 var(--display); letter-spacing: -.08em; animation: poster-mark 2.1s both; pointer-events: none; }
+.impact-intro-mark > span { position: absolute; top: 66%; left: 0; right: 0; text-align: center; font: 11px/1.5 var(--type); letter-spacing: .16em; }
+.impact-skip { position: absolute; z-index: 25; top: 82px; right: 26px; min-height: 44px; padding: 10px 15px; color: var(--poster-cream); background: var(--poster-ink); border: 1px solid #f7f1df50; font-size: 12px; }
+.impact-hero.is-opening .impact-portrait { animation: poster-person 2.1s cubic-bezier(.2,.8,.2,1) both; }
+.impact-hero.is-opening .impact-name > span:first-child { animation: poster-name-left 2.1s cubic-bezier(.2,.8,.2,1) both; }
+.impact-hero.is-opening .impact-name > span:last-child { animation: poster-name-right 2.1s cubic-bezier(.2,.8,.2,1) both; }
+.impact-hero.is-opening .impact-copy,.impact-hero.is-opening .impact-switch { animation: poster-copy 2.1s both; }
+.impact-hero.is-opening .impact-mascot { animation: poster-mascot 2.1s cubic-bezier(.16,.8,.2,1) both; }
+.topbar.is-over-poster { background: #ff6b40; color: #171814; border-color: #17181435; backdrop-filter: none; }
+.topbar.is-over-poster .tiny-control,.topbar.is-over-poster .music-pill { background: transparent; border-color: #17181450; }
+.site-guide[data-section="top"] { display: none; }
+.site:not(.photos-on) .impact-portrait { opacity: 0; }
+@keyframes poster-open-top { 0%,22% { transform: translateY(0); } 80%,100% { transform: translateY(-102%); } }
+@keyframes poster-open-bottom { 0%,22% { transform: translateY(0); } 80%,100% { transform: translateY(102%); } }
+@keyframes poster-mark { 0% { opacity: 0; transform: scale(1.12); } 12%,24% { opacity: 1; transform: scale(1); } 44%,100% { opacity: 0; transform: scale(.92); } }
+@keyframes poster-person { 0%,20% { transform: translate(-50%,90px) scale(1.15); } 100% { transform: translate(-50%,0) scale(1); } }
+@keyframes poster-name-left { 0%,24% { transform: translateX(13%) skewY(-3deg); } 100% { transform: none; } }
+@keyframes poster-name-right { 0%,24% { transform: translateX(-13%) skewY(3deg); } 100% { transform: none; } }
+@keyframes poster-copy { 0%,56% { opacity: 0; transform: translateY(22px); } 100% { opacity: 1; transform: none; } }
+@keyframes poster-mascot { 0%,62% { opacity: 0; transform: translateY(80px) rotate(9deg); } 86% { opacity: 1; transform: translateY(-9px) rotate(-4deg); } 100% { opacity: 1; transform: none; } }
+@keyframes poster-greet { 0%,100% { transform: none; } 35% { transform: translateY(-10px) rotate(-7deg); } 65% { transform: translateY(-3px) rotate(4deg); } }
+@media (max-width: 760px) {
+  .impact-stage { height: 570px; }
+  .impact-name { top: 10px; font-size: 38cqw; }
+  .impact-portrait { width: 63%; height: 92%; }
+  .impact-copy { left: 24px; bottom: 98px; max-width: 190px; }
+  .impact-eyebrow { max-width: 170px; font-size: 10px; }
+  .impact-statement { font-size: 30px; }
+  .impact-switch { right: 24px; bottom: 62px; width: 96px; height: 96px; }
+  .impact-switch strong { font-size: 14px; }
+  .impact-mascot { right: 35px; bottom: 179px; width: 76px; height: 139px; }
+  .impact-foot > div { gap: 15px; }
+  .impact-foot > div > span { display: none; }
+}
+@media (max-width: 480px) {
+  .impact-stage { height: 576px; }
+  .impact-name { inset: 15px 4% auto; font-size: 41cqw; letter-spacing: -.09em; }
+  .impact-portrait { bottom: 80px; width: 96%; height: 84%; }
+  .impact-copy { left: 21px; bottom: 48px; padding: 7px 9px 7px 0; background: var(--poster); }
+  .impact-eyebrow { display: none; }
+  .impact-statement { font-size: 28px; }
+  .impact-contact { margin: 0; padding: 7px 0; font-size: 11px; }
+  .impact-switch { right: 20px; bottom: 66px; width: 90px; height: 90px; }
+  .impact-mascot { right: 31px; bottom: 188px; width: 62px; height: 114px; }
+  .impact-hello { left: -47px; top: -8px; padding: 8px 9px; font-size: 11px; }
+  .impact-caption { bottom: 17px; left: 21px; right: 15px; display: flex; flex-wrap: wrap; gap: 3px 13px; font-size: 10px; letter-spacing: .02em; }
+  .impact-foot { padding: 14px 21px; gap: 9px 20px; flex-wrap: wrap; }
+  .impact-foot > div { gap: 9px 18px; }
+  .impact-foot em { font-size: 20px; }
+  .impact-foot a { font-size: 12px; }
+  .impact-intro-mark > span { font-size: 9px; letter-spacing: .1em; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .impact-hero *, .impact-hero *::before, .impact-hero *::after { animation: none!important; transition: none!important; }
+  .impact-shutter,.impact-intro-mark,.impact-skip,.impact-replay { display: none; }
+  .impact-portrait-motion { transform: none; }
+}

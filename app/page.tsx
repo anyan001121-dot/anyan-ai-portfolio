@@ -2,8 +2,9 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import LetterSwap3D from "./LetterSwap3D";
+import ImpactHero from "./ImpactHero";
 
 const fitCards = [
   {
@@ -373,7 +374,7 @@ const guideSections = [
 ] as const;
 
 export default function Home() {
-  const [introLifted, setIntroLifted] = useState(false);
+  const [introLifted, setIntroLifted] = useState(true);
   const [musicOpen, setMusicOpen] = useState(false);
   const [photosOn, setPhotosOn] = useState(true);
   const [identityOpen, setIdentityOpen] = useState(false);
@@ -394,72 +395,9 @@ export default function Home() {
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
-  const heroPortraitRef = useRef<HTMLElement>(null);
   const guideRef = useRef<HTMLButtonElement>(null);
   const guideMotionTimerRef = useRef<number | null>(null);
   const guideSectionRef = useRef("");
-  const guideAudioRef = useRef<AudioContext | null>(null);
-  const guideAudioUnlockedRef = useRef(false);
-
-  const playEntranceSfx = useCallback(() => {
-    if (!guideAudioUnlockedRef.current || typeof window.AudioContext === "undefined") return;
-    const context = guideAudioRef.current ?? new window.AudioContext();
-    guideAudioRef.current = context;
-    if (context.state === "suspended") void context.resume();
-
-    const startedAt = context.currentTime + 0.01;
-    const notes = [523.25, 659.25, 783.99];
-    notes.forEach((frequency, index) => {
-      const oscillator = context.createOscillator();
-      const gain = context.createGain();
-      const noteStart = startedAt + index * 0.055;
-      oscillator.type = index === notes.length - 1 ? "sine" : "triangle";
-      oscillator.frequency.setValueAtTime(frequency, noteStart);
-      oscillator.frequency.exponentialRampToValueAtTime(frequency * 1.045, noteStart + 0.12);
-      gain.gain.setValueAtTime(0.0001, noteStart);
-      gain.gain.exponentialRampToValueAtTime(0.028, noteStart + 0.018);
-      gain.gain.exponentialRampToValueAtTime(0.0001, noteStart + 0.2);
-      oscillator.connect(gain).connect(context.destination);
-      oscillator.start(noteStart);
-      oscillator.stop(noteStart + 0.22);
-    });
-  }, []);
-
-  // Site entrance: a soft focus dissolve on first load before the hero settles in.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      const frame = window.requestAnimationFrame(() => setIntroLifted(true));
-      return () => window.cancelAnimationFrame(frame);
-    }
-    const soundTimer = window.setTimeout(playEntranceSfx, 1810);
-    const timer = window.setTimeout(() => setIntroLifted(true), 2650);
-    return () => {
-      window.clearTimeout(soundTimer);
-      window.clearTimeout(timer);
-    };
-  }, [playEntranceSfx]);
-
-  useEffect(() => {
-    const unlockGuideAudio = () => {
-      guideAudioUnlockedRef.current = true;
-      if (typeof window.AudioContext !== "undefined") {
-        const context = guideAudioRef.current ?? new window.AudioContext();
-        guideAudioRef.current = context;
-        if (context.state === "suspended") void context.resume();
-      }
-      window.removeEventListener("pointerdown", unlockGuideAudio);
-      window.removeEventListener("keydown", unlockGuideAudio);
-    };
-    window.addEventListener("pointerdown", unlockGuideAudio, { passive: true });
-    window.addEventListener("keydown", unlockGuideAudio);
-    return () => {
-      window.removeEventListener("pointerdown", unlockGuideAudio);
-      window.removeEventListener("keydown", unlockGuideAudio);
-      if (guideAudioRef.current) void guideAudioRef.current.close();
-      guideAudioRef.current = null;
-    };
-  }, []);
-
   useEffect(() => {
     const canvas = glyphCanvasRef.current;
     const container = wordCloudRef.current;
@@ -804,52 +742,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const portrait = heroPortraitRef.current;
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    if (!portrait || reduceMotion || !precisePointer) return;
-
-    const layers = Array.from(portrait.querySelectorAll<HTMLElement>(".depth-layer"));
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let parallaxFrame = 0;
-
-    const onPointerMove = (event: PointerEvent) => {
-      const bounds = portrait.getBoundingClientRect();
-      targetX = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2;
-      targetY = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2;
-      portrait.classList.add("is-parallax-active");
-    };
-    const onPointerLeave = () => {
-      targetX = 0;
-      targetY = 0;
-      portrait.classList.remove("is-parallax-active");
-    };
-    const animateParallax = () => {
-      currentX += (targetX - currentX) * 0.085;
-      currentY += (targetY - currentY) * 0.085;
-      layers.forEach((layer) => {
-        const speed = Number(layer.dataset.speed ?? 1);
-        layer.style.setProperty("--depth-x", `${(currentX * speed * 5).toFixed(2)}px`);
-        layer.style.setProperty("--depth-y", `${(currentY * speed * 3.5).toFixed(2)}px`);
-        layer.style.setProperty("--depth-r", `${(currentX * speed * 0.11).toFixed(3)}deg`);
-      });
-      parallaxFrame = window.requestAnimationFrame(animateParallax);
-    };
-
-    portrait.addEventListener("pointermove", onPointerMove, { passive: true });
-    portrait.addEventListener("pointerleave", onPointerLeave);
-    parallaxFrame = window.requestAnimationFrame(animateParallax);
-    return () => {
-      window.cancelAnimationFrame(parallaxFrame);
-      portrait.removeEventListener("pointermove", onPointerMove);
-      portrait.removeEventListener("pointerleave", onPointerLeave);
-    };
-  }, []);
-
-  useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const precisePointer = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     if (reduceMotion || !precisePointer) return;
@@ -1039,7 +931,6 @@ export default function Home() {
   const activeProjectLinkLabel = "linkLabel" in activeProject ? activeProject.linkLabel : "打开题库";
   const activeProjectOverturn = "overturn" in activeProject ? activeProject.overturn : undefined;
   const activeProjectSteps = "steps" in activeProject ? activeProject.steps : undefined;
-  useEffect(() => { setActiveStep(0); }, [openProject]);
   const triggerProjectGuide = (direction: "left" | "right") => {
     if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
     setGuideProjectMotion(null);
@@ -1050,12 +941,14 @@ export default function Home() {
     if (index === openProject) return;
     triggerProjectGuide(index > openProject ? "right" : "left");
     setOpenProject(index);
+    setActiveStep(0);
   };
   const selectAdjacentProject = (direction: number) => {
     const group = projectGroups[projectGroup];
     const currentPosition = Math.max(0, group.indexOf(openProject));
     triggerProjectGuide(direction > 0 ? "right" : "left");
     setOpenProject(group[(currentPosition + direction + group.length) % group.length]);
+    setActiveStep(0);
   };
 
   const selectProjectGroup = (group: ProjectGroup) => {
@@ -1063,6 +956,7 @@ export default function Home() {
     triggerProjectGuide(group === "data" ? "right" : "left");
     setProjectGroup(group);
     setOpenProject(projectGroups[group][0]);
+    setActiveStep(0);
   };
 
   const focusIdentityCategory = (key: IdentityCategory) => {
@@ -1097,10 +991,6 @@ export default function Home() {
 
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
-      <div className={"site-intro" + (introLifted ? " is-lifted" : "")} aria-hidden="true">
-        <span className="site-intro-mark">AY<span>·</span></span>
-        <span className="intro-subtext">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</span>
-      </div>
       <button
         ref={guideRef}
         key={currentGuide.id}
@@ -1115,7 +1005,7 @@ export default function Home() {
       </button>
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
-      <header className="topbar">
+      <header className={`topbar${!activeSection || activeSection === "top" ? " is-over-poster" : ""}`}>
         <span className="scroll-progress" style={{ "--scroll-progress": `${scrollProgress}%` } as CSSProperties} aria-hidden="true" />
         <a className="wordmark magnetic" href="#top" aria-label="返回首页">AY<span>·</span></a>
         <nav aria-label="页面导航">
@@ -1135,59 +1025,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section className="hero interactive-section" id="top">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <span className="hero-pulse-field" aria-hidden="true" />
-        <span className="hero-ghost-mark" aria-hidden="true">AY</span>
-        <div className="hero-copy">
-          <p className="eyebrow mono-label" data-scramble>AN YAN / PORTFOLIO · 2026</p>
-          <h1 className="hero-name" aria-label="安颜 Yan An">
-            <span className="hero-name-cn" aria-hidden="true">
-              {Array.from("安颜").map((character, index) => (
-                <i style={{ "--char-index": index } as CSSProperties} key={`${character}-${index}`}>
-                  {character}
-                </i>
-              ))}
-            </span>
-            <span className="hero-name-en" aria-hidden="true">
-              {Array.from("Yan An").map((character, index) => (
-                <i style={{ "--char-index": index } as CSSProperties} key={`${character}-${index}`}>
-                  {character === " " ? "\u00a0" : character}
-                </i>
-              ))}
-            </span>
-          </h1>
-          <p className="hero-statement">从数据中寻找答案</p>
-          <p className="hero-role">STATISTICS × CAUSAL INFERENCE × AI PRODUCT</p>
-          <p className="intro">用统计理解问题，用数据验证判断</p>
-          <div className="hero-actions">
-            <a className="primary-cta magnetic" href="#work">查看作品 <span>↘</span></a>
-            <a className="text-link magnetic" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
-          </div>
-          <div className="hero-signature" aria-hidden="true">
-            <span>CURIOUS</span><i />
-            <span>RIGOROUS</span><i />
-            <span>EXPRESSIVE</span>
-          </div>
-        </div>
-        <figure ref={heroPortraitRef} className="hero-portrait">
-          <div className="hero-portrait-media">
-            <div className="depth-layer hero-color-layer" data-speed="1" aria-hidden="true" />
-            <div className="depth-layer hero-photo-layer" data-speed="2">
-              <div className="hero-scene-window">
-                <img className="hero-scene" src="./photos/london-shadow.webp" alt="安颜拍摄的伦敦街景与人物剪影" />
-              </div>
-            </div>
-            <span className="depth-layer hero-name-depth" data-speed="3" aria-hidden="true">Yan An</span>
-            <span className="hero-role-depth" aria-hidden="true">STATISTICS</span>
-            <div className="depth-layer hero-person-layer" data-speed="4" aria-hidden="true">
-              <img className="hero-cutout" src="./photos/hero-cutout-v2.webp" alt="" />
-            </div>
-          </div>
-          <figcaption className="hero-portrait-caption"><span>01 / 02 · PORTRAIT</span><span>LONDON</span></figcaption>
-        </figure>
-        <a className="scroll-note" href="#work">SCROLL / 看作品 ↓</a>
-      </section>
+      <ImpactHero onIntroCompleteChange={setIntroLifted} />
 
       {musicOpen && (
         <aside className="music-card" aria-label="背景音乐说明">
