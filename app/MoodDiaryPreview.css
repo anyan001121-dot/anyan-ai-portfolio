@@ -1,0 +1,35 @@
+.project-stage.garden { background: #e8eedc; }
+.project-stage.garden::before { background: radial-gradient(circle at 85% 18%,#bed8b54d,transparent 40%); }
+.mood-preview { margin: 0; overflow: hidden; border: 1px solid #31524430; border-radius: 16px; color: #284536; background: #f9f9f0; box-shadow: 0 18px 44px #2b463322; }
+.mood-preview-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 17px 20px; border-bottom: 1px solid #31524420; }
+.mood-preview-bar > span { font: 700 16px/1.4 var(--sans); }
+.mood-preview-bar small { font: 10px/1.4 var(--type); letter-spacing: .09em; }
+.mood-preview-scene { position: relative; min-height: 385px; padding: 25px 22px 110px; background: #d6ebd0 url("/photos/mood-diary/garden.webp") center bottom / cover; }
+.mood-preview-panel { position: relative; z-index: 1; min-height: 250px; padding: 22px; border: 1px solid #ffffff8c; border-radius: 14px; background: #fffdf3ef; box-shadow: 0 6px 22px #31524410; animation: mood-panel-in .3s ease both; }
+.mood-preview-panel > small { display: block; font: 10px/1.5 var(--type); letter-spacing: .09em; color: #60795e; }
+.mood-preview-panel h4 { margin: 16px 0; font: 650 clamp(21px,2.4vw,30px)/1.45 var(--sans); letter-spacing: -.03em; white-space: pre-line; }
+.mood-preview-panel > p { margin: 0 0 17px; font-size: 13px; line-height: 1.8; }
+.mood-preview-feelings { display: flex; justify-content: space-between; gap: 6px; margin-top: 24px; }
+.mood-preview-feelings > span { padding: 7px 3px; border-bottom: 2px solid #9fbc87; font-size: 12px; white-space: nowrap; }
+.mood-preview-choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.mood-preview-choices > span { padding: 9px 4px; border-radius: 7px; background: #e0e8d3; font-size: 12px; text-align: center; }
+.mood-preview-choices > small { grid-column: 1 / -1; padding-top: 1px; font-size: 11px; color: #60705c; }
+.mood-preview-memory { padding: 13px; border-left: 3px solid #9fbc87; background: #e5eddd; }
+.mood-preview-memory > small { display: block; margin-bottom: 7px; font-size: 10px; color: #526c4f; }
+.mood-preview-memory > span { display: flex; justify-content: space-between; gap: 6px; font-size: 13px; }
+.mood-preview-memory i { font-style: normal; }
+.mood-preview-flowers { position: absolute; z-index: 2; right: 6%; bottom: 2px; left: 7%; display: flex; align-items: end; justify-content: space-around; pointer-events: none; }
+.mood-preview-flowers img { display: block; width: 29%; max-width: 100px; height: 105px; object-fit: contain; object-position: bottom; }
+.mood-preview-flowers img:nth-child(2) { height: 78px; }
+.mood-preview figcaption { display: flex; justify-content: space-between; gap: 10px; padding: 13px 18px; font-size: 10px; color: #526c4f; }
+@keyframes mood-panel-in { from { opacity: 0; transform: translateY(7px); } to { opacity: 1; transform: none; } }
+@media (max-width: 620px) {
+  .mood-preview-scene { padding: 16px 12px 96px; }
+  .mood-preview-panel { padding: 18px 15px; min-height: 273px; }
+  .mood-preview-panel h4 { font-size: 23px; }
+  .mood-preview-bar { padding: 14px; }
+  .mood-preview-flowers img { height: 88px; }
+  .mood-preview-flowers img:nth-child(2) { height: 66px; }
+  .mood-preview figcaption { padding-inline: 12px; font-size: 9px; }
+}
+@media (prefers-reduced-motion: reduce) { .mood-preview-panel { animation: none; } }

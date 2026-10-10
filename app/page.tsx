@@ -5,6 +5,7 @@
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 import LetterSwap3D from "./LetterSwap3D";
 import ImpactHero from "./ImpactHero";
+import MoodDiaryPreview from "./MoodDiaryPreview";
 
 const fitCards = [
   {
@@ -356,12 +357,37 @@ const projects = [
     tone: "lavender",
     preview: "metric",
   },
+  {
+    year: "2026",
+    title: "心情日记",
+    subtitle: "情绪花园与主动关怀产品",
+    tags: ["JavaScript", "LocalStorage", "Web Audio", "LLM · BYOK"],
+    metric: "CARE",
+    metricLabel: "记录 → 关怀 → 反馈",
+    lead: "把每次心情种成一朵花；当用户说“今天不太好”，产品主动接住，并给出一个小行动。",
+    star: {
+      situation: "面对学业、工作与社交压力，用户既需要低门槛记录，也需要在低落时少做选择、及时获得回应。",
+      task: "把情绪记录、即时关怀与后续反馈连起来，让用户可以按自己的状态决定下一步。",
+      action: "用五档心情驱动花园生长；低落时在当前页面展开关怀流程，提供呼吸、书写或暂不行动的选择。记录主观反馈，在类似情境下提示上次可能有帮助的方法；另设可选的“小萤”AI 陪聊。",
+      result: "已上线可直接体验的静态应用，包含 7／30 天趋势、情绪日历、植物图鉴、关怀反馈与延迟回访。日记与关怀记录保存在本地；AI 陪聊需用户自带密钥开启，对话发送至所选服务商。",
+    },
+    steps: [
+      { label: "种下心情", description: "点选最接近当下的感受，就能在花园里留下一朵花；不必先填写一长串问题。" },
+      { label: "即时关怀", description: "选择低落或很糟后，关怀面板直接出现：可以缓一下、说一说，也可以什么都不做。" },
+      { label: "反馈与记忆", description: "完成行动后留下真实感受；下次遇到类似的事，产品会轻量提示上次可能有帮助的方法。" },
+    ],
+    tone: "garden",
+    preview: "mood-diary",
+    url: "https://github.com/anyan001121-dot/mood-diary-app",
+    liveUrl: "https://anyan001121-dot.github.io/mood-diary-app/",
+    linkLabel: "体验心情日记",
+  },
 ];
 
 type ProjectGroup = "ai" | "data";
 
 const projectGroups: Record<ProjectGroup, number[]> = {
-  ai: [0, 1, 2],
+  ai: [0, 8, 1, 2],
   data: [3, 4, 5, 6, 7],
 };
 
@@ -939,7 +965,8 @@ export default function Home() {
   };
   const chooseProject = (index: number) => {
     if (index === openProject) return;
-    triggerProjectGuide(index > openProject ? "right" : "left");
+    const group = projectGroups[projectGroup];
+    triggerProjectGuide(group.indexOf(index) > group.indexOf(openProject) ? "right" : "left");
     setOpenProject(index);
     setActiveStep(0);
   };
@@ -1047,12 +1074,12 @@ export default function Home() {
         <div className="project-showcase">
           <div className="project-modules" aria-label="项目分类">
             <button className={projectGroup === "ai" ? "is-active" : ""} type="button" onClick={() => selectProjectGroup("ai")}>
-              <small>MODULE A / 03</small>
+              <small>MODULE A / {String(projectGroups.ai.length).padStart(2, "0")}</small>
               <strong>AI 应用</strong>
               <span>从问题到可交互原型</span>
             </button>
             <button className={projectGroup === "data" ? "is-active" : ""} type="button" onClick={() => selectProjectGroup("data")}>
-              <small>MODULE B / 04</small>
+              <small>MODULE B / {String(projectGroups.data.length).padStart(2, "0")}</small>
               <strong>数据分析</strong>
               <span>从数据到可解释结论</span>
             </button>
@@ -1111,6 +1138,7 @@ export default function Home() {
             </div>
 
             <div className="project-stage-visual">
+              {activeProject.preview === "mood-diary" && <MoodDiaryPreview step={activeStep} />}
               {activeProject.preview === "focusflow" && (
                 <figure className="project-window focusflow-window" aria-label="FocusFlow 产品界面预览">
                   <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>focusflow.app</small></div>
