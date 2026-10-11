@@ -3,36 +3,10 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState, type CSSProperties } from "react";
-import LetterSwap3D from "./LetterSwap3D";
 import ImpactHero from "./ImpactHero";
-import MoodDiaryPreview from "./MoodDiaryPreview";
-
-const fitCards = [
-  {
-    no: "01",
-    title: "从业务问题到数据问题",
-    tag: "PRODUCT × ANALYTICS",
-    detail: "从业务目标出发拆解用户、场景与核心指标，将模糊需求转化为可量化、可验证的数据问题，并明确分析口径与成功标准。",
-  },
-  {
-    no: "02",
-    title: "让数据口径先对齐",
-    tag: "SQL × DATA ANALYSIS",
-    detail: "使用 SQL 完成多表关联、聚合、窗口计算与指标构建，结合 Python / R 进行数据清洗、EDA 与异常归因，为后续分析建立一致、可复现的数据基础。",
-  },
-  {
-    no: "03",
-    title: "用实验回答“有没有用”",
-    tag: "A/B TESTING",
-    detail: "从业务目标定义核心指标与护栏指标，通过 A/B Test、假设检验与置信区间评估策略效果，同时关注效应量、统计显著性与实际业务价值。",
-  },
-  {
-    no: "04",
-    title: "相关不等于因果",
-    tag: "CAUSAL INFERENCE",
-    detail: "识别并合理控制关键混杂因素，根据研究设计选择回归调整、匹配等因果推断方法，并通过敏感性分析与稳健性检验验证结论。",
-  },
-];
+import { WorkGallery, MethodLab, PhotoDesk, StudioGuide } from "./StudioSections";
+import { projects } from "./projects";
+import "./Studio.css";
 
 type IdentityCategory = "data" | "product" | "expression" | "observe";
 
@@ -154,250 +128,7 @@ class TextScramble {
   }
 }
 
-function TypewriterText({ text, active }: { text: string; active: boolean }) {
-  const [visibleLength, setVisibleLength] = useState(0);
-
-  useEffect(() => {
-    let typingTimer: number | undefined;
-    const startTimer = window.setTimeout(() => {
-      setVisibleLength(0);
-      if (!active) return;
-      typingTimer = window.setInterval(() => {
-        setVisibleLength((length) => {
-          if (length >= text.length) {
-            if (typingTimer) window.clearInterval(typingTimer);
-            return text.length;
-          }
-          return length + 1;
-        });
-      }, 18);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(startTimer);
-      if (typingTimer) window.clearInterval(typingTimer);
-    };
-  }, [active, text]);
-
-  return (
-    <p className="typewriter-copy">
-      {text.slice(0, visibleLength)}
-      {active && visibleLength < text.length && <span className="typing-caret" aria-hidden="true">▋</span>}
-    </p>
-  );
-}
-
-const projects = [
-  {
-    year: "2026",
-    title: "FocusFlow",
-    subtitle: "面向 ADHD 场景的 AI 任务执行助手",
-    tags: ["LangGraph", "Streamlit", "SQLite", "LLM"],
-    metric: "≤ 3",
-    metricLabel: "即时优先项",
-    lead: "将杂乱任务压缩为不超过三项、可立即执行的下一步。",
-    star: {
-      situation: "任务一多，最难的往往不是完成，而是不知道先做哪一步。",
-      task: "将模糊、杂乱的任务输入拆解为少量可执行步骤，并支持中断后的状态恢复。",
-      action: "LangGraph 负责 Brain Dump、任务拆解、计时、暂存和恢复；SQLite 保存本地记录，任务时长会按实际用时继续调整。",
-      result: "每轮只给 3 个以内的优先项，并记录启动耗时、完成率和恢复成功率，用来判断产品是否真的有用。",
-    },
-    steps: [
-      { label: "杂乱输入", description: "把脑子里所有的任务一股脑倒出来，不用管顺序、不用管轻重。" },
-      { label: "拆解为 3 步", description: "LangGraph 把杂乱输入压缩成不超过 3 个可以立即执行的下一步。" },
-      { label: "开始执行", description: "选一项开始计时；中断后可以恢复，时长会按实际用时继续调整。" },
-    ],
-    tone: "focus",
-    preview: "focusflow",
-    url: "https://github.com/anyan001121-dot/focusflow",
-  },
-  {
-    year: "2026",
-    title: "北森刷题台",
-    subtitle: "校招测评练习产品",
-    tags: ["Vanilla JS", "LocalStorage", "Quiz UX", "GitHub Pages"],
-    metric: "727",
-    metricLabel: "道题 · 三大模块",
-    lead: "将 727 道测评题整合为一套可练习、可追踪、可复盘的在线系统。",
-    star: {
-      situation: "备考校招测评时，727 道题分散在三个模块，练习和复盘需要来回切换。",
-      task: "做一套从选题、答题到错题回看的完整刷题流程。",
-      action: "用原生 JS 与 LocalStorage 实现快速小测、顺序/随机练习、答题卡、收藏、错题筛选和成绩报告。",
-      result: "收录言语 321 题、资料 254 题、图形 152 题；进度、错题和收藏均保存在本地，可直接在线使用。",
-    },
-    steps: [
-      { label: "抽题", description: "从言语、资料、图形三大模块里随机抽一题，也可以按模块顺序练习。" },
-      { label: "作答", description: "答题卡实时记录进度，不确定的题目可以先收藏，稍后回头看。" },
-      { label: "查看反馈", description: "提交后立即看到正误和正确率，答错的题会自动进入错题筛选。" },
-    ],
-    tone: "quiz",
-    preview: "quiz",
-    url: "https://github.com/anyan001121-dot/beisen-quiz",
-    liveUrl: "https://anyan001121-dot.github.io/beisen-quiz/",
-  },
-  {
-    year: "2024",
-    title: "AYBot",
-    subtitle: "RAG 知识检索助手",
-    tags: ["LangChain", "Coze", "LLM", "API"],
-    metric: "TOP 3",
-    metricLabel: "知识片段召回",
-    lead: "先检索依据，再组织答案。",
-    star: {
-      situation: "通用大模型不了解本地资料，面对新信息时也容易给出没有依据的回答。",
-      task: "搭建一套先找资料、再生成答案的检索流程，并让信息来源可以追溯。",
-      action: "在 Coze 中拆成输入、知识库检索、外部搜索、答案生成和输出 5 个节点；每次召回 Top 3 片段，最低匹配度设为 0.14。",
-      result: "回答会结合内部资料与外部搜索依据；扩展工作流还能按关键词整理 10 条新闻并定时推送。",
-    },
-    tone: "coral",
-    preview: "aybot",
-  },
-  {
-    year: "2023",
-    title: "QAR 航空安全模型",
-    subtitle: "高维飞行数据风险识别与预警",
-    tags: ["PCA", "Random Forest", "LOF", "SVM"],
-    metric: "0.85",
-    metricLabel: "预警准确度",
-    lead: "从 100+ 项高频飞行参数中识别关键风险信号。",
-    award: "MathorCup 数学建模挑战赛全国二等奖",
-    star: {
-      situation: "QAR 底层时间序列包含 100+ 项高频飞行参数，数据量大、噪声多，异常信号分散在不同机场与飞行阶段。",
-      task: "完成数据质量治理、关键指标筛选与危险飞行标注，形成可用于飞员评估和实时预警的分析链路。",
-      action: "以箱线图、缺失值处理和 Cronbach’s α 检验清洗数据；PCA 缓解高维计算压力，随机森林筛出着陆 G 值等 5 项核心特征；再用 LOF 无监督标注离群飞行，并训练 Sigmoid 核 SVM。",
-      result: "测试集预警准确率达到 0.85；ADF 检验与超限热力图进一步定位机场、飞行阶段和超限类型的交叉风险，项目获 MathorCup 全国二等奖。",
-    },
-    tone: "blue",
-    preview: "metric",
-  },
-  {
-    year: "2023",
-    title: "新能源汽车与双碳",
-    subtitle: "市场增长与双碳目标建模",
-    tags: ["GM(1,1)", "Regression", "Ridge"],
-    metric: "R² .973",
-    metricLabel: "岭回归拟合",
-    lead: "结合市场、能源与碳排放数据，识别新能源汽车增长的关键驱动因素。",
-    award: "长三角数学建模竞赛二等奖",
-    star: {
-      situation: "新能源市场、能源消费与碳排放数据来自不同口径，难以直接比较。",
-      task: "评估新能源汽车增长与双碳目标之间的关系，并推演关键时间节点。",
-      action: "用多元回归识别充电桩、原油产量与居民消费水平等关键驱动因素，再结合 GM(1,1) 与 Cobb-Douglas 岭回归验证预测与拟合表现。",
-      result: "后验差比值 0.002、平均相对误差 1.983%、R² 0.973；项目获长三角数学建模竞赛二等奖。",
-    },
-    tone: "acid",
-    preview: "metric",
-  },
-  {
-    year: "2026",
-    title: "电影商业成功预测",
-    subtitle: "IMDb 数据挖掘小组项目",
-    tags: ["R", "LDA", "SVM", "Random Forest", "kNN"],
-    metric: "AUC .769",
-    metricLabel: "随机森林",
-    lead: "只用上映前信息预测电影表现，再按决策成本选择模型。",
-    star: {
-      situation: "IMDb 数据含 2,000 部电影、28 个变量；成功影片仅占训练集的 23.9%，单看准确率容易掩盖漏判。",
-      task: "用上映前可获得的信息构造成功标签，并比较不同模型在‘发现潜力片’与‘减少误判’两类决策中的表现。",
-      action: "结合 IMDb 评分与 ROI 定义目标，剔除上映后变量防止泄漏；完成缺失值填补、偏态变量对数变换和 70/30 分层切分，比较 LDA、决策树、Bagging、随机森林、SVM 与 kNN 等 7 类模型。",
-      result: "随机森林 AUC 0.7685、精确率 68.9%；SVM 召回率 45.5%、F1 0.459，最适合优先捕捉潜在成功影片。上映年份、片长、预算与导演关注度反复进入关键变量。",
-    },
-    tone: "paper",
-    preview: "metric",
-  },
-  {
-    year: "2026",
-    title: "Olist 履约质量分析",
-    subtitle: "巴西电商履约与差评归因",
-    tags: ["DuckDB", "PSM/IPW", "因果推断", "LightGBM"],
-    metric: "+45.05pp",
-    metricLabel: "延迟对差评率的净效应（PSM 验证）",
-    lead: "从数据质量陷阱到因果验证，再到可执行的资源投向建议。",
-    star: {
-      situation: "基于 Olist 巴西电商公开数据集（9 张表、9.8 万订单、11.2 万明细、10 万条评论），用 DuckDB 搭建 DWD 视图层统一指标口径，修正三处数据陷阱：customer_id 为订单级键导致复购率误算为 0、同日拆单使复购率虚高 29%、多表一对多 JOIN 使 GMV 虚高 4.57%。",
-      task: "定位平台 13.7% 差评率的核心成因，验证配送延迟的因果效应是否被订单本身的构成差异高估，并判断责任在卖家还是物流网络。",
-      action: "延迟订单差评率 54.0% vs 按时 9.2%，剂量反应分析显示伤害呈断崖式（延迟 1-3 天差评率即从 11.7% 跳至 32.2%）；用倾向得分匹配（110 维协变量，匹配后 SMD 全部 < 0.045）估计 ATT +45.05pp，经 IPW 与回归调整交叉验证（四法极差 0.67pp），选择偏差仅 0.3%；将延迟责任拆解至运输段（85.5%）与卖家备货段（14.5%），卖家分层数据显示四档延迟率仅 7.3%~8.1%，排除卖家治理假设；构建 LightGBM 下单时差评预警模型，排查修复时间穿越泄漏（卖家历史特征由全期均值改为扩展窗口），AUC 由虚高的 0.932 回落至真实的 0.636。",
-      result: "推翻“偏远地区差评不可避免”与“延迟主要是卖家问题”两个内部假设，论证问题在物流网络而非卖家治理；据剂量反应结果提出“提升时效确定性优先于压缩平均时效”；预警模型 TOP 10% 订单差评概率提升 2.43 倍。",
-    },
-    overturn: {
-      before: "下单时差评预警模型测试集 AUC 一度跑到 0.932，看起来已经可以直接上线。",
-      evidence: "排查特征口径才发现问题：卖家历史表现用的是“全期平均值”，混进了预测那一刻还没发生的未来订单信息，是一次时间穿越泄漏。",
-      after: "把卖家历史特征改成只用“下单当下已经发生”的扩展窗口统计重新训练，AUC 回落到真实可信的 0.636——数字变难看了，但这才是能真正部署的模型。",
-    },
-    steps: [
-      { label: "散乱记录", description: "9 张表、9.8 万订单、10 万条评论，指标口径还没对齐，复购率、GMV 都是脏数据。" },
-      { label: "修正口径", description: "修正三处数据陷阱：customer_id 误判复购率为 0、同日拆单使复购率虚高、一对多 JOIN 使 GMV 虚高 4.57%。" },
-      { label: "验证证据", description: "倾向得分匹配 110 维协变量，匹配后 SMD 全部 < 0.045，估计延迟对差评率的净效应 +45.05pp。" },
-    ],
-    tone: "steel",
-    preview: "metric",
-    url: "https://github.com/anyan001121-dot/olist-analysis",
-    liveUrl: "https://claude.ai/artifact/BHLyhhHL68UPTpoqz7vkge",
-    linkLabel: "查看分析报告",
-  },
-  {
-    year: "2026",
-    title: "血糖与 HDL 关联因素",
-    subtitle: "统计学硕士论文",
-    tags: ["HC3", "GAM", "Lasso", "BMA"],
-    metric: "N 3,808",
-    metricLabel: "参与者",
-    lead: "基于 3,808 名参与者的数据，评估血糖与 HDL 的临床、生活方式及遗传关联。",
-    star: {
-      situation: "血糖和 HDL 同时受到临床、生活方式与遗传因素影响，变量之间也存在相关性。",
-      task: "基于 3,808 名参与者识别稳定关联，并评估 SNP 面板的整体贡献。",
-      action: "结合 HC3、GLM/GAM、Lasso 与 BMA，并通过共线性检查精简候选位点。",
-      result: "BMI 每增加 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%；女性 HDL 约高 20%，并发现 SNP 面板与血糖存在整体关联。",
-    },
-    overturn: {
-      before: "本以为遗传位点（SNP）会是这篇论文最亮眼的发现，是血糖和 HDL 的重要解释变量。",
-      evidence: "多重比较校正之后，单个位点的证据非常有限，SNP 面板对预测效果的整体增益也很小。",
-      after: "没有为了让结论“更好看”而夸大遗传效应，而是把论文重心放回 BMI、吸烟等效应清晰、稳定的生活方式因素上，对遗传部分的表述也写得更保守克制。",
-    },
-    tone: "lavender",
-    preview: "metric",
-  },
-  {
-    year: "2026",
-    title: "心情日记",
-    subtitle: "情绪花园与主动关怀产品",
-    tags: ["JavaScript", "LocalStorage", "Web Audio", "LLM · BYOK"],
-    metric: "CARE",
-    metricLabel: "记录 → 关怀 → 反馈",
-    lead: "把每次心情种成一朵花；当用户说“今天不太好”，产品主动接住，并给出一个小行动。",
-    star: {
-      situation: "面对学业、工作与社交压力，用户既需要低门槛记录，也需要在低落时少做选择、及时获得回应。",
-      task: "把情绪记录、即时关怀与后续反馈连起来，让用户可以按自己的状态决定下一步。",
-      action: "用五档心情驱动花园生长；低落时在当前页面展开关怀流程，提供呼吸、书写或暂不行动的选择。记录主观反馈，在类似情境下提示上次可能有帮助的方法；另设可选的“小萤”AI 陪聊。",
-      result: "已上线可直接体验的静态应用，包含 7／30 天趋势、情绪日历、植物图鉴、关怀反馈与延迟回访。日记与关怀记录保存在本地；AI 陪聊需用户自带密钥开启，对话发送至所选服务商。",
-    },
-    steps: [
-      { label: "种下心情", description: "点选最接近当下的感受，就能在花园里留下一朵花；不必先填写一长串问题。" },
-      { label: "即时关怀", description: "选择低落或很糟后，关怀面板直接出现：可以缓一下、说一说，也可以什么都不做。" },
-      { label: "反馈与记忆", description: "完成行动后留下真实感受；下次遇到类似的事，产品会轻量提示上次可能有帮助的方法。" },
-    ],
-    tone: "garden",
-    preview: "mood-diary",
-    url: "https://github.com/anyan001121-dot/mood-diary-app",
-    liveUrl: "https://anyan001121-dot.github.io/mood-diary-app/",
-    linkLabel: "体验心情日记",
-  },
-];
-
 type ProjectGroup = "ai" | "data";
-
-const projectGroups: Record<ProjectGroup, number[]> = {
-  ai: [0, 8, 1, 2],
-  data: [3, 4, 5, 6, 7],
-};
-
-const guideSections = [
-  { id: "top", name: "首页" },
-  { id: "work", name: "项目" },
-  { id: "self", name: "个人关键词" },
-  { id: "fit", name: "方法与工具" },
-  { id: "about", name: "屏幕之外" },
-] as const;
 
 export default function Home() {
   const [introLifted, setIntroLifted] = useState(true);
@@ -405,25 +136,16 @@ export default function Home() {
   const [photosOn, setPhotosOn] = useState(true);
   const [identityOpen, setIdentityOpen] = useState(false);
   const [particlesReady, setParticlesReady] = useState(false);
-  const [openFit, setOpenFit] = useState<string | null>(null);
-  const [hoveredFit, setHoveredFit] = useState<string | null>(null);
-  const [projectGroup, setProjectGroup] = useState<ProjectGroup>("ai");
-  const [openProject, setOpenProject] = useState(0);
-  const [activeStep, setActiveStep] = useState(0);
+  const [projectGroup, setProjectGroup] = useState<ProjectGroup | "all">("all");
+  const [surprise, setSurprise] = useState(0);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [activeSection, setActiveSection] = useState("");
-  const [guideDropping, setGuideDropping] = useState(false);
-  const [guideProjectMotion, setGuideProjectMotion] = useState<"left" | "right" | null>(null);
   const [activeIdentityCategory, setActiveIdentityCategory] = useState<IdentityCategory | null>(null);
-  const [pinnedInterest, setPinnedInterest] = useState<"debate" | "photo" | null>(null);
   const glyphCanvasRef = useRef<HTMLCanvasElement>(null);
   const wordCloudRef = useRef<HTMLButtonElement>(null);
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
-  const guideRef = useRef<HTMLButtonElement>(null);
-  const guideMotionTimerRef = useRef<number | null>(null);
-  const guideSectionRef = useRef("");
   useEffect(() => {
     const canvas = glyphCanvasRef.current;
     const container = wordCloudRef.current;
@@ -832,68 +554,33 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const updateProgress = () => {
-      const available = document.documentElement.scrollHeight - window.innerHeight;
-      setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
-    };
     const sections = ["top", "work", "self", "fit", "about"]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
-    const sectionObserver = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setActiveSection(visible.target.id);
-      },
-      { rootMargin: "-30% 0px -55%", threshold: [0, 0.15, 0.35] },
-    );
-
+    let frame = 0;
+    const updateProgress = () => {
+      frame = 0;
+      const available = document.documentElement.scrollHeight - window.innerHeight;
+      setScrollProgress(available > 0 ? Math.min(100, (window.scrollY / available) * 100) : 0);
+      const marker = Math.max(80, window.innerHeight * 0.35);
+      const visible = sections.find((section) => {
+        const bounds = section.getBoundingClientRect();
+        return bounds.top <= marker && bounds.bottom > marker;
+      });
+      if (visible) setActiveSection(visible.id);
+    };
+    const schedule = () => { if (!frame) frame = window.requestAnimationFrame(updateProgress); };
+    const resizeObserver = new ResizeObserver(schedule);
+    resizeObserver.observe(document.body);
     updateProgress();
-    window.addEventListener("scroll", updateProgress, { passive: true });
-    sections.forEach((section) => sectionObserver.observe(section));
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
     return () => {
-      window.removeEventListener("scroll", updateProgress);
-      sectionObserver.disconnect();
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+      window.cancelAnimationFrame(frame);
+      resizeObserver.disconnect();
     };
-  }, []);
-
-  useEffect(() => {
-    if (!activeSection) return;
-    if (!introLifted) {
-      guideSectionRef.current = activeSection;
-      return;
-    }
-    if (!guideSectionRef.current || guideSectionRef.current === activeSection) {
-      guideSectionRef.current = activeSection;
-      return;
-    }
-    guideSectionRef.current = activeSection;
-    const startTimer = window.setTimeout(() => setGuideDropping(true), 0);
-    const stopTimer = window.setTimeout(() => setGuideDropping(false), 2260);
-    return () => {
-      window.clearTimeout(startTimer);
-      window.clearTimeout(stopTimer);
-    };
-  }, [activeSection, introLifted]);
-
-  useEffect(() => {
-    const followPointer = (event: PointerEvent) => {
-      const guide = guideRef.current;
-      if (!guide) return;
-      const bounds = guide.getBoundingClientRect();
-      const dx = Math.max(-1, Math.min(1, (event.clientX - (bounds.left + bounds.width / 2)) / (window.innerWidth * 0.42)));
-      const dy = Math.max(-1, Math.min(1, (event.clientY - (bounds.top + bounds.height * 0.28)) / (window.innerHeight * 0.55)));
-      guide.style.setProperty("--guide-look-x", `${dx * 1.8}px`);
-      guide.style.setProperty("--guide-look-y", `${dy * 0.8}px`);
-      guide.style.setProperty("--guide-look-r", `${dx * 1.6}deg`);
-      guide.style.setProperty("--guide-gaze-x", `${dx * 2.2}px`);
-      guide.style.setProperty("--guide-gaze-y", `${dy * 1.4}px`);
-    };
-    window.addEventListener("pointermove", followPointer, { passive: true });
-    return () => window.removeEventListener("pointermove", followPointer);
-  }, []);
-
-  useEffect(() => () => {
-    if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
   }, []);
 
   // Cinematic reveal: each section heading's label + h2 rise through a
@@ -920,72 +607,6 @@ export default function Home() {
     return () => curtainObserver.disconnect();
   }, []);
 
-  // Page-to-page transition: each section continuously reports how much of
-  // itself is visible via --in-view (0-1), and CSS uses that to settle the
-  // section into focus (scale/blur/opacity) as it crosses into place instead
-  // of just appearing. Not a one-shot reveal -- this tracks scroll position
-  // the whole time, so scrolling back and forth replays it both ways.
-  useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const panels = Array.from(document.querySelectorAll<HTMLElement>(".hero, .section"));
-    if (!panels.length) return;
-    const thresholds = Array.from({ length: 101 }, (_, i) => i / 100);
-    const focusObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          // Ratio relative to the viewport, not the section's own height --
-          // otherwise a section taller than the viewport (e.g. the last one)
-          // can never reach 1 and stays permanently blurred/dim.
-          const viewportHeight = entry.rootBounds?.height || window.innerHeight;
-          const ratio = viewportHeight > 0
-            ? Math.min(1, entry.intersectionRect.height / viewportHeight)
-            : entry.intersectionRatio;
-          (entry.target as HTMLElement).style.setProperty("--in-view", ratio.toFixed(3));
-        });
-      },
-      { threshold: thresholds },
-    );
-    panels.forEach((panel) => focusObserver.observe(panel));
-    return () => focusObserver.disconnect();
-  }, []);
-
-  const toggleFit = (key: string) => setOpenFit((current) => current === key ? null : key);
-  const activeProject = projects[openProject];
-  const activeProjectUrl = "url" in activeProject ? activeProject.url : undefined;
-  const activeProjectLiveUrl = "liveUrl" in activeProject ? activeProject.liveUrl : undefined;
-  const activeProjectAward = "award" in activeProject ? activeProject.award : undefined;
-  const activeProjectLinkLabel = "linkLabel" in activeProject ? activeProject.linkLabel : "打开题库";
-  const activeProjectOverturn = "overturn" in activeProject ? activeProject.overturn : undefined;
-  const activeProjectSteps = "steps" in activeProject ? activeProject.steps : undefined;
-  const triggerProjectGuide = (direction: "left" | "right") => {
-    if (guideMotionTimerRef.current !== null) window.clearTimeout(guideMotionTimerRef.current);
-    setGuideProjectMotion(null);
-    window.requestAnimationFrame(() => setGuideProjectMotion(direction));
-    guideMotionTimerRef.current = window.setTimeout(() => setGuideProjectMotion(null), 1180);
-  };
-  const chooseProject = (index: number) => {
-    if (index === openProject) return;
-    const group = projectGroups[projectGroup];
-    triggerProjectGuide(group.indexOf(index) > group.indexOf(openProject) ? "right" : "left");
-    setOpenProject(index);
-    setActiveStep(0);
-  };
-  const selectAdjacentProject = (direction: number) => {
-    const group = projectGroups[projectGroup];
-    const currentPosition = Math.max(0, group.indexOf(openProject));
-    triggerProjectGuide(direction > 0 ? "right" : "left");
-    setOpenProject(group[(currentPosition + direction + group.length) % group.length]);
-    setActiveStep(0);
-  };
-
-  const selectProjectGroup = (group: ProjectGroup) => {
-    if (group === projectGroup) return;
-    triggerProjectGuide(group === "data" ? "right" : "left");
-    setProjectGroup(group);
-    setOpenProject(projectGroups[group][0]);
-    setActiveStep(0);
-  };
-
   const focusIdentityCategory = (key: IdentityCategory) => {
     if (activeIdentityCategory === key) {
       setActiveIdentityCategory(null);
@@ -996,40 +617,19 @@ export default function Home() {
     // 先留半秒看清关键词高亮，再跳转——否则高亮效果会被滚动直接盖过去，等于白做。
     window.setTimeout(() => {
       if (key === "data" || key === "product") {
-        setPinnedInterest(null);
-        selectProjectGroup(key === "data" ? "data" : "ai");
+        setProjectGroup(key === "data" ? "data" : "ai");
         document.getElementById("work")?.scrollIntoView({ behavior: "smooth", block: "start" });
       } else if (key === "expression") {
-        setPinnedInterest("debate");
         document.getElementById("interest-debate")?.scrollIntoView({ behavior: "smooth", block: "center" });
       } else if (key === "observe") {
-        setPinnedInterest("photo");
         document.getElementById("offscreen-gallery")?.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }, 550);
   };
 
-  const guideIndex = Math.max(0, guideSections.findIndex((section) => section.id === activeSection));
-  const currentGuide = guideSections[guideIndex];
-  const nextGuide = guideSections[(guideIndex + 1) % guideSections.length];
-  const advanceGuide = () => {
-    document.getElementById(nextGuide.id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
-      <button
-        ref={guideRef}
-        key={currentGuide.id}
-        className={`site-guide magnetic${!introLifted ? " is-entering" : ""}${guideDropping ? " is-section-drop" : ""}${guideProjectMotion ? ` is-project-${guideProjectMotion}` : ""}`}
-        data-section={currentGuide.id}
-        type="button"
-        onClick={advanceGuide}
-        aria-label={`当前位于${currentGuide.name}，点击前往${nextGuide.name}`}
-      >
-        <span className="guide-path" aria-hidden="true"><i style={{ "--guide-step": guideIndex } as CSSProperties} /></span>
-        <span className="guide-avatar" aria-hidden="true"><i /><span className="guide-eyes"><b /><b /></span></span>
-      </button>
+      <StudioGuide section={activeSection || "top"} hidden={!introLifted} onSurprise={() => { setSurprise((v) => v + 1); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }} />
       <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
       <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
       <header className={`topbar${!activeSection || activeSection === "top" ? " is-over-poster" : ""}`}>
@@ -1037,8 +637,8 @@ export default function Home() {
         <a className="wordmark magnetic" href="#top" aria-label="返回首页">AY<span>·</span></a>
         <nav aria-label="页面导航">
           <a className={(activeSection === "top" ? "active " : "") + "magnetic"} href="#top" data-scramble>ME</a>
-          <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>WORK</a>
-          <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>WHY / TOOLS</a>
+          <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>PLAY & WORK</a>
+          <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>HOW I THINK</a>
           <a className={(activeSection === "about" ? "active " : "") + "magnetic"} href="#about" data-scramble>OFF SCREEN</a>
         </nav>
         <div className="header-actions">
@@ -1064,192 +664,7 @@ export default function Home() {
         </aside>
       )}
 
-      <section className="work section interactive-section" id="work">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="section-heading compact-heading curtain-observe">
-          <span className="heading-ghost-num" aria-hidden="true">01</span>
-          <p className="section-index">01 / SELECTED WORK</p>
-          <h2>我的项目</h2>
-        </div>
-        <div className="project-showcase">
-          <div className="project-modules" aria-label="项目分类">
-            <button className={projectGroup === "ai" ? "is-active" : ""} type="button" onClick={() => selectProjectGroup("ai")}>
-              <small>MODULE A / {String(projectGroups.ai.length).padStart(2, "0")}</small>
-              <strong>AI 应用</strong>
-              <span>从问题到可交互原型</span>
-            </button>
-            <button className={projectGroup === "data" ? "is-active" : ""} type="button" onClick={() => selectProjectGroup("data")}>
-              <small>MODULE B / {String(projectGroups.data.length).padStart(2, "0")}</small>
-              <strong>数据分析</strong>
-              <span>从数据到可解释结论</span>
-            </button>
-          </div>
-          <div className="project-rail-head">
-            <p className="mono-label" data-scramble>{projectGroup === "ai" ? "AI APPLICATIONS / 交互原型" : "DATA ANALYSIS / 建模与验证"}</p>
-            <span>悬停或点击切换项目</span>
-          </div>
-          <div className="project-rail" role="tablist" aria-label="选择项目">
-            {projectGroups[projectGroup].map((index) => {
-              const project = projects[index];
-              return (
-              <button
-                className={openProject === index ? "is-active" : ""}
-                type="button"
-                role="tab"
-                aria-selected={openProject === index}
-                onMouseEnter={() => chooseProject(index)}
-                onFocus={() => chooseProject(index)}
-                onClick={() => chooseProject(index)}
-                key={project.title}
-              >
-                <small>{projectGroup === "ai" ? "AI APP" : "DATA"} / {String(projectGroups[projectGroup].indexOf(index) + 1).padStart(2, "0")}</small>
-                <strong>{project.title}</strong>
-                <span>{project.metric}</span>
-                {"award" in project && <em className="project-rail-award">AWARD</em>}
-              </button>
-            )})}
-          </div>
-
-          <article className={`project-stage ${activeProject.tone}`} key={activeProject.title}>
-            <div className="project-stage-copy">
-              <div className="project-stage-meta">
-                <span>{String(projectGroups[projectGroup].indexOf(openProject) + 1).padStart(2, "0")} / {String(projectGroups[projectGroup].length).padStart(2, "0")}</span>
-                <span>{activeProject.year}</span>
-                {activeProjectAward && <strong className="project-award">{activeProjectAward}</strong>}
-              </div>
-              <h3>{activeProject.title}</h3>
-              <p className="project-stage-subtitle">{activeProject.subtitle}</p>
-              <p className="project-stage-lead">{activeProject.lead}</p>
-              <div className="project-tags">{activeProject.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>
-              {(activeProjectLiveUrl || activeProjectUrl) && (
-                <div className="project-links">
-                  {activeProjectLiveUrl && (
-                    <a className="project-link primary" href={activeProjectLiveUrl} target="_blank" rel="noreferrer">
-                      {activeProjectLinkLabel} <span>↗</span>
-                    </a>
-                  )}
-                  {activeProjectUrl && (
-                    <a className="project-link" href={activeProjectUrl} target="_blank" rel="noreferrer">
-                      查看 GitHub <span>↗</span>
-                    </a>
-                  )}
-                </div>
-              )}
-            </div>
-
-            <div className="project-stage-visual">
-              {activeProject.preview === "mood-diary" && <MoodDiaryPreview step={activeStep} />}
-              {activeProject.preview === "focusflow" && (
-                <figure className="project-window focusflow-window" aria-label="FocusFlow 产品界面预览">
-                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>focusflow.app</small></div>
-                  <div className="project-window-body"><img src="./photos/focusflow-preview.png" alt="FocusFlow 的 Brain Dump 任务输入界面" /></div>
-                  <figcaption>PRODUCT UI / STREAMLIT</figcaption>
-                </figure>
-              )}
-              {activeProject.preview === "quiz" && (
-                <figure className="project-window quiz-window" aria-label="北森刷题台真实产品界面">
-                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>anyan001121-dot.github.io/beisen-quiz</small></div>
-                  <a className="project-window-body project-window-click" href={activeProjectLiveUrl} target="_blank" rel="noreferrer" aria-label="打开北森刷题台">
-                    <img className="quiz-shot quiz-shot-home" src="./photos/beisen-quiz-home.png" alt="北森刷题台首页，包含快速练习、三个题型模块及练习数据" />
-                    <img className="quiz-shot quiz-shot-practice" src="./photos/beisen-quiz-practice.png" alt="北森刷题台答题页，包含题目、选项、计时器与答题卡" />
-                    <small className="quiz-view-hint" aria-hidden="true">HOVER / PRACTICE VIEW</small>
-                    <span className="project-window-open">进入真实题库 ↗</span>
-                  </a>
-                  <figcaption>REAL PRODUCT UI / 727 QUESTIONS</figcaption>
-                </figure>
-              )}
-              {activeProject.preview === "aybot" && (
-                <figure className="project-window aybot-window" aria-label="AYBot 论文中的系统架构、Coze 工作流和回答界面">
-                  <div className="project-window-bar" aria-hidden="true"><span /><span /><span /><small>aybot.flow</small></div>
-                  <div className="project-window-body aybot-evidence">
-                    <img className="aybot-shot aybot-shot-flow" src="./photos/aybot-architecture.png" alt="AYBot 的检索增强生成架构图" />
-                    <img className="aybot-shot aybot-shot-workflow" src="./photos/aybot-coze-workflow.jpg" alt="AYBot 在 Coze 中搭建的五节点工作流" />
-                    <img className="aybot-shot aybot-shot-answer" src="./photos/aybot-answer.png" alt="AYBot 结合外部检索结果生成的带来源回答" />
-                    <span className="aybot-view-note" aria-hidden="true">HOVER / 查看论文原图</span>
-                  </div>
-                  <figcaption>THESIS EVIDENCE / ARCHITECTURE · WORKFLOW · ANSWER</figcaption>
-                </figure>
-              )}
-              {activeProject.preview === "metric" && (
-                <div className="data-signal" aria-label={`${activeProject.metric} ${activeProject.metricLabel}`}>
-                  <div className="signal-grid" aria-hidden="true"><i /><i /><i /><i /><i /></div>
-                  <small>MODEL OUTPUT / VALIDATED SIGNAL</small>
-                  <b>{activeProject.metric}</b>
-                  <span>{activeProject.metricLabel}</span>
-                </div>
-              )}
-            </div>
-
-            {activeProjectSteps && (
-              <div className="project-steps" aria-label={`${activeProject.title} 交互步骤`}>
-                <small className="project-steps-label">体验一次我的思考过程</small>
-                <div className="project-steps-track" role="tablist" aria-label="步骤">
-                  {activeProjectSteps.map((step, index) => (
-                    <button
-                      key={step.label}
-                      type="button"
-                      role="tab"
-                      aria-selected={index === activeStep}
-                      className={"project-step" + (index === activeStep ? " is-active" : "") + (index < activeStep ? " is-done" : "")}
-                      onClick={() => setActiveStep(index)}
-                    >
-                      <span className="project-step-index">{String(index + 1).padStart(2, "0")}</span>
-                      <span className="project-step-label">{step.label}</span>
-                    </button>
-                  ))}
-                </div>
-                <div className="project-step-panel">
-                  <p>{activeProjectSteps[activeStep].description}</p>
-                </div>
-                <div className="project-step-nav">
-                  <button type="button" disabled={activeStep === 0} onClick={() => setActiveStep((s) => Math.max(0, s - 1))}>← 上一步</button>
-                  <button type="button" disabled={activeStep === activeProjectSteps.length - 1} onClick={() => setActiveStep((s) => Math.min(activeProjectSteps.length - 1, s + 1))}>下一步 →</button>
-                </div>
-              </div>
-            )}
-
-            <div className="project-star" aria-label={`${activeProject.title} 项目拆解`}>
-              {([
-                ["context", "项目背景", activeProject.star.situation],
-                ["goal", "目标", activeProject.star.task],
-                ["action", "解决方法", activeProject.star.action],
-                ["result", "项目结果", activeProject.star.result],
-              ] as const).map(([key, label, copy]) => (
-                <article className={key === "result" ? "is-result" : ""} key={key}>
-                  <small>{label}</small>
-                  <p>{copy}</p>
-                </article>
-              ))}
-            </div>
-            {activeProjectOverturn && (
-              <div className="project-overturn" aria-label={`${activeProject.title} 一个被我推翻的判断`}>
-                <small className="project-overturn-label">一个被我推翻的判断</small>
-                <div className="project-overturn-grid">
-                  <article>
-                    <small>原以为</small>
-                    <p>{activeProjectOverturn.before}</p>
-                  </article>
-                  <span className="project-overturn-arrow" aria-hidden="true">→</span>
-                  <article>
-                    <small>证据显示</small>
-                    <p>{activeProjectOverturn.evidence}</p>
-                  </article>
-                  <span className="project-overturn-arrow" aria-hidden="true">→</span>
-                  <article className="is-after">
-                    <small>因此我改成</small>
-                    <p>{activeProjectOverturn.after}</p>
-                  </article>
-                </div>
-              </div>
-            )}
-            <div className="project-stage-controls" aria-label="切换项目">
-              <button type="button" onClick={() => selectAdjacentProject(-1)} aria-label="上一个项目">←</button>
-              <span>{String(projectGroups[projectGroup].indexOf(openProject) + 1).padStart(2, "0")} / {String(projectGroups[projectGroup].length).padStart(2, "0")}</span>
-              <button type="button" onClick={() => selectAdjacentProject(1)} aria-label="下一个项目">→</button>
-            </div>
-          </article>
-        </div>
-      </section>
+      <WorkGallery projects={projects} group={projectGroup} onGroupChange={setProjectGroup} surprise={surprise} />
 
       <section className="self-map section interactive-section" id="self">
         <span className="section-pointer-glow" aria-hidden="true" />
@@ -1272,7 +687,7 @@ export default function Home() {
           <div className="education-list" aria-label="教育背景">
             <p>EDUCATION / 受教育经历</p>
             <article>
-              <span>2025.09 - 2026.12</span>
+              <span>2025.09 - 2027.01（预计）</span>
               <div><strong>格拉斯哥大学 · 英国</strong><small>统计学硕士</small></div>
             </article>
             <article>
@@ -1336,148 +751,8 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="fit section interactive-section" id="fit">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="section-heading curtain-observe">
-          <p className="section-index">03 / WHY ME &amp; TOOLS</p>
-          <h2>先定义问题，<br />再用数据和原型<em>验证。</em></h2>
-          <p className="section-note">卡片只保留结论。悬停后，可以看到具体做法。</p>
-        </div>
-        <div className="fit-grid">
-          {fitCards.map((card) => (
-            <button
-              className={"reveal-card" + (openFit === card.no ? " is-open" : "")}
-              key={card.no}
-              type="button"
-              aria-expanded={openFit === card.no}
-              onPointerEnter={() => setHoveredFit(card.no)}
-              onPointerLeave={() => setHoveredFit(null)}
-              onFocus={() => setHoveredFit(card.no)}
-              onBlur={() => setHoveredFit(null)}
-              onClick={() => toggleFit(card.no)}
-            >
-              <div className="card-top"><span>{card.no}</span><small>{card.tag}</small></div>
-              <h3>{card.title}</h3>
-              <p className="hover-hint">HOVER TO REVEAL ↗</p>
-              <div className="card-reveal"><TypewriterText text={card.detail} active={hoveredFit === card.no || openFit === card.no} /></div>
-            </button>
-          ))}
-        </div>
-        <div className="tool-circuit" aria-label="AI 工作流">
-          <div className="circuit-heading">
-            <span className="mono-label" data-scramble>EVIDENCE-DRIVEN AI WORKFLOW</span>
-            <p>从问题定义到结果交付，将数据分析、跨方法验证与 AI 开发串成完整闭环；关键结论不依赖单一模型，而通过独立方法与结果复核提高可靠性。</p>
-          </div>
-          <div className="circuit-track">
-            {[
-              ["01", "DEFINE", "问题定义", "Business Goal · Metrics · XMind", "将业务需求转化为明确的问题、指标、约束条件与验证标准。"],
-              ["02", "QUERY", "数据构建", "SQL · Data Cleaning · Feature Engineering", "完成数据提取、多表关联、指标构建、数据清洗与分析样本准备。"],
-              ["03", "ANALYZE", "统计分析", "R · Python · Regression · ML", "根据问题选择合适的统计或机器学习方法，从探索性分析、统计推断到预测建模形成分析结果。"],
-              ["04", "VALIDATE", "交叉验证", "A/B Test · Robustness · Sensitivity", "通过实验结果、不同统计与机器学习方法、敏感性分析及独立证据复核关键结论，避免单一模型或单一假设主导最终判断。"],
-              ["05", "BUILD", "AI 实现", "LLM · RAG · Tool Calling · Workflow", "将经过验证的分析逻辑和业务规则转化为可交互的 AI Workflow 或产品原型，并通过模块化工具调用完成实际任务。"],
-              ["06", "EVALUATE", "评估迭代", "Metrics · Error Analysis · Human Review", "结合量化指标、错误分析、人工核验与实际使用反馈定位问题，并将评估结果反馈到前序步骤持续迭代。"],
-            ].map(([no, phase, name, keywords, note], index) => (
-              <article className={`circuit-node magnetic${phase === "VALIDATE" ? " is-validation" : ""}`} key={phase} style={{ "--node-index": index } as CSSProperties}>
-                <small>{no} / {phase}</small>
-                <strong>{name}</strong>
-                <span>{keywords}</span>
-                <p>{note}</p>
-              </article>
-            ))}
-            <span className="circuit-pulse" aria-hidden="true" />
-          </div>
-          <p className="method-annotation">Evidence before generation. <span>Validation before conclusion.</span> Evaluation after deployment. <b>↺ Return to DEFINE</b></p>
-        </div>
-      </section>
-
-      <section className="offscreen section interactive-section" id="about">
-        <span className="section-pointer-glow" aria-hidden="true" />
-        <div className="offscreen-stage">
-          <div className="offscreen-heading curtain-observe">
-            <p className="section-index">04 / OFF SCREEN &amp; TALK</p>
-            <h2>屏幕之外，<em>有声音，也有留白。</em></h2>
-          </div>
-          <div className="offscreen-gallery" id="offscreen-gallery">
-            <figure className="offscreen-photo"><img src="./photos/athens-portrait.webp" alt="安颜在雅典的旅行照片" /><figcaption>ATHENS / light & structure</figcaption></figure>
-            <figure className="offscreen-photo"><img src="./photos/york-minster.jpg" alt="安颜拍摄的约克大教堂尖塔" /><figcaption>YORK MINSTER / spires & sky</figcaption></figure>
-            <figure className="offscreen-photo"><img src="./photos/pantheon-dome.jpg" alt="安颜拍摄的罗马万神殿穹顶" /><figcaption>PANTHEON / structure & light</figcaption></figure>
-            <figure className="offscreen-photo"><img src="./photos/winter-coast-portrait.jpg" alt="安颜在冬日海岸的侧面人像" /><figcaption>WINTER COAST / wind & silence</figcaption></figure>
-            <figure className="offscreen-photo"><img src="./photos/winter-coast-camera.jpg" alt="安颜在海岸拍摄的背影" /><figcaption>BEHIND THE LENS / looking closely</figcaption></figure>
-          </div>
-        </div>
-        <div className="offscreen-body">
-          <div className="interest-list">
-            <article>
-              <span>ROCK</span>
-              <h3><button className="interest-title-trigger" type="button" aria-label="显示摇滚相关内容"><LetterSwap3D text="摇滚" origin="center" /></button></h3>
-              <p>喜欢摇滚的直白和张力。Blur 的 Tender 温柔，但不软弱。</p>
-            </article>
-            <article>
-              <span>ART</span>
-              <h3>
-                <button className="interest-title-trigger" type="button" aria-label="显示艺术与建筑相关内容">
-                  <LetterSwap3D text="艺术与" origin="center" />
-                  <LetterSwap3D text="建筑" origin="last" />
-                </button>
-              </h3>
-              <p>喜欢高迪建筑里自由的曲线、色彩与想象力，也喜欢高更画作中大胆而直接的色彩表达。比起追随某一种风格，我更喜欢观察不同创作者如何用自己的方式理解和表达世界。</p>
-            </article>
-            <article className={pinnedInterest === "photo" ? "is-pinned" : ""}>
-              <span>PHOTO</span>
-              <h3>
-                <button
-                  className="interest-title-trigger"
-                  type="button"
-                  aria-label="显示摄影相关内容"
-                  onClick={() => setPinnedInterest((current) => current === "photo" ? null : "photo")}
-                >
-                  <LetterSwap3D text="摄影" origin="center" />
-                </button>
-              </h3>
-              <p>摄影像是我观察世界的另一双眼睛。旅行时，我喜欢记录偶然出现的光线、人与环境的关系，以及那些很容易被忽略的瞬间。</p>
-            </article>
-            <article>
-              <span>GAME</span>
-              <h3><button className="interest-title-trigger" type="button" aria-label="显示游戏相关内容"><LetterSwap3D text="游戏" origin="center" /></button></h3>
-              <p>玩得比较杂，主机、掌机、手游都有涉猎，比起通关数量，更喜欢琢磨故事怎么讲、系统怎么设计。</p>
-            </article>
-            <article
-              className={"interest-debate" + (pinnedInterest === "debate" ? " is-pinned" : "")}
-              id="interest-debate"
-            >
-              <span>ENTP</span>
-              <h3>
-                <button
-                  className="interest-title-trigger debate-trigger"
-                  type="button"
-                  aria-label="显示辩论与表达相关内容"
-                  onClick={() => setPinnedInterest((current) => current === "debate" ? null : "debate")}
-                >
-                  <LetterSwap3D text="辩论与" origin="center" />
-                  <LetterSwap3D text="表达" origin="last" />
-                </button>
-              </h3>
-              <div className="debate-copy">
-                <p>曾任学院辩论队队长，带领 10 余人团队并组织百人规模赛事。长期的辩论与组织经历，让我习惯拆解复杂问题、检验证据与假设，也能在多人协作中快速识别分歧、推动共识与行动。</p>
-                <ul aria-label="辩论经历形成的能力">
-                  <li><LetterSwap3D text="拆解复杂问题" stagger={0.022} /></li>
-                  <li><LetterSwap3D text="检验证据与假设" stagger={0.022} origin="last" /></li>
-                  <li><LetterSwap3D text="识别协作分歧" stagger={0.022} /></li>
-                  <li><LetterSwap3D text="推动共识与行动" stagger={0.022} origin="last" /></li>
-                </ul>
-              </div>
-            </article>
-          </div>
-          <div className="offscreen-cta">
-            <a className="offscreen-mail magnetic" href="mailto:anyan001121@gmail.com" aria-label="发送邮件给安颜">
-              <span>LET&apos;S TALK</span>
-              <strong>发邮件<br />给我</strong>
-              <small>anyan001121@gmail.com</small>
-              <i aria-hidden="true">↗</i>
-            </a>
-          </div>
-        </div>
-      </section>
+      <MethodLab />
+      <PhotoDesk />
     </main>
   );
 }

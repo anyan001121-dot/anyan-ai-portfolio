@@ -34,3 +34,14 @@ npm run build:pages
 ```
 
 推送到 `main` 分支后，GitHub Actions 会自动构建并发布网站。
+
+## Interactive studio redesign
+
+The orange portrait opening leads into an editorial project playground with three featured exhibits (FocusFlow, Mood Diary and MathorCup) and a smaller archive of the remaining six projects. Category filters keep all nine projects reachable. A native dialog opens each case with its original evidence, result-first narrative chapters, process notes and source links.
+
+- **Thinking workbench**: four keyboard-accessible steps connect methods to concrete project examples.
+- **Off screen**: five travel photographs can be turned over and browsed with previous/next controls; interest buttons reveal debate, music, games and art notes.
+- **Little guide**: click to open section navigation, choose a project, high-five or minimize. Dragging repositions the character without accidentally opening the menu. The menu returns to a safe corner when opened.
+- **Accessibility**: native modal focus containment and Escape; focus restoration; arrow-key tab navigation; reduced-motion CSS; mobile tap equivalents.
+
+Project content lives in `app/projects.ts`; the new sections in `app/StudioSections.tsx` and their styles in `app/Studio.css`. The existing portrait opening and keyword particle identity map are retained.
