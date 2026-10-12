@@ -11,6 +11,14 @@ const chapterNames = ["问题从哪里来", "我想解决什么", "我是怎么�
 const chapterKeys = ["situation", "task", "action", "result"] as const;
 const mono = (n: number) => String(n).padStart(2, "0");
 
+function CurvedArrow({ shelf = false }: { shelf?: boolean }) {
+  return <svg className="curved-arrow" viewBox="0 0 100 80" fill="none" aria-hidden="true"><path d={shelf ? "M14 9 C8 51 45 68 85 48 M68 42 Q79 45 85 48 Q81 58 75 63" : "M86 12 C78 48 37 19 18 65 M16 45 Q16 57 18 65 Q28 62 37 61"} stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"/></svg>;
+}
+
+function PetalMark() {
+  return <svg viewBox="0 0 90 90" fill="none" aria-hidden="true">{[0,60,120,180,240,300].map(angle => <ellipse key={angle} cx="45" cy="25" rx="8.5" ry="16" stroke="currentColor" strokeWidth="2" transform={`rotate(${angle} 45 45)`}/>)}<circle cx="45" cy="45" r="5" fill="currentColor"/></svg>;
+}
+
 function ExhibitArt({ project }: { project: Project }) {
   if (project.preview === "focusflow") return <div className="focus-art" aria-hidden="true">
     <div className="focus-orbit" /><span className="floating-note note-one">还有好多事……</span><span className="floating-note note-two">先从这一件开始。</span>
@@ -18,11 +26,11 @@ function ExhibitArt({ project }: { project: Project }) {
     <span className="art-caption">交互概念示意 / AI 专注助手</span>
   </div>;
   if (project.preview === "mood-diary") return <div className="garden-art" aria-hidden="true"><span className="garden-label">HOW ARE YOU, REALLY?</span><div className="garden-sun"/><img src="./photos/mood-diary/sunflower.webp" alt="" loading="lazy"/><img src="./photos/mood-diary/tulip.webp" alt="" loading="lazy"/><img src="./photos/mood-diary/low-flower.webp" alt="" loading="lazy"/><span className="garden-note">今天的心情，也值得被接住。</span></div>;
-  if (project.title.startsWith("QAR")) return <div className="radar-art" aria-hidden="true"><div className="radar-rings"><i/><b/><span>✧</span><span>+</span><span>+</span></div><div className="flight-mark">↗</div><span className="radar-coordinate">QAR / SIGNAL FOUND</span><strong>85<small>%</small></strong><span className="radar-caption">测试集准确率</span><span className="award-stamp">MATHORCUP<br/>全国二等奖</span></div>;
+  if (project.title.startsWith("QAR")) return <div className="radar-art" aria-hidden="true"><div className="radar-rings"><i/><b/><span>✧</span><span>+</span><span>+</span></div><div className="flight-mark"><svg viewBox="0 0 150 120" fill="none"><path d="M8 104 C-1 75 40 95 57 68 S67 29 100 29" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="3 7" opacity=".55"/><path d="M90 28 Q108 24 135 12 Q127 35 121 58 L109 40 Z M109 40 L134 13" fill="#f9e4ca" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg></div><span className="radar-coordinate">QAR / SIGNAL FOUND</span><strong>85<small>%</small></strong><span className="radar-caption">测试集准确率</span><span className="award-stamp">MATHORCUP<br/>全国二等奖</span></div>;
   return <div className={`archive-art art-${project.tone}`} aria-hidden="true"><span className="archive-orbit"/><strong>{project.metric}</strong><small>{project.metricLabel}</small><span className="archive-code">{project.year} / RESEARCH NOTES</span></div>;
 }
 
-function CaseFile({ project, onClose }: { project: Project | null; onClose: () => void }) {
+function CaseFile({ project, onClose, onCursorHostChange }: { project: Project | null; onClose: () => void; onCursorHostChange: (host: HTMLDialogElement | null) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [chapter, setChapter] = useState(3);
   const [previewStep, setPreviewStep] = useState(0);
@@ -34,10 +42,11 @@ function CaseFile({ project, onClose }: { project: Project | null; onClose: () =
     setChapter(3);
     setPreviewStep(0);
     node.showModal();
+    onCursorHostChange(node);
     node.scrollTop = 0;
     document.body.style.overflow = "hidden";
-    return () => { node.close(); document.body.style.overflow = oldOverflow; previous?.focus({ preventScroll: true }); };
-  }, [project]);
+    return () => { node.close(); onCursorHostChange(null); document.body.style.overflow = oldOverflow; previous?.focus({ preventScroll: true }); };
+  }, [project, onCursorHostChange]);
   return <dialog className="case-file" ref={dialog} aria-labelledby="case-title" onCancel={onClose} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
     {project && <div className="case-paper">
       <div className="case-toolbar"><span>OPEN FILE / {project.year}</span><button type="button" onClick={onClose} aria-label="关闭项目详情">关闭 ×</button></div>
@@ -55,7 +64,7 @@ function CaseFile({ project, onClose }: { project: Project | null; onClose: () =
   </dialog>;
 }
 
-export function WorkGallery({ projects, group, onGroupChange, surprise }: { projects: Project[]; group: Group; onGroupChange: (g: Group) => void; surprise: number }) {
+export function WorkGallery({ projects, group, onGroupChange, surprise, onCursorHostChange }: { projects: Project[]; group: Group; onGroupChange: (g: Group) => void; surprise: number; onCursorHostChange: (host: HTMLDialogElement | null) => void }) {
   const [selected, setSelected] = useState<number | null>(null);
   const [seen, setSeen] = useState<number[]>([]);
   const lastSurprise = useRef(0);
@@ -71,13 +80,13 @@ export function WorkGallery({ projects, group, onGroupChange, surprise }: { proj
   const archive = group === "all" ? [2, 1, 4, 6, 7, 5] : group === "ai" ? [2, 1] : [6, 7, 5];
   return <section className="workshop" id="work" aria-labelledby="work-title">
     <div className="studio-section-top"><span>01 / THE PROJECT PLAYGROUND</span><span>IDEAS → EXPERIMENTS → THINGS</span></div>
-    <div className="workshop-heading"><h2 id="work-title">好奇心，<br/>做成了<em>这些。</em><span className="heading-asterisk" aria-hidden="true">✳</span></h2><div className="workshop-intro"><span className="hand-arrow" aria-hidden="true">↙</span><p>有解决小麻烦的工具，<br/>也有追问大问题的研究。<br/>挑一件，打开看看。</p><span className="explore-count">已翻阅 {mono(seen.length)} / {mono(projects.length)} 件作品</span></div></div>
+    <div className="workshop-heading"><h2 id="work-title">好奇心，<br/>做成了<em>这些。</em><span className="heading-asterisk" aria-hidden="true"><PetalMark/></span></h2><div className="workshop-intro"><span className="hand-arrow" aria-hidden="true"><CurvedArrow/></span><p>有解决小麻烦的工具，<br/>也有追问大问题的研究。<br/>挑一件，打开看看。</p><span className="explore-count">已翻阅 {mono(seen.length)} / {mono(projects.length)} 件作品</span></div></div>
     <div className="workshop-controls"><div className="exhibit-filters" aria-label="筛选作品">{([['all','全部作品'],['ai','AI 与产品'],['data','数据与研究']] as const).map(([key, label]) => <button type="button" key={key} aria-pressed={group === key} onClick={() => onGroupChange(key)}>{label}<span>{key === "all" ? "09" : key === "ai" ? "04" : "05"}</span></button>)}</div><span>点击作品 · 翻开完整过程 ↗</span></div>
     <div className={`exhibit-floor floor-${group}`} key={group}>
       {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'PRODUCT EXPERIMENT' : 'DATA INVESTIGATION'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖研究 / AWARD WINNER" : "想法 → 可交互原型"}</small><h3>{p.title}</h3><p>{p.preview === "focusflow" ? "让临时的想法有地方去，让眼前的任务继续。" : p.preview === "mood-diary" ? "把一次心情，种成一朵花。" : p.lead}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
     </div>
-    <div className="archive-shelf"><div className="archive-intro"><span>KEEP EXPLORING</span><h3>桌上还有<br/><em>一些想法。</em></h3><p>从知识检索到行业研究，<br/>每份档案里都有一次尝试。</p><span className="shelf-doodle" aria-hidden="true">↳</span></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}`} key={p.title} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b></span></button>; })}</div></div>
-    <CaseFile project={selected === null ? null : projects[selected]} onClose={() => setSelected(null)}/>
+    <div className="archive-shelf"><div className="archive-intro"><span>KEEP EXPLORING</span><h3>桌上还有<br/><em>一些想法。</em></h3><p>从知识检索到行业研究，<br/>每份档案里都有一次尝试。</p><span className="shelf-doodle" aria-hidden="true"><CurvedArrow shelf/></span></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}`} key={p.title} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b></span></button>; })}</div></div>
+    <CaseFile project={selected === null ? null : projects[selected]} onClose={() => setSelected(null)} onCursorHostChange={onCursorHostChange}/>
   </section>;
 }
 

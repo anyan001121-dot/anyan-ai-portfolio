@@ -2,11 +2,13 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import ImpactHero from "./ImpactHero";
 import { WorkGallery, MethodLab, PhotoDesk, StudioGuide } from "./StudioSections";
 import { projects } from "./projects";
 import "./Studio.css";
+import "./SoftStudio.css";
 
 type IdentityCategory = "data" | "product" | "expression" | "observe";
 
@@ -146,6 +148,8 @@ export default function Home() {
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
+  const [cursorHost, setCursorHost] = useState<HTMLDialogElement | null>(null);
+  const cursorPosition = useRef({ x: -1000, y: -1000, visible: false });
   useEffect(() => {
     const canvas = glyphCanvasRef.current;
     const container = wordCloudRef.current;
@@ -418,7 +422,7 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const dot = cursorDotRef.current;
     const ring = cursorRingRef.current;
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -426,16 +430,20 @@ export default function Home() {
     if (!dot || !ring || reduceMotion || !precisePointer) return;
 
     document.body.classList.add("has-custom-cursor");
-    let pointerX = window.innerWidth / 2;
-    let pointerY = window.innerHeight / 2;
+    let pointerX = cursorPosition.current.x;
+    let pointerY = cursorPosition.current.y;
     let ringX = pointerX;
     let ringY = pointerY;
     let magneticTarget: HTMLElement | null = null;
     let cursorFrame = 0;
+    dot.classList.toggle("is-visible", cursorPosition.current.visible);
+    ring.classList.toggle("is-visible", cursorPosition.current.visible);
 
     const onPointerMove = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
       pointerX = event.clientX;
       pointerY = event.clientY;
+      cursorPosition.current = { x: pointerX, y: pointerY, visible: true };
       dot.classList.add("is-visible");
       ring.classList.add("is-visible");
     };
@@ -457,7 +465,7 @@ export default function Home() {
       cursorFrame = window.requestAnimationFrame(animateCursor);
     };
 
-    const magneticElements = Array.from(document.querySelectorAll<HTMLElement>(".magnetic"));
+    const magneticElements = Array.from((cursorHost || document).querySelectorAll<HTMLElement>(cursorHost ? "button, a, summary" : ".magnetic"));
     const enterHandlers = magneticElements.map((element) => {
       const enter = () => {
         magneticTarget = element;
@@ -475,7 +483,7 @@ export default function Home() {
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown);
     window.addEventListener("pointerup", onPointerUp);
-    cursorFrame = window.requestAnimationFrame(animateCursor);
+    animateCursor();
     return () => {
       document.body.classList.remove("has-custom-cursor");
       window.cancelAnimationFrame(cursorFrame);
@@ -487,7 +495,7 @@ export default function Home() {
         element.removeEventListener("pointerleave", leave);
       });
     };
-  }, []);
+  }, [cursorHost]);
 
   useEffect(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -627,11 +635,16 @@ export default function Home() {
     }, 550);
   };
 
+  const cursor = <>
+    <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
+    <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
+  </>;
+
   return (
     <main className={"site" + (photosOn ? " photos-on" : "")}>
       <StudioGuide section={activeSection || "top"} hidden={!introLifted} onSurprise={() => { setSurprise((v) => v + 1); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }} />
-      <div ref={cursorDotRef} className="cursor-dot" aria-hidden="true" />
-      <div ref={cursorRingRef} className="cursor-ring" aria-hidden="true" />
+      {/* Native dialogs live above every z-index; keep the cursor in that same top layer. */}
+      {cursorHost ? createPortal(cursor, cursorHost) : cursor}
       <header className={`topbar${!activeSection || activeSection === "top" ? " is-over-poster" : ""}`}>
         <span className="scroll-progress" style={{ "--scroll-progress": `${scrollProgress}%` } as CSSProperties} aria-hidden="true" />
         <a className="wordmark magnetic" href="#top" aria-label="返回首页">AY<span>·</span></a>
@@ -664,7 +677,7 @@ export default function Home() {
         </aside>
       )}
 
-      <WorkGallery projects={projects} group={projectGroup} onGroupChange={setProjectGroup} surprise={surprise} />
+      <WorkGallery projects={projects} group={projectGroup} onGroupChange={setProjectGroup} surprise={surprise} onCursorHostChange={setCursorHost} />
 
       <section className="self-map section interactive-section" id="self">
         <span className="section-pointer-glow" aria-hidden="true" />

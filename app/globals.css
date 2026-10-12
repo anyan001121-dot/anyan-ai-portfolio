@@ -408,7 +408,7 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 
 @media (hover: hover) and (pointer: fine) {
   .cursor-dot,.cursor-ring { display: block; }
-  body.has-custom-cursor,body.has-custom-cursor a,body.has-custom-cursor button { cursor: none!important; }
+  body.has-custom-cursor,body.has-custom-cursor a,body.has-custom-cursor button,body.has-custom-cursor summary { cursor: none!important; }
 }
 
 .music-card { position: fixed; z-index: 50; right: 32px; top: 88px; width: 275px; padding: 22px; border: 1px solid var(--line); background: var(--paper-2); box-shadow: 0 20px 44px rgba(0,0,0,.5); }
