@@ -85,7 +85,7 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
         <figure className="impact-portrait">
           <div className="impact-portrait-motion">
             <img className="impact-photo" src="./photos/portrait-outline.webp" width="1207" height="1303" fetchPriority="high" alt="安颜的描边人像照片" aria-hidden={cartoon} />
-            <img className="impact-cartoon" src="./photos/portrait-cartoon.webp" width="1207" height="1303" decoding="async" alt="安颜的卡通人像" aria-hidden={!cartoon} />
+            <img className="impact-cartoon" src="./photos/guide-actions-v2/present.png" width="164" height="280" decoding="async" alt="黑白简约风格的小安" aria-hidden={!cartoon} />
           </div>
         </figure>
         <div className="impact-copy">
@@ -97,10 +97,10 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
           <img src="./photos/guide-actions-v2/present.png" width="164" height="280" alt="" />
           <span className="impact-hello" aria-hidden="true">嗨，这是我！</span>
         </button>
-        <button type="button" className="impact-switch" onClick={() => setCartoon((current) => !current)} aria-pressed={cartoon} aria-label={cartoon ? "切换回真人照片" : "切换为卡通人像"}>
-          <small>ANOTHER ME</small><strong>{cartoon ? "真实的我" : "卡通的我"}</strong><span aria-hidden="true">↗</span>
+        <button type="button" className="impact-switch" onClick={() => setCartoon((current) => !current)} aria-pressed={cartoon} aria-label={cartoon ? "切换回真人照片" : "切换为小安"}>
+          <small>ANOTHER ME</small><strong>{cartoon ? "真实的我" : "小安"}</strong><span aria-hidden="true">↗</span>
         </button>
-        <p className="impact-caption" aria-live="polite"><span>{cartoon ? "02 / MY CARTOON SELF" : "01 / THE REAL ME"}</span><span>PORTFOLIO · 2026</span></p>
+        <p className="impact-caption" aria-live="polite"><span>{cartoon ? "02 / XIAO AN" : "01 / THE REAL ME"}</span><span>PORTFOLIO · 2026</span></p>
       </div>
       <div className="impact-foot">
         <div><em>Ideas into things.</em><a href="#work">进入我的作品 ↗</a></div>
