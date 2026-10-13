@@ -3,6 +3,8 @@ export type Project = {
   metric: string; metricLabel: string; lead: string;
   star: { situation: string; task: string; action: string; result: string };
   tone: string; preview: string; award?: string; url?: string; liveUrl?: string; linkLabel?: string;
+  stage?: string;
+  research?: { title: string; url: string; summary: string; application: string; notesUrl: string };
   steps?: { label: string; description: string }[];
   overturn?: { before: string; evidence: string; after: string };
 };
@@ -11,21 +13,29 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "FocusFlow",
-    subtitle: "面向 ADHD 场景的 AI 任务执行助手",
+    subtitle: "面向 ADHD 任务启动困难的 AI 助手",
+    stage: "可运行原型 · 使用效果待验证",
     tags: ["LangGraph", "Streamlit", "SQLite", "LLM"],
     metric: "≤ 3",
-    metricLabel: "即时优先项",
-    lead: "将杂乱任务压缩为不超过三项、可立即执行的下一步。",
+    metricLabel: "候选任务 · 执行时聚焦一步",
+    lead: "知道要做什么，却迟迟开始不了。FocusFlow 帮用户找到眼前能动手的一小步。",
     star: {
-      situation: "任务一多，最难的往往不是完成，而是不知道先做哪一步。",
-      task: "将模糊、杂乱的任务输入拆解为少量可执行步骤，并支持中断后的状态恢复。",
-      action: "LangGraph 负责 Brain Dump、任务拆解、计时、暂存和恢复；SQLite 保存本地记录，任务时长会按实际用时继续调整。",
-      result: "每轮只给 3 个以内的优先项，并记录启动耗时、完成率和恢复成功率，用来判断产品是否真的有用。",
+      situation: "我关注年轻人在学习与工作中难以启动任务的时刻，尤其是 ADHD 用户的使用困难。结合 NICE NG87 的环境调整说明与项目情境走查，将切入点收窄为‘知道要做什么，却开始不了’，以及被打断后难以接回原任务。",
+      task: "让用户不必先整理好所有待办，就能开始眼前的一步。第一阶段围绕任务启动、杂念暂存和中断恢复设计流程，减少开始前需要做的选择。",
+      action: "用 LangGraph 串联输入、任务拆解和执行流程：先给出最多 3 个候选任务，选定后只展示当前步骤与完成条件；步骤太难可以继续拆小，突然想起的事可以暂存。SQLite 保存任务状态，暂停时可留返回提示，计时按需展开。",
+      result: "已实现任务输入、逐步执行、杂念暂存及暂停恢复的可运行原型，并提供无需 API 密钥的练习模式。当前产出是功能与流程的实现；是否帮助用户更容易开始或返回任务，仍需在真实使用情境中验证。",
+    },
+    research: {
+      title: "NICE NG87 · 环境调整",
+      url: "https://www.nice.org.uk/guidance/ng87/chapter/recommendations#terms-used-in-this-guideline",
+      summary: "指南举例包括减少干扰、较短的专注时段配合休息，以及用文字补充口头说明，并强调按个人需要调整。",
+      application: "据此将低干扰、可暂停和清晰提示作为设计方向，落实为当前一步、杂念暂存与返回提示。具体功能是产品设计推论，指南不能代替实际使用效果的验证。",
+      notesUrl: "https://github.com/anyan001121-dot/focusflow/blob/main/docs/product-review-2026-09-16.md",
     },
     steps: [
-      { label: "杂乱输入", description: "把脑子里所有的任务一股脑倒出来，不用管顺序、不用管轻重。" },
-      { label: "拆解为 3 步", description: "LangGraph 把杂乱输入压缩成不超过 3 个可以立即执行的下一步。" },
-      { label: "开始执行", description: "选一项开始计时；中断后可以恢复，时长会按实际用时继续调整。" },
+      { label: "杂乱输入", description: "写下眼前的事，不必先整理优先级；一句话也可以开始。" },
+      { label: "聚焦当前一步", description: "从最多 3 个候选任务中选择一个，再看当前动作与完成条件。如果这一步仍然太难，可以继续拆小。" },
+      { label: "暂存与返回", description: "想到别的事先暂存；需要离开时保留当前步骤，回来继续。计时按需展开。" },
     ],
     tone: "focus",
     preview: "focusflow",
@@ -180,21 +190,23 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "心情日记",
-    subtitle: "情绪花园与主动关怀产品",
+    subtitle: "轻量情绪记录与日常关怀",
+    stage: "已上线 · 长期记录的 API 关联分析规划中",
     tags: ["JavaScript", "LocalStorage", "Web Audio", "LLM · BYOK"],
     metric: "CARE",
-    metricLabel: "记录 → 关怀 → 反馈",
-    lead: "把每次心情种成一朵花；当用户说“今天不太好”，产品主动接住，并给出一个小行动。",
+    metricLabel: "轻松记录 · 当下关怀 · 持续回看",
+    lead: "轻松记下当下的感受，在心情不好时找到一个可以尝试的小行动。",
     star: {
-      situation: "面对学业、工作与社交压力，用户既需要低门槛记录，也需要在低落时少做选择、及时获得回应。",
-      task: "把情绪记录、即时关怀与后续反馈连起来，让用户可以按自己的状态决定下一步。",
-      action: "用五档心情驱动花园生长；低落时在当前页面展开关怀流程，提供呼吸、书写或暂不行动的选择。记录主观反馈，在类似情境下提示上次可能有帮助的方法；另设可选的“小萤”AI 陪聊。",
-      result: "已上线可直接体验的静态应用，包含 7／30 天趋势、情绪日历、植物图鉴、关怀反馈与延迟回访。日记与关怀记录保存在本地；AI 陪聊需用户自带密钥开启，对话发送至所选服务商。",
+      situation: "项目从学业、工作与生活压力下的情绪记录需求出发。我想做一个轻松就能留下感受的工具，让记录本身少一点负担，并让用户在心情不好时获得具体的支持。",
+      task: "降低单次记录的门槛，让用户愿意持续回来；低落时提供可选择的行动，积累记录后再帮助用户回看情绪与生活事件之间的联系。",
+      action: "用五档心情和简短记录作为入口，以植物图鉴与随机事件增加探索的趣味，鼓励持续记录。用户心情低落时可进入关怀流程，选择正念、呼吸或书写等活动，并留下行动后的主观感受；另设可选的“小萤”AI 陪聊。",
+      result: "已上线可体验的记录、关怀与花园功能，包含正念与呼吸模块、植物图鉴、随机事件，以及 7／30 天趋势回看。后续计划接入 API，结合长期记录提示情绪与事件的可能关联，供用户回看与确认；这项能力仍在规划中，记录意愿与关怀效果也仍待验证。",
     },
     steps: [
-      { label: "种下心情", description: "点选最接近当下的感受，就能在花园里留下一朵花；不必先填写一长串问题。" },
-      { label: "即时关怀", description: "选择低落或很糟后，关怀面板直接出现：可以缓一下、说一说，也可以什么都不做。" },
-      { label: "反馈与记忆", description: "完成行动后留下真实感受；下次遇到类似的事，产品会轻量提示上次可能有帮助的方法。" },
+      { label: "轻松记一下", description: "点选最接近当下的感受，再按意愿补充事件或文字，不要求先写一篇完整日记。" },
+      { label: "找一个小行动", description: "心情不好时提供可选择的支持，包括正念、呼吸和书写。用户可以尝试，也可以暂时不做。" },
+      { label: "给下次记录一点期待", description: "通过植物图鉴与随机事件增加探索感。它们是鼓励用户回来记录的设计，是否有效仍需使用反馈。" },
+      { label: "长期关联分析 · 规划中", description: "计划在用户选择并授权后，将选定记录交给 API 辅助整理，提示情绪与生活事件可能共同出现的模式，并回到原始记录核对。现有趋势回看和可选 AI 陪聊不等同于这项能力。" },
     ],
     tone: "garden",
     preview: "mood-diary",
@@ -203,4 +215,3 @@ export const projects: Project[] = [
     linkLabel: "体验心情日记",
   },
 ];
-

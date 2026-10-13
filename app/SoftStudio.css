@@ -76,6 +76,13 @@
 .case-file::backdrop { background:#25302699; backdrop-filter:blur(8px); }
 .case-toolbar { background:#fafaf5f5; border-color:var(--soft-line); }
 .case-heading h2 { font-weight:500; }
+.case-heading > .case-stage { font-size:11px; color:#52688b; margin:16px 0 0; }
+.case-evidence { margin-top:24px; border-top:1px solid var(--soft-line); padding-top:16px; font-size:12px; line-height:1.8; }
+.case-evidence summary { cursor:pointer; color:#52688b; }
+.case-evidence p { color:#626c5c; margin:12px 0; }
+.case-evidence > div { display:flex; flex-wrap:wrap; gap:8px 20px; }
+.case-evidence a { text-decoration:underline; text-underline-offset:4px; }
+.case-evidence summary:focus-visible { outline:2px solid #52688b; outline-offset:5px; }
 .case-tags span { border-color:var(--soft-line); border-radius:4px; }
 .case-visual { border-radius:10px; }
 .chapter-tabs { border-color:var(--soft-line); }
