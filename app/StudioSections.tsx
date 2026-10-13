@@ -11,6 +11,47 @@ const chapterNames = ["问题从哪里来", "我想解决什么", "我是怎么�
 const chapterKeys = ["situation", "task", "action", "result"] as const;
 const mono = (n: number) => String(n).padStart(2, "0");
 
+// Animate once as an exhibit enters view; content stays visible without the observer.
+function useExhibitEntrance(group: Group) {
+  const floor = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!floor.current || !('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('has-entered');
+        observer.unobserve(entry.target);
+      }
+    }), { threshold: 0.08 });
+    floor.current.querySelectorAll('.exhibit').forEach(node => {
+      node.classList.add('will-enter');
+      observer.observe(node);
+    });
+    return () => observer.disconnect();
+  }, [group]);
+  return floor;
+}
+
+function moveExhibit(e: PointerEvent<HTMLButtonElement>) {
+  if (e.pointerType !== 'mouse' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const box = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty('--look-x', `${((e.clientX - box.left) / box.width - .5) * 24}px`);
+  e.currentTarget.style.setProperty('--look-y', `${((e.clientY - box.top) / box.height - .5) * 18}px`);
+}
+
+function resetExhibit(e: PointerEvent<HTMLButtonElement>) {
+  e.currentTarget.style.setProperty('--look-x', '0px');
+  e.currentTarget.style.setProperty('--look-y', '0px');
+}
+
+function IndexPreview({ project }: { project: Project }) {
+  return <div className={`index-preview preview-${project.preview}`} key={project.title} aria-hidden="true">
+    <div className="index-preview-art">
+      {project.preview === 'aybot' ? <img src="./photos/project-flat-v1/aybot.png" alt="" loading="lazy"/> : project.preview === 'quiz' ? <img className="index-screen" src="./photos/beisen-quiz-home.png" alt="" loading="lazy"/> : <div className="index-signal"><i/><i/><i/><strong>{project.metric}</strong><span>{project.metricLabel}</span></div>}
+    </div>
+    <div className="index-preview-note"><span>{project.year} / {project.award ? 'AWARDED' : 'PROJECT'}</span><p>{project.lead}</p></div>
+  </div>;
+}
+
 function ExhibitArt({ project }: { project: Project }) {
   if (project.preview === "focusflow") return <div className="focus-art flat-focus" aria-hidden="true">
     <p>把脑子里的事，<br />放到这里。</p>
@@ -65,6 +106,8 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
 
 export function WorkGallery({ projects, group, onGroupChange, surprise, onCursorHostChange }: { projects: Project[]; group: Group; onGroupChange: (g: Group) => void; surprise: number; onCursorHostChange: (host: HTMLDialogElement | null) => void }) {
   const [selected, setSelected] = useState<number | null>(null);
+  const [preview, setPreview] = useState<number>(2);
+  const floor = useExhibitEntrance(group);
   const [seen, setSeen] = useState<number[]>([]);
   const lastSurprise = useRef(0);
   const open = (index: number) => { setSelected(index); setSeen(s => s.includes(index) ? s : [...s, index]); };
@@ -77,14 +120,15 @@ export function WorkGallery({ projects, group, onGroupChange, surprise, onCursor
   }, [surprise]);
   const featured = group === "all" ? [0, 8, 3] : group === "ai" ? [0, 8] : [3, 4];
   const archive = group === "all" ? [2, 1, 4, 6, 7, 5] : group === "ai" ? [2, 1] : [6, 7, 5];
+  const activePreview = archive.includes(preview) ? preview : archive[0];
   return <section className="workshop" id="work" aria-labelledby="work-title">
     <div className="studio-section-top"><span>01 / SELECTED WORK</span><span>2023 / 2026</span></div>
     <div className="workshop-heading"><h2 id="work-title">做过的项目<span className="work-title-dot">.</span></h2><div className="workshop-intro"><p>AI 产品 · 数据研究</p><span className="explore-count">{mono(projects.length)} PROJECTS</span></div></div>
     <div className="workshop-controls"><div className="exhibit-filters" aria-label="筛选作品">{([['all','全部作品'],['ai','AI 与产品'],['data','数据与研究']] as const).map(([key, label]) => <button type="button" key={key} aria-pressed={group === key} onClick={() => onGroupChange(key)}>{label}<span>{key === "all" ? "09" : key === "ai" ? "04" : "05"}</span></button>)}</div><span>查看项目 ↗</span></div>
-    <div className={`exhibit-floor floor-${group}`} key={group}>
-      {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'AI / PRODUCT' : 'DATA / RESEARCH'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖项目" : "产品原型"}</small><h3>{p.title}</h3><p>{p.preview === "focusflow" ? "暂存杂念，专注当前任务。" : p.preview === "mood-diary" ? "用花朵记录每日心情。" : p.lead}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
+    <div ref={floor} className={`exhibit-floor floor-${group}`} key={group}>
+      {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onPointerMove={moveExhibit} onPointerLeave={resetExhibit} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'AI / PRODUCT' : 'DATA / RESEARCH'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖项目" : "产品原型"}</small><h3>{p.title}</h3><p>{p.preview === "focusflow" ? "暂存杂念，专注当前任务。" : p.preview === "mood-diary" ? "用花朵记录每日心情。" : p.lead}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
     </div>
-    <div className="archive-shelf"><div className="archive-intro"><span>PROJECT INDEX</span><h3>更多项目</h3></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}${p.preview === "aybot" ? " file-illustrated" : ""}`} key={p.title} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b>{p.preview === "aybot" && <img src="./photos/project-flat-v1/aybot.png" width="1448" height="1086" alt="" loading="lazy" decoding="async"/>}</span></button>; })}</div></div>
+    <div className="archive-shelf"><div className="archive-intro"><span>PROJECT INDEX</span><h3>更多项目</h3><IndexPreview project={projects[activePreview]}/></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}${activePreview === index ? " is-previewing" : ""}`} key={p.title} onPointerEnter={() => setPreview(index)} onFocus={() => setPreview(index)} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b></span></button>; })}</div></div>
     <CaseFile project={selected === null ? null : projects[selected]} onClose={() => setSelected(null)} onCursorHostChange={onCursorHostChange}/>
   </section>;
 }
@@ -101,10 +145,22 @@ export function PhotoDesk(){
  const copyTimer=useRef<ReturnType<typeof setTimeout>|null>(null);
  useEffect(()=>()=>{if(copyTimer.current)clearTimeout(copyTimer.current);},[]);
  const select=(n:number)=>{setPhoto((n+photos.length)%photos.length);setFlipped(false);};
+ const swipe=useRef({id:-1,x:0,y:0,dx:0,moved:false});
+ const photoMotion=useRef<HTMLDivElement>(null);
+ const resetPhotoMotion=()=>{if(photoMotion.current){photoMotion.current.style.removeProperty('--swipe-x');photoMotion.current.style.removeProperty('--swipe-angle');photoMotion.current.classList.remove('is-dragging');}};
+ const startSwipe=(e:PointerEvent<HTMLButtonElement>)=>{if(e.button!==0||!e.isPrimary)return;swipe.current={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,moved:false};e.currentTarget.setPointerCapture(e.pointerId);};
+ const moveSwipe=(e:PointerEvent<HTMLButtonElement>)=>{
+   const d=swipe.current;if(d.id!==e.pointerId)return;
+   d.dx=e.clientX-d.x;
+   if(!d.moved && Math.abs(e.clientY-d.y)>Math.abs(d.dx)+10){d.id=-1;resetPhotoMotion();return;}
+   if(Math.abs(d.dx)>8)d.moved=true;
+   if(d.moved && photoMotion.current){const x=Math.max(-150,Math.min(150,d.dx));photoMotion.current.classList.add('is-dragging');photoMotion.current.style.setProperty('--swipe-x',`${x}px`);photoMotion.current.style.setProperty('--swipe-angle',`${x/18}deg`);}
+ };
+ const endSwipe=(e:PointerEvent<HTMLButtonElement>)=>{const d=swipe.current;if(d.id!==e.pointerId)return;d.id=-1;if(Math.abs(d.dx)>60)select(photo+(d.dx<0?1:-1));resetPhotoMotion();if(e.currentTarget.hasPointerCapture(e.pointerId))e.currentTarget.releasePointerCapture(e.pointerId);};
  const current=photos[photo];
  const interests=[{key:'debate',title:'辩论',symbol:'“ ”',text:'曾任学院辩论队队长，带领 10 余人团队、统筹百人规模赛事。辩论让我习惯先听清分歧，再整理证据，把想法讲明白。',detail:'2022 校争鸣杯全程最佳辩手'}, {key:'music',title:'摇滚',symbol:'↯',text:'喜欢摇滚的直白和张力。Blur 的 Tender 温柔，但不软弱。',detail:'ON REPEAT / TENDER · BLUR'}, {key:'game',title:'游戏',symbol:'✥',text:'主机、掌机、手游都玩。比起通关数量，更喜欢琢磨故事怎么讲、系统怎么设计。',detail:'PLAYER MODE / ALWAYS CURIOUS'}, {key:'art',title:'艺术',symbol:'✳',text:'喜欢高迪自由的曲线，也喜欢高更大胆的色彩。会留意不同创作者如何用自己的方式理解世界。',detail:'LOOK CLOSELY / THINK FREELY'}];
  const selected=interests.find(i=>i.key===interest)!;
- return <section id="about" className="photo-desk" aria-labelledby="offscreen-title"><div className="studio-section-top"><span>03 / OFF SCREEN</span></div><div className="photo-layout"><div className="photo-intro"><h2 id="offscreen-title">屏幕之外<span className="work-title-dot">.</span></h2><p>旅行、拍照，偶尔辩论。</p><span className="photo-handnote">点照片，翻到背面 ↗</span></div><div className="photo-stack-wrap" id="offscreen-gallery"><div className="photo-stack" onKeyDown={e=>{if(e.key==='ArrowLeft'){e.preventDefault();select(photo-1);}if(e.key==='ArrowRight'){e.preventDefault();select(photo+1);}}}><div className="photo-underprint"><img src={`./photos/${photos[(photo+1)%photos.length].src}`} alt="" loading="lazy"/></div><button type="button" className={`photo-print${flipped?' is-flipped':''}`} onClick={()=>setFlipped(!flipped)} aria-label={flipped?'查看照片正面':'翻看照片背面的笔记'} aria-pressed={flipped}><span className="photo-front" aria-hidden={flipped}><img src={`./photos/${current.src}`} alt={current.title} loading="lazy"/><span><b>{current.place}</b><small>{mono(photo+1)} / 05</small></span></span><span className="photo-back" aria-hidden={!flipped}><small>A NOTE FROM THE OTHER SIDE</small><strong>{current.title}</strong><span>{current.note}</span><em>安颜 / travel notes</em></span></button><span className="photo-tape" aria-hidden="true"/></div><div className="photo-controls"><button type="button" onClick={()=>select(photo-1)} aria-label="上一张旅行照片">←</button><span>{current.place}</span><button type="button" onClick={()=>select(photo+1)} aria-label="下一张旅行照片">→</button></div></div></div>
+ return <section id="about" className="photo-desk" aria-labelledby="offscreen-title"><div className="studio-section-top"><span>03 / OFF SCREEN</span></div><div className="photo-layout"><div className="photo-intro"><h2 id="offscreen-title">屏幕之外<span className="work-title-dot">.</span></h2><p>旅行、拍照，偶尔辩论。</p><span className="photo-handnote">拖动换一张 · 点击看背面</span></div><div className="photo-stack-wrap" id="offscreen-gallery"><div className="photo-stack" onKeyDown={e=>{if(e.key==='ArrowLeft'){e.preventDefault();select(photo-1);}if(e.key==='ArrowRight'){e.preventDefault();select(photo+1);}}}><div className="photo-underprint"><img src={`./photos/${photos[(photo+1)%photos.length].src}`} alt="" loading="lazy"/></div><div className="photo-motion" ref={photoMotion}><button type="button" className={`photo-print${flipped?' is-flipped':''}`} onPointerDown={startSwipe} onPointerMove={moveSwipe} onPointerUp={endSwipe} onPointerCancel={()=>{swipe.current.id=-1;swipe.current.moved=true;resetPhotoMotion();}} onLostPointerCapture={()=>{swipe.current.id=-1;resetPhotoMotion();}} onClick={e=>{if(e.detail!==0 && swipe.current.moved){swipe.current.moved=false;return;}setFlipped(!flipped);}} aria-label={flipped?'查看照片正面':'翻看照片背面的笔记'} aria-pressed={flipped}><span className="photo-front" aria-hidden={flipped}><img draggable={false} src={`./photos/${current.src}`} alt={current.title} loading="lazy"/><span><b>{current.place}</b><small>{mono(photo+1)} / 05</small></span></span><span className="photo-back" aria-hidden={!flipped}><small>A NOTE FROM THE OTHER SIDE</small><strong>{current.title}</strong><span>{current.note}</span><em>安颜 / travel notes</em></span></button></div><span className="photo-tape" aria-hidden="true"/></div><div className="photo-controls"><button type="button" onClick={()=>select(photo-1)} aria-label="上一张旅行照片">←</button><span aria-live="polite">{current.place}</span><button type="button" onClick={()=>select(photo+1)} aria-label="下一张旅行照片">→</button></div><div className="photo-contact-sheet" aria-label="选择旅行照片">{photos.map((p,i)=><button type="button" key={p.src} aria-label={`查看照片：${p.place}`} aria-pressed={photo===i} onClick={()=>select(i)}><img src={`./photos/${p.src}`} alt="" loading="lazy"/><span>{mono(i+1)}</span></button>)}</div></div></div>
  <div className="pocket-notes" id="interest-debate"><div className="pocket-heading"><span>A FEW FAVOURITES</span><h3>平时喜欢</h3></div><div className="interest-switches" aria-label="选择兴趣">{interests.map(i=><button type="button" key={i.key} aria-pressed={interest===i.key} onClick={()=>setInterest(i.key)}><span>{i.symbol}</span>{i.title}</button>)}</div><div className="interest-note" key={interest}><small>{selected.detail}</small><p>{selected.text}</p>{interest==='music'&&<a href="https://open.spotify.com/search/Blur%20Tender" target="_blank" rel="noreferrer">去听这首歌 ↗</a>}</div></div>
  <footer className="studio-footer"><div><span>GET IN TOUCH</span><h2>聊聊下一件事<span className="work-title-dot">.</span></h2></div><div className="footer-contact"><a href="mailto:anyan001121@gmail.com">来聊聊 <span>↗</span></a><button type="button" onClick={async()=>{try{await navigator.clipboard.writeText('anyan001121@gmail.com');setCopied(true);if(copyTimer.current)clearTimeout(copyTimer.current);copyTimer.current=setTimeout(()=>setCopied(false),2500);}catch{window.location.href='mailto:anyan001121@gmail.com';}}}>{copied?'邮箱已复制 ✓':'anyan001121@gmail.com ⧉'}</button><span role="status" className="sr-only">{copied?'邮箱已复制':''}</span></div><div className="footer-bottom"><span>© 2026 安颜</span><a href="#top">回到顶部 ↑</a></div></footer></section>;
 }

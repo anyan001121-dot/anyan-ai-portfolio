@@ -1,0 +1,56 @@
+/* Small, user-led motion: no autoplay or scroll interception. */
+.exhibit-floor { animation:none; }
+.exhibit.will-enter { opacity:0; transform:translateY(28px); }
+.exhibit.will-enter.has-entered { opacity:1; transform:none; transition:opacity .7s,transform .7s; }
+.exhibit.will-enter:focus-visible { opacity:1; transform:none; }
+.exhibit .flat-focus > img,.exhibit .garden-art img,.exhibit .flat-flight-scene img {
+  transition:translate .45s cubic-bezier(.2,.75,.25,1),transform .6s;
+  translate:var(--look-x,0px) var(--look-y,0px);
+}
+.exhibit .garden-art img:nth-of-type(2),.exhibit .qar-cloud-wide {
+  translate:calc(var(--look-x,0px) * -.5) calc(var(--look-y,0px) * -.4);
+}
+.exhibit .garden-art img:nth-of-type(3),.exhibit .qar-cloud-small {
+  translate:calc(var(--look-x,0px) * .5) calc(var(--look-y,0px) * .5);
+}
+.archive-shelf { align-items:start; grid-template-columns:1fr 1.45fr; gap:clamp(40px,7vw,110px); }
+.archive-intro { position:sticky; top:110px; }
+.index-preview { margin-top:28px; animation:index-in .35s both; }
+.index-preview-art { position:relative; aspect-ratio:1.15; overflow:hidden; border-radius:10px; background:#e8ece3; }
+.index-preview-art > img { width:100%; height:100%; object-fit:contain; }
+.preview-aybot .index-preview-art { background:#ebe3d8; }
+.index-preview-art > .index-screen { width:82%; height:84%; position:absolute; left:9%; top:12%; object-fit:cover; object-position:top; border-radius:5px; }
+.index-signal { height:100%; display:flex; flex-direction:column; align-items:center; justify-content:center; isolation:isolate; }
+.index-signal i { position:absolute; width:67%; aspect-ratio:1; border:1px solid #81907528; border-radius:50%; z-index:-1; }
+.index-signal i:nth-child(2) { width:85%; }.index-signal i:nth-child(3) { width:110%; }
+.index-signal strong { font:400 clamp(30px,4.2vw,60px)/1.2 var(--sans); letter-spacing:-.06em; color:#4f6150; }
+.index-signal > span { font-size:11px; color:#657461; margin-top:15px; }
+.index-preview-note { padding-top:18px; }.index-preview-note > span { font:9px/1.5 var(--type); color:#78806f; }
+.index-preview-note p { font-size:12px; line-height:1.9; color:#697362; max-width:280px; margin-top:10px; }
+.archive-file { transition:background .3s,padding .3s; }
+.archive-file.is-previewing { background:#edf0e8; padding-inline:16px; }
+.archive-file.is-previewing .file-content b { transform:translate(3px,-3px); }
+.photo-motion { position:absolute; inset:0; transform:translateX(var(--swipe-x,0px)) rotate(var(--swipe-angle,0deg)); transition:transform .4s cubic-bezier(.2,.8,.2,1); }
+.photo-motion.is-dragging { transition:none; }
+.photo-print { touch-action:pan-y; user-select:none; -webkit-user-select:none; cursor:grab; }
+.is-dragging .photo-print { cursor:grabbing; }
+.photo-contact-sheet { display:flex; justify-content:center; gap:10px; margin:24px 0 0; }
+.photo-contact-sheet button { position:relative; background:transparent; border:0; padding:4px; width:56px; height:63px; border-bottom:1px solid transparent; transition:transform .3s,border-color .3s; }
+.photo-contact-sheet img { display:block; width:100%; height:43px; object-fit:cover; opacity:.45; transition:opacity .3s; border-radius:2px; }
+.photo-contact-sheet button:hover { transform:translateY(-4px); }
+.photo-contact-sheet button[aria-pressed=true] { border-color:#52688b; }
+.photo-contact-sheet button[aria-pressed=true] img,.photo-contact-sheet button:hover img { opacity:1; }
+.photo-contact-sheet span { display:block; text-align:center; font:8px/1.6 var(--type); color:#747c6d; }
+@keyframes index-in { from { opacity:.35; transform:translateY(8px); } to { opacity:1; transform:none; } }
+@media(max-width:760px) {
+  .archive-shelf { grid-template-columns:1fr; gap:15px; }
+  .archive-intro { position:static; }.index-preview { display:none; }
+  .archive-file.is-previewing { background:transparent; padding-inline:0; }
+  .photo-contact-sheet { gap:7px; }.photo-contact-sheet button { width:48px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .exhibit.will-enter { opacity:1; transform:none; }
+  .exhibit.will-enter.has-entered,.index-preview,.archive-file,.photo-motion,.photo-contact-sheet button { animation:none; transition:none; }
+  .exhibit .flat-focus > img,.exhibit .garden-art img,.exhibit .flat-flight-scene img { translate:none; transition:none; }
+  .photo-motion { transform:none; }.photo-print { transition:none; }
+}

@@ -9,6 +9,7 @@ import { WorkGallery, PhotoDesk, StudioGuide } from "./StudioSections";
 import { projects } from "./projects";
 import "./Studio.css";
 import "./SoftStudio.css";
+import "./InteractiveStudio.css";
 
 type IdentityCategory = "data" | "product" | "expression" | "observe";
 
