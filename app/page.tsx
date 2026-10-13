@@ -5,7 +5,7 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import ImpactHero from "./ImpactHero";
-import { WorkGallery, MethodLab, PhotoDesk, StudioGuide } from "./StudioSections";
+import { WorkGallery, PhotoDesk, StudioGuide } from "./StudioSections";
 import { projects } from "./projects";
 import "./Studio.css";
 import "./SoftStudio.css";
@@ -562,7 +562,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    const sections = ["top", "work", "self", "fit", "about"]
+    const sections = ["top", "work", "self", "about"]
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     let frame = 0;
@@ -650,8 +650,8 @@ export default function Home() {
         <a className="wordmark magnetic" href="#top" aria-label="返回首页">AY<span>·</span></a>
         <nav aria-label="页面导航">
           <a className={(activeSection === "top" ? "active " : "") + "magnetic"} href="#top" data-scramble>ME</a>
-          <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>PLAY & WORK</a>
-          <a className={(activeSection === "fit" ? "active " : "") + "magnetic"} href="#fit" data-scramble>HOW I THINK</a>
+          <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>WORK</a>
+          <a className={(activeSection === "self" ? "active " : "") + "magnetic"} href="#self" data-scramble>ABOUT ME</a>
           <a className={(activeSection === "about" ? "active " : "") + "magnetic"} href="#about" data-scramble>OFF SCREEN</a>
         </nav>
         <div className="header-actions">
@@ -682,7 +682,7 @@ export default function Home() {
       <section className="self-map section interactive-section" id="self">
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="self-map-copy curtain-observe">
-          <p className="section-index mono-label" data-scramble>02 / ME · IDENTITY MAP</p>
+          <p className="section-index mono-label" data-scramble>02 / ABOUT ME</p>
           <h2>
             <button
               className="identity-trigger magnetic"
@@ -693,9 +693,9 @@ export default function Home() {
               onBlur={() => setIdentityOpen(false)}
               onClick={() => setIdentityOpen((current) => !current)}
               aria-label={identityOpen ? "收拢个人关键词" : "炸开个人关键词"}
-            >我</button>
+            >安颜</button>
             <span className="identity-trigger-guide" aria-hidden="true"><i />悬停看看</span>
-            <br /><span className="identity-title-rest">不止一个标签。</span>
+
           </h2>
           <div className="education-list" aria-label="教育背景">
             <p>EDUCATION / 受教育经历</p>
@@ -708,7 +708,7 @@ export default function Home() {
               <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
             </article>
           </div>
-          <p>悬停时关键词散开，移开后重新聚合。</p>
+          <p className="education-note">本科两年修完四年学分。</p>
           <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
           <div className="identity-categories" role="group" aria-label="按分类探索关键词">
             {identityCategories.map((cat) => (
@@ -764,7 +764,7 @@ export default function Home() {
         </div>
       </section>
 
-      <MethodLab />
+
       <PhotoDesk />
     </main>
   );

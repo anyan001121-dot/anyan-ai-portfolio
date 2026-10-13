@@ -89,8 +89,8 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
           </div>
         </figure>
         <div className="impact-copy">
-          <p className="impact-eyebrow">STATISTICS × AI PRODUCT<br />ANALYTICAL MIND. CURIOUS EYES.</p>
-          <p className="impact-statement">严谨地想，<br />自由地看。</p>
+          <p className="impact-eyebrow">STATISTICS × AI PRODUCT</p>
+          <p className="impact-statement">研究数据，<br />也做产品。</p>
           <a className="impact-contact" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
         </div>
         <button type="button" className={`impact-mascot${greeting ? " is-greeting" : ""}`} onClick={greet} aria-label="让小人打个招呼">
@@ -103,13 +103,13 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
         <p className="impact-caption" aria-live="polite"><span>{cartoon ? "02 / MY CARTOON SELF" : "01 / THE REAL ME"}</span><span>PORTFOLIO · 2026</span></p>
       </div>
       <div className="impact-foot">
-        <div><em>Ideas into things.</em><span>从判断，到行动。</span><a href="#work">进入我的作品 ↗</a></div>
+        <div><em>Ideas into things.</em><a href="#work">进入我的作品 ↗</a></div>
         <button type="button" onClick={playIntro} disabled={playing} className="impact-replay">重播开场 ↗</button>
       </div>
       {playing && <>
         <div className="impact-shutter impact-shutter-top" aria-hidden="true" />
         <div className="impact-shutter impact-shutter-bottom" aria-hidden="true" />
-        <div className="impact-intro-mark" aria-hidden="true">AY.<span>AN YAN — MORE THAN ONE SIDE</span></div>
+        <div className="impact-intro-mark" aria-hidden="true">AY.<span>AN YAN / PORTFOLIO</span></div>
         <button className="impact-skip" type="button" onClick={finishIntro}>跳过开场 ↗</button>
       </>}
     </section>
