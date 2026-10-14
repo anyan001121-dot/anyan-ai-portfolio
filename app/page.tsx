@@ -698,6 +698,13 @@ export default function Home() {
             <span className="identity-trigger-guide" aria-hidden="true"><i />悬停看看</span>
 
           </h2>
+          <div className="turning-point" aria-labelledby="turning-point-title">
+            <h3 id="turning-point-title">从机械工程，<br />转向数据。</h3>
+            <p>读到大二下，我发现自己更想用数字分析问题。尽管老师、辅导员和家人起初并不支持，我还是转入了数据科学与大数据技术专业。</p>
+            <div className="turning-point-result"><strong>2<span>年</span></strong><p>修完新专业<br /><b>四年学分</b></p></div>
+            <p className="turning-point-awards">转专业后参加多次数学建模竞赛，获得 MathorCup 全国二等奖、长三角二等奖及校赛一等奖。</p>
+            <a href="#work" onClick={() => setProjectGroup("data")}>看看我的获奖项目 <span aria-hidden="true">↗</span></a>
+          </div>
           <div className="education-list" aria-label="教育背景">
             <p>EDUCATION / 受教育经历</p>
             <article>
@@ -709,7 +716,6 @@ export default function Home() {
               <div><strong>浙江农林大学</strong><small>数据科学与大数据技术学士</small></div>
             </article>
           </div>
-          <p className="education-note">本科两年修完四年学分。</p>
           <span className="self-map-hint mono-label" data-scramble>HOVER / TAP TO DECONSTRUCT ↗</span>
           <div className="identity-categories" role="group" aria-label="按分类探索关键词">
             {identityCategories.map((cat) => (
