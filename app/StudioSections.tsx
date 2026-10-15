@@ -65,7 +65,7 @@ function ExhibitArt({ project }: { project: Project }) {
       <img className="qar-cloud-small" src="./photos/project-flat-v1/qar-cloud-small.png" width="1448" height="1086" alt="" loading="lazy" decoding="async" />
       <img className="qar-plane" src="./photos/project-flat-v1/qar-plane.png" width="1448" height="1086" alt="" loading="lazy" decoding="async" />
     </div>
-    <span className="radar-coordinate">QAR / SIGNAL FOUND</span><strong>85<small>%</small></strong><span className="radar-caption">测试集准确率</span><span className="award-stamp">MATHORCUP<br/>全国二等奖</span>
+    <span className="radar-coordinate">QAR / SIGNAL FOUND</span><strong>5<small>项</small></strong><span className="radar-caption">关键飞行指标</span><span className="award-stamp">MATHORCUP<br/>全国二等奖</span>
   </div>;
   return <div className={`archive-art art-${project.tone}`} aria-hidden="true"><span className="archive-orbit"/><strong>{project.metric}</strong><small>{project.metricLabel}</small><span className="archive-code">{project.year} / RESEARCH NOTES</span></div>;
 }
@@ -91,15 +91,30 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
     {project && <div className="case-paper">
       <div className="case-toolbar"><span>OPEN FILE / {project.year}</span><button type="button" onClick={onClose} aria-label="关闭项目详情">关闭 ×</button></div>
       <header className="case-heading"><p>{project.subtitle}</p><h2 id="case-title">{project.title}</h2><p>{project.lead}</p>{project.stage && <p className="case-stage">{project.stage}</p>}{project.award && <strong className="case-award">✳ {project.award}</strong>}<div className="case-tags">{project.tags.map(t => <span key={t}>{t}</span>)}</div>
+        {(project.contribution || project.evidence) && <dl className="case-facts">
+          {project.contribution && <div><dt>我的工作</dt><dd>{project.contribution}</dd></div>}
+          {project.evidence && <div><dt>当前证据</dt><dd>{project.evidence.summary}</dd></div>}
+        </dl>}
+        {(project.liveUrl || project.url) && <div className="case-entry-links">
+          {project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer">{project.linkLabel || "打开在线体验"} ↗</a>}
+          {project.url && <a href={project.url} target="_blank" rel="noreferrer">查看项目源码 ↗</a>}
+        </div>}
+        {project.evidence && <details className="case-proof"><summary>证据与指标口径 <span aria-hidden="true">＋</span></summary>
+          <dl>{project.evidence.items.map(item => <div key={item.label}><dt>{item.label}</dt><dd>{item.text}</dd></div>)}</dl>
+          {project.evidence.next && <p className="case-proof-next">{project.evidence.next}</p>}
+          {project.evidence.links && <div className="case-proof-links">{project.evidence.links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}</div>}
+        </details>}
         {project.research && <details className="case-evidence"><summary>文献与设计依据 · {project.research.title}</summary><p>{project.research.summary}</p><p>{project.research.application}</p><div><a href={project.research.url} target="_blank" rel="noreferrer">查看指南 ↗</a><a href={project.research.notesUrl} target="_blank" rel="noreferrer">项目走查与验证计划 ↗</a></div></details>}
       </header>
       <div className={`case-visual case-${project.preview}`}>
         {project.preview === "mood-diary" ? <><MoodDiaryPreview step={previewStep} /><div className="mood-demo-controls" aria-label="切换心情日记流程演示">{["种下心情", "即时关怀", "反馈与记忆"].map((label, i) => <button type="button" key={label} aria-pressed={previewStep === i} onClick={() => setPreviewStep(i)}>{mono(i + 1)} {label}</button>)}</div></> : project.preview === "focusflow" ? <img src="./photos/focusflow-preview.png" alt="FocusFlow 真实产品界面" /> : project.preview === "aybot" ? <img src="./photos/aybot-coze-workflow.jpg" alt="AYBot 的 Coze 工作流"/> : project.preview === "quiz" ? <img src="./photos/beisen-quiz-home.png" alt="北森刷题台真实界面"/> : <><ExhibitArt project={project}/><p>指标来自项目结果；图形为展示示意。</p></>}
       </div>
-      <div className="case-reading"><div className="chapter-tabs" role="tablist" aria-label="项目叙事章节">{chapterNames.map((name, i) => <button id={`chapter-tab-${i}`} role="tab" type="button" key={name} aria-selected={chapter === i} aria-controls="case-chapter" tabIndex={chapter === i ? 0 : -1} onClick={() => setChapter(i)} onKeyDown={(e) => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) { e.preventDefault(); const next = e.key === "Home" ? 0 : e.key === "End" ? 3 : (i + (e.key === "ArrowRight" ? 1 : 3)) % 4; setChapter(next); document.getElementById(`chapter-tab-${next}`)?.focus(); } }}><small>{mono(i + 1)}</small>{name}</button>)}</div>
+      <div className="case-reading">
+        {project.decision && <section className="case-decision" aria-label="关键取舍"><p>关键取舍</p><h3>{project.decision.title}</h3><p>{project.decision.detail}</p><small>{project.decision.basis}</small></section>}
+        <div className="chapter-tabs" role="tablist" aria-label="项目叙事章节">{chapterNames.map((name, i) => <button id={`chapter-tab-${i}`} role="tab" type="button" key={name} aria-selected={chapter === i} aria-controls="case-chapter" tabIndex={chapter === i ? 0 : -1} onClick={() => setChapter(i)} onKeyDown={(e) => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) { e.preventDefault(); const next = e.key === "Home" ? 0 : e.key === "End" ? 3 : (i + (e.key === "ArrowRight" ? 1 : 3)) % 4; setChapter(next); document.getElementById(`chapter-tab-${next}`)?.focus(); } }}><small>{mono(i + 1)}</small>{name}</button>)}</div>
         <div id="case-chapter" role="tabpanel" aria-labelledby={`chapter-tab-${chapter}`} className="chapter-text" key={`${project.title}-${chapter}`}><span>{mono(chapter + 1)}</span><p>{project.star[chapterKeys[chapter]]}</p></div>
         {project.steps && <div className="case-process"><p>从输入到结果 / EXPERIENCE FLOW</p>{project.steps.map((step, i) => <details key={step.label}><summary><small>{mono(i + 1)}</small>{step.label}<span>＋</span></summary><p>{step.description}</p></details>)}</div>}
-        {project.overturn && <aside className="case-rethink"><p>↺ 关键判断</p><del>{project.overturn.before}</del><p>{project.overturn.evidence}</p><strong>{project.overturn.after}</strong></aside>}
+        {project.overturn && !project.decision && <aside className="case-rethink"><p>↺ 关键判断</p><del>{project.overturn.before}</del><p>{project.overturn.evidence}</p><strong>{project.overturn.after}</strong></aside>}
         <div className="case-actions">{project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer">{project.linkLabel || "打开在线体验"} ↗</a>}{project.url && <a href={project.url} target="_blank" rel="noreferrer">查看项目源码 ↗</a>}<button type="button" onClick={onClose}>关闭项目 ↙</button></div>
       </div>
     </div>}
