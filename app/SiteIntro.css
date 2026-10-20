@@ -1,0 +1,191 @@
+/* ---------- 12s opening reel · 120 BPM, 1 beat = .5s, every shot one bar ---------- */
+.reel-intro {
+  /* Defaults match the site; SiteIntro re-reads the live hero and title-dot colours at runtime. */
+  --ri-paper: #f7f7ef;       /* poster cream */
+  --ri-ink: #2c322c;         /* poster ink */
+  --ri-mute: #858b80;
+  --ri-accent: #687a98;      /* the site's signature period colour — the only accent */
+  --ri-poster: #e8ebe2;      /* hero background the reel floods into */
+  --ri-beat: .5s;
+  --ri-ease: cubic-bezier(.16, 1, .3, 1);
+  --ri-hook: clamp(40px, 9.5vw, 168px);
+  position: fixed; z-index: 1000; inset: 0; overflow: hidden;
+  background: var(--ri-paper); color: var(--ri-ink);
+  font-family: var(--display);
+  transition: opacity .26s linear;
+}
+.reel-intro.is-leaving { opacity: 0; pointer-events: none; }
+.reel-intro.is-measuring *, .reel-intro.is-measuring *::before { animation: none !important; }
+
+/* ---------- Gate: one accent dot pulsing on the beat, waiting for a click ---------- */
+.ri-gate { position: absolute; inset: 0; display: grid; place-items: center; cursor: pointer; }
+.ri-gate-dot {
+  position: absolute; z-index: 1; pointer-events: none; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%;
+  background: var(--ri-accent); animation: ri-gate-pulse var(--ri-beat) var(--ri-ease) infinite;
+}
+@keyframes ri-gate-pulse { 0% { transform: scale(1.5); } 100% { transform: scale(1); } }
+.ri-gate-play {
+  position: absolute; inset: 0; display: grid; align-content: start; justify-items: center; gap: 10px;
+  padding: calc(50vh + 34px) 16px 0; border: 0; background: none; color: var(--ri-ink); cursor: pointer;
+}
+.ri-gate-play span { font-size: clamp(22px, 2.4vw, 32px); font-weight: 700; letter-spacing: -.02em; }
+.ri-gate-play small { font: 600 11px/1 var(--type); letter-spacing: .2em; color: var(--ri-mute); white-space: nowrap; }
+.ri-gate-play:focus-visible span { outline: 1px solid var(--ri-ink); outline-offset: 8px; }
+.ri-gate-alt { position: absolute; z-index: 1; right: max(16px, 4vw); bottom: clamp(16px, 4vh, 34px); display: flex; gap: clamp(16px, 2.4vw, 32px); cursor: default; }
+.ri-gate-alt button { padding: 8px 0; border: 0; background: none; color: var(--ri-ink); cursor: pointer; font: 600 11px/1 var(--type); letter-spacing: .2em; opacity: .55; transition: opacity .2s; }
+.ri-gate-alt button:hover, .ri-gate-alt button:focus-visible { opacity: 1; }
+.ri-gate-alt button:focus-visible { outline: 1px solid var(--ri-ink); outline-offset: 4px; }
+.ri-gate .ri-brand, .ri-gate .ri-tempo { color: var(--ri-ink); }
+
+/* ---------- Stage: everything that zooms together, including the thread ---------- */
+.ri-stage {
+  position: absolute; inset: 0;
+  animation: ri-zoom calc(var(--ri-beat) * 22) linear both;
+}
+@keyframes ri-zoom { from { transform: scale(1); } to { transform: scale(1.04); } }
+
+/* Shots: visible only during their own bar, so every cut is a hard cut on a downbeat. */
+.ri-shot {
+  position: absolute; inset: 0; display: grid; place-items: center; padding: 0 max(16px, 5vw);
+  background: var(--ri-paper); color: var(--ri-ink); visibility: hidden;
+  animation: ri-shot calc(var(--ri-beat) * 4) step-end calc(var(--from) * var(--ri-beat));
+}
+.ri-shot.ri-last { animation-fill-mode: forwards; }
+.ri-shot.ri-ink { background: var(--ri-ink); color: var(--ri-paper); }
+@keyframes ri-shot { 0%, 100% { visibility: visible; } }
+.ri-shot-inner { display: flex; flex-direction: column; align-items: center; gap: clamp(14px, 2.6vh, 32px); }
+
+/* The thread — one accent element that every shot hands to the next. */
+.ri-thread { position: absolute; z-index: 5; left: 0; top: 0; width: 14px; height: 14px; border-radius: 999px; background: var(--ri-accent); opacity: 0; pointer-events: none; }
+
+/* Period anchors keep their space but stay invisible; the thread draws the dot. */
+.ri-dot-anchor { color: transparent; }
+.ri-dot-anchor i { display: inline-block; width: 0; height: 0; vertical-align: baseline; }
+
+/* ---------- Beat-locked actions: start on beat --b, settle within it, never overshoot ---------- */
+.ri-fx {
+  animation-duration: .38s; animation-timing-function: var(--ri-ease); animation-fill-mode: both;
+  animation-delay: calc(var(--b) * var(--ri-beat));
+}
+.ri-drop { display: inline-block; animation-name: ri-drop; }
+.ri-rise { display: inline-block; animation-name: ri-rise; }
+.ri-fade { animation-name: ri-fade; }
+.ri-draw { stroke-dasharray: 1; animation-name: ri-draw; }
+.ri-swap { animation-name: ri-swap; animation-duration: calc(var(--ri-beat) * 2); animation-timing-function: linear; }
+.ri-letters { display: inline-flex; overflow: hidden; padding: .04em .02em .1em; margin: -.04em -.02em -.1em; }
+.ri-letter { display: inline-block; animation-name: ri-letter; animation-duration: .38s; animation-delay: calc(var(--b) * var(--ri-beat) + var(--i) * 12ms); }
+
+@keyframes ri-drop { from { opacity: 0; transform: translateY(-.55em); } to { opacity: 1; transform: none; } }
+@keyframes ri-rise { from { opacity: 0; transform: translateY(.3em); clip-path: inset(0 0 100% 0); } to { opacity: 1; transform: none; clip-path: inset(-10% -10% -25% -10%); } }
+@keyframes ri-letter { from { opacity: 0; transform: translateY(105%); } to { opacity: 1; transform: none; } }
+@keyframes ri-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ri-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+/* In on its beat, out on the next as the following word arrives. */
+@keyframes ri-swap {
+  0% { opacity: 0; transform: translateY(.7em); animation-timing-function: cubic-bezier(.16, 1, .3, 1); }
+  42%, 50% { opacity: 1; transform: none; animation-timing-function: cubic-bezier(.7, 0, .84, 0); }
+  62%, 100% { opacity: 0; transform: translateY(-.7em); }
+}
+
+/* Chinese line: the second voice under each English word — medium, tight, same ink. */
+.ri-zh { display: block; margin: 0; font-size: clamp(20px, 2.7vw, 46px); font-weight: 600; line-height: 1.2; letter-spacing: .04em; }
+.ri-zh b { font-weight: inherit; color: var(--ri-accent); }
+
+/* Bar 1 — PORTFOLIO, then the hook */
+.ri-portfolio {
+  position: absolute; z-index: 1; left: 0; right: 0; top: 50%; margin: 0; text-align: center;
+  font-size: 14vw; font-weight: 800; line-height: 1; letter-spacing: -.045em;
+  transform: translateY(-50%);
+  animation: ri-fold .42s var(--ri-ease) calc(var(--b) * var(--ri-beat)) both;
+}
+.ri-hook-wrap { position: relative; }
+.ri-hook-zh { position: absolute; left: 0; right: 0; top: calc(100% + clamp(10px, 2vh, 22px)); text-align: center; }
+@keyframes ri-fold {
+  from { top: 50%; font-size: 14vw; letter-spacing: -.045em; color: var(--ri-ink); }
+  to { top: calc(50% - var(--ri-hook) * .6 - 34px); font-size: 12px; letter-spacing: .42em; color: var(--ri-mute); }
+}
+.ri-hook {
+  margin: 0; display: flex; flex-wrap: wrap; justify-content: center; column-gap: .24em;
+  font-size: var(--ri-hook); font-weight: 750; line-height: 1.05; letter-spacing: -.05em;
+}
+
+/* Bar 2 — STATISTICS */
+.ri-mega { margin: 0; font-size: clamp(48px, 13vw, 250px); font-weight: 800; line-height: .9; letter-spacing: -.05em; }
+.ri-curve { display: block; width: min(84vw, 1100px); height: auto; overflow: visible; fill: none; stroke: currentColor; stroke-width: 1.5; }
+
+/* Bar 3 — CORRELATION → CAUSATION */
+.ri-struck { position: relative; display: block; }
+.ri-big { display: block; font-size: clamp(40px, 10.5vw, 200px); font-weight: 800; line-height: .98; letter-spacing: -.05em; }
+.ri-shot-inner > .ri-big { margin-top: calc(-1 * clamp(14px, 2.6vh, 32px)); }
+.ri-dim { animation: ri-dim .42s var(--ri-ease) calc(var(--b) * var(--ri-beat)) both; }
+@keyframes ri-dim { from { opacity: 1; } to { opacity: .16; } }
+
+/* Bar 4 — IDEA → PROTOTYPE → SHIPPED. */
+.ri-label { margin: 0; font: 600 12px/1 var(--type); letter-spacing: .42em; color: var(--ri-mute); }
+.ri-slot { display: grid; place-items: center; font-size: clamp(56px, 14vw, 250px); font-weight: 800; line-height: 1.05; letter-spacing: -.05em; }
+.ri-slot > span { grid-area: 1 / 1; }
+
+/* Bar 5 — ink shot */
+.ri-lines { display: flex; flex-direction: column; align-items: flex-start; margin: 0; font-size: clamp(48px, 11vw, 190px); font-weight: 800; line-height: .94; letter-spacing: -.05em; }
+
+/* Bar 6 — lock-up, bloom, hand-off */
+.ri-name { margin: 0; font-size: clamp(84px, 17vw, 300px); font-weight: 750; line-height: .9; letter-spacing: -.055em; white-space: nowrap; }
+.ri-sign { margin: 0; text-align: center; font-size: clamp(16px, 1.9vw, 30px); font-weight: 600; letter-spacing: .06em; color: var(--ri-mute); }
+.ri-flood { position: absolute; z-index: 2; inset: 0; background: var(--ri-poster); clip-path: circle(0 at 50% 50%); pointer-events: none; }
+.ri-hero-name { position: absolute; z-index: 3; inset: 0; pointer-events: none; }
+.ri-hero-name span { position: absolute; display: block; margin: 0; }
+.ri-slam-l { animation-name: ri-slam-l; }
+.ri-slam-r { animation-name: ri-slam-r; }
+@keyframes ri-slam-l { from { opacity: 0; transform: translateX(28%); } to { opacity: 1; transform: none; } }
+@keyframes ri-slam-r { from { opacity: 0; transform: translateX(-28%); } to { opacity: 1; transform: none; } }
+
+.ri-caption { margin: 0; text-align: center; font: 600 clamp(10px, 1vw, 12px)/1.6 var(--type); letter-spacing: .22em; color: var(--ri-mute); }
+
+/* ---------- Chrome: difference mode so it reads on cream and ink; gone once the poster floods in ---------- */
+.ri-chrome { position: absolute; inset: 0; z-index: 4; pointer-events: none; color: #fff; mix-blend-mode: difference; animation: ri-chrome-out .2s linear calc(var(--ri-beat) * 22) both; }
+@keyframes ri-chrome-out { to { opacity: 0; } }
+.ri-brand { position: absolute; top: clamp(18px, 4vh, 36px); left: max(16px, 4vw); font: 700 13px/1 var(--display); letter-spacing: -.01em; }
+.ri-tempo { position: absolute; top: clamp(18px, 4vh, 36px); left: 50%; transform: translateX(-50%); font: 600 11px/1 var(--type); letter-spacing: .2em; opacity: .55; white-space: nowrap; }
+.ri-beats { position: absolute; left: max(16px, 4vw); bottom: clamp(24px, 5vh, 44px); display: flex; gap: 8px; }
+.ri-beats i {
+  width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .25;
+  animation: ri-beat calc(var(--ri-beat) * 4) step-end calc(var(--b) * var(--ri-beat)) 6;
+}
+@keyframes ri-beat { 0% { opacity: 1; } 25%, 100% { opacity: .25; } }
+.ri-progress {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 2px; background: currentColor;
+  transform-origin: left center; animation: ri-progress 12s linear both;
+}
+@keyframes ri-progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+.ri-controls {
+  position: absolute; z-index: 6; right: max(16px, 4vw); bottom: clamp(16px, 4vh, 34px);
+  display: flex; align-items: center; gap: clamp(16px, 2.4vw, 32px);
+  color: #fff; mix-blend-mode: difference;
+  animation: ri-chrome-out .2s linear calc(var(--ri-beat) * 22) both;
+}
+.ri-controls button {
+  display: inline-flex; align-items: center; gap: 8px; padding: 8px 0; border: 0; background: none; color: inherit; cursor: pointer;
+  font: 600 11px/1 var(--type); letter-spacing: .2em; opacity: .6; transition: opacity .2s;
+}
+.ri-controls button:hover, .ri-controls button:focus-visible, .ri-sound[aria-pressed="true"] { opacity: 1; }
+.ri-controls button:focus-visible { outline: 1px solid #fff; outline-offset: 4px; }
+.ri-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 10px; }
+.ri-eq i { width: 2px; height: 3px; background: currentColor; }
+.ri-sound[aria-pressed="true"] .ri-eq i { animation: ri-eq var(--ri-beat) var(--ri-ease) infinite; }
+.ri-sound[aria-pressed="true"] .ri-eq i:nth-child(2) { animation-delay: calc(var(--ri-beat) / -3); }
+.ri-sound[aria-pressed="true"] .ri-eq i:nth-child(3) { animation-delay: calc(var(--ri-beat) / -1.5); }
+@keyframes ri-eq { 0% { height: 10px; } 100% { height: 3px; } }
+
+@media (max-width: 760px) {
+  .ri-tempo { display: none; }
+}
+
+/* Calmer fallback: no zoom, no pulse, every move becomes a fade; cuts and beat timing stay. */
+@media (prefers-reduced-motion: reduce) {
+  .ri-stage, .ri-gate-dot, .ri-sound[aria-pressed="true"] .ri-eq i { animation: none; }
+  .ri-fx { animation-name: ri-fade; animation-duration: .5s; animation-timing-function: ease; }
+  .ri-fx.ri-swap { animation-name: ri-swap-fade; animation-duration: 1s; animation-timing-function: linear; }
+  .ri-portfolio { animation: none; top: calc(50% - var(--ri-hook) * .6 - 34px); font-size: 12px; letter-spacing: .42em; color: var(--ri-mute); }
+}
+@keyframes ri-swap-fade { 0% { opacity: 0; } 30%, 50% { opacity: 1; } 62%, 100% { opacity: 0; } }

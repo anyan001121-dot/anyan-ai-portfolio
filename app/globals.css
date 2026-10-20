@@ -808,6 +808,7 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
   html { scroll-behavior: auto; scroll-snap-type: none; }
   .section-pointer-glow,.hero-pulse-field { display: none; }
   .fit-grid,.tool-circuit,.project-showcase,.offscreen-stage,.self-glyph-stage { translate: none; }
-  *,*::before,*::after { animation: none!important; transition: none!important; }
+  /* The opening reel has its own calmer fade-only fallback (SiteIntro.css). */
+  *:not(.reel-intro,.reel-intro *),*::before,*::after { animation: none!important; transition: none!important; }
   .site-guide { transform: translateX(-50%); }
 }

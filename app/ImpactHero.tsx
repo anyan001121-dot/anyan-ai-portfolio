@@ -1,61 +1,58 @@
 "use client";
 
 /* eslint-disable @next/next/no-img-element */
-import { useCallback, useEffect, useRef, useState, type PointerEvent } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PointerEvent } from "react";
+import { createPortal } from "react-dom";
+import SiteIntro from "./SiteIntro";
 import "./ImpactHero.css";
 
-const INTRO_KEY = "anyan-poster-intro-v1";
-const INTRO_DURATION = 2100;
+// The 8s opening reel (SiteIntro) plays once per tab session and hands off onto this poster.
+const INTRO_KEY = "anyan-reel-intro-v1";
 
 export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteChange: (complete: boolean) => void }) {
   const [cartoon, setCartoon] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [reel, setReel] = useState<"gate" | "play" | null>(null);
+  const [handoff, setHandoff] = useState(false);
   const [greeting, setGreeting] = useState(false);
   const stageRef = useRef<HTMLDivElement>(null);
-  const introTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const nameRef = useRef<HTMLHeadingElement>(null);
+  const handoffTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const greetingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const playing = reel !== null;
 
   const finishIntro = useCallback(() => {
-    if (introTimer.current) clearTimeout(introTimer.current);
-    introTimer.current = null;
-    setPlaying(false);
+    setReel(null);
     onIntroCompleteChange(true);
     try { sessionStorage.setItem(INTRO_KEY, "seen"); } catch { /* Storage is optional. */ }
+    // The reel ends on this exact poster; the portrait and copy then step in.
+    setHandoff(true);
+    if (handoffTimer.current) clearTimeout(handoffTimer.current);
+    handoffTimer.current = setTimeout(() => setHandoff(false), 1300);
   }, [onIntroCompleteChange]);
 
+  // Replay is itself a click, so the reel can skip the gate and start with sound.
   const playIntro = useCallback(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (introTimer.current) clearTimeout(introTimer.current);
-    setPlaying(true);
+    setReel("play");
     onIntroCompleteChange(false);
-    introTimer.current = setTimeout(finishIntro, INTRO_DURATION);
-  }, [finishIntro, onIntroCompleteChange]);
+  }, [onIntroCompleteChange]);
 
-  useEffect(() => {
+  // Decide before the first paint, so the poster never flashes ahead of the gate.
+  useLayoutEffect(() => {
     let seen = false;
     try { seen = sessionStorage.getItem(INTRO_KEY) === "seen"; } catch { /* Storage is optional. */ }
     const deepLink = window.location.hash !== "" && window.location.hash !== "#top";
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const start = !seen && !deepLink && !reduceMotion ? setTimeout(playIntro, 0) : null;
-    return () => {
-      if (start) clearTimeout(start);
-      if (introTimer.current) clearTimeout(introTimer.current);
-      if (greetingTimer.current) clearTimeout(greetingTimer.current);
-    };
-  }, [playIntro]);
+    if (seen || deepLink) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reads sessionStorage, which only exists on the client
+    setReel("gate");
+    onIntroCompleteChange(false);
+  }, [onIntroCompleteChange]);
 
-  useEffect(() => {
-    if (!playing) return;
-    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") finishIntro(); };
-    const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const onMotion = () => { if (motion.matches) finishIntro(); };
-    window.addEventListener("keydown", onKey);
-    motion.addEventListener("change", onMotion);
-    return () => {
-      window.removeEventListener("keydown", onKey);
-      motion.removeEventListener("change", onMotion);
-    };
-  }, [playing, finishIntro]);
+  useEffect(() => () => {
+    if (handoffTimer.current) clearTimeout(handoffTimer.current);
+    if (greetingTimer.current) clearTimeout(greetingTimer.current);
+  }, []);
+
+  const heroName = useCallback(() => nameRef.current, []);
 
   const movePortrait = (event: PointerEvent<HTMLDivElement>) => {
     if (playing || event.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
@@ -71,7 +68,7 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
   };
 
   return (
-    <section id="top" className={`impact-hero${playing ? " is-opening" : ""}`} data-portrait={cartoon ? "cartoon" : "photo"} aria-label="安颜的个人主页">
+    <section id="top" className={`impact-hero${playing ? " is-reeling" : handoff ? " is-handoff" : ""}`} data-portrait={cartoon ? "cartoon" : "photo"} aria-label="安颜的个人主页">
       <div
         className="impact-stage"
         ref={stageRef}
@@ -81,7 +78,7 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
           stageRef.current?.style.setProperty("--poster-y", "0px");
         }}
       >
-        <h1 className="impact-name" aria-label="安颜 · Yan An"><span>安</span><span>颜</span></h1>
+        <h1 className="impact-name" ref={nameRef} aria-label="安颜 · Yan An"><span>安</span><span>颜</span></h1>
         <figure className="impact-portrait">
           <div className="impact-portrait-motion">
             <img className="impact-photo" src="./photos/portrait-outline.webp" width="1207" height="1303" fetchPriority="high" alt="安颜的描边人像照片" aria-hidden={cartoon} />
@@ -106,12 +103,7 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
         <div><em>Ideas into things.</em><a href="#work">进入我的作品 ↗</a></div>
         <button type="button" onClick={playIntro} disabled={playing} className="impact-replay">重播开场 ↗</button>
       </div>
-      {playing && <>
-        <div className="impact-shutter impact-shutter-top" aria-hidden="true" />
-        <div className="impact-shutter impact-shutter-bottom" aria-hidden="true" />
-        <div className="impact-intro-mark" aria-hidden="true">AY.<span>AN YAN / PORTFOLIO</span></div>
-        <button className="impact-skip" type="button" onClick={finishIntro}>跳过开场 ↗</button>
-      </>}
+      {reel && createPortal(<SiteIntro key={reel} startPlaying={reel === "play"} heroName={heroName} onDone={finishIntro} />, document.body)}
     </section>
   );
 }
