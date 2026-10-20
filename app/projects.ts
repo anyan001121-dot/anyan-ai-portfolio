@@ -15,12 +15,15 @@ export type Project = {
   research?: { title: string; url: string; summary: string; application: string; notesUrl: string };
   steps?: { label: string; description: string }[];
   overturn?: { before: string; evidence: string; after: string };
+  /** 30-second version: every line is condensed from the full write-up below, no new claims. */
+  brief: { role: string; result: string; method: string; why: string };
 };
 
 export const projects: Project[] = [
   {
     year: "2026",
     title: "FocusFlow",
+    brief: { role: "独立设计与开发，用 Claude Code、Codex 辅助编码", result: "可运行原型：逐步执行、杂念暂存、暂停后接回", method: "LangGraph · Streamlit · SQLite", why: "AI 可以理解杂念，不能擅自换掉当前任务" },
     subtitle: "面向 ADHD 任务启动困难的 AI 助手",
     stage: "可运行原型 · 使用效果待验证",
     contribution: "独立设计任务启动与中断工作流，使用 Claude Code、Codex 辅助需求拆解、代码开发、调试与迭代。",
@@ -68,6 +71,7 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "北森刷题台",
+    brief: { role: "独立开发并上线", result: "727 道题、三大模块，可在线练习与复盘", method: "原生 JS · LocalStorage", why: "从抽题、作答到错题回看，一条完整练习流程" },
     subtitle: "校招测评练习产品",
     tags: ["Vanilla JS", "LocalStorage", "Quiz UX", "GitHub Pages"],
     metric: "727",
@@ -92,6 +96,7 @@ export const projects: Project[] = [
   {
     year: "2024",
     title: "AYBot",
+    brief: { role: "毕业设计，独立完成需求、知识库与工作流", result: "5 节点检索工作流原型，回答可追溯来源", method: "Coze · LangChain · RAG", why: "把找资料和组织答案拆开，出错时能分清是哪一步" },
     subtitle: "RAG 知识检索助手",
     stage: "毕业设计原型 · 检索与回答质量待系统评估",
     contribution: "独立完成需求分析、知识库构建、Coze 工作流、Prompt 设计、外部信息接入与案例调试。",
@@ -124,6 +129,7 @@ export const projects: Project[] = [
   {
     year: "2023",
     title: "QAR 航空安全模型",
+    brief: { role: "团队项目：负责代码、建模框架、可视化与调优", result: "MathorCup 全国二等奖；100+ 参数中筛出 5 项关键指标", method: "PCA · 随机森林 · LOF · SVM", why: "先缩小分析范围，再定位异常出现的场景" },
     subtitle: "高维飞行数据风险识别与预警",
     stage: "数模竞赛 · 离线建模与风险分析",
     contribution: "团队项目中负责 Python 分析代码、整体建模框架、可视化和模型调优。",
@@ -157,6 +163,7 @@ export const projects: Project[] = [
   {
     year: "2023",
     title: "新能源汽车与双碳",
+    brief: { role: "团队项目：负责数据分析、建模框架与可视化", result: "长三角二等奖；碳排放模型样本内 R² 0.973", method: "GM(1,1) · 多元回归 · 岭回归", why: "把市场趋势和碳排放拆成两个问题分别回答" },
     subtitle: "市场增长与双碳目标建模",
     stage: "数模竞赛 · 历史数据分析与趋势推演",
     contribution: "团队项目中负责 Python 数据分析、整体建模框架、代码实现及可视化，参与公开数据采集和口径统一。",
@@ -191,6 +198,7 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "电影商业成功预测",
+    brief: { role: "小组项目：负责清洗、建模、评价与 ROC 可视化", result: "随机森林 AUC 0.769；SVM 召回率 45.5%", method: "R · 7 类模型比较", why: "只用上映前信息，按决策成本选模型" },
     subtitle: "IMDb 数据挖掘小组项目",
     contribution: "小组项目中负责数据清洗、分层划分、决策树系列与 SVM 建模、评价指标、ROC 可视化及结果整合。",
     tags: ["R", "LDA", "SVM", "Random Forest", "kNN"],
@@ -209,6 +217,7 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "Olist 履约质量分析",
+    brief: { role: "负责口径治理、履约分析与下单时预警建模", result: "测试集 Top 10% 差评命中率为基线 2.43 倍", method: "DuckDB · PSM / IPW · LightGBM", why: "发现时间泄漏后，主动把 AUC 从 0.932 修正为 0.636" },
     subtitle: "巴西电商履约与差评归因",
     stage: "公开数据分析 · 运营建议待实际干预验证",
     contribution: "完成多表口径治理、履约分析、特征调整与下单时预警建模，并将结果整理为运营建议。",
@@ -257,6 +266,7 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "血糖与 HDL 关联因素",
+    brief: { role: "硕士论文，独立完成分析、写作与答辩", result: "N = 3,808：BMI 每增 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%", method: "HC3 · GAM · Lasso · BMA", why: "没有为了结论好看而夸大遗传效应" },
     subtitle: "统计学硕士论文",
     contribution: "独立完成数据处理、探索分析、统计建模、稳健性检查、英文论文及答辩。",
     tags: ["HC3", "GAM", "Lasso", "BMA"],
@@ -280,6 +290,7 @@ export const projects: Project[] = [
   {
     year: "2026",
     title: "心情日记",
+    brief: { role: "提出产品方向，设计图鉴、随机事件与回看思路", result: "已上线：轻量记录、低落关怀、植物图鉴与趋势回看", method: "JavaScript · Web Audio · LLM", why: "先让一次记录足够轻，再给下次一点期待" },
     subtitle: "轻量情绪记录与日常关怀",
     stage: "已上线 · 长期记录的 API 关联分析规划中",
     contribution: "提出轻量记录与低落关怀的产品方向，设计植物图鉴、随机事件和长期回看思路。",

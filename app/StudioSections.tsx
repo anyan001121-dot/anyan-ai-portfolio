@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import type { Project } from "./projects";
 import MoodDiaryPreview from "./MoodDiaryPreview";
+import { FlipText, GlasgowClock, Odometer, SkillMap } from "./Evidence";
 
 type Group = "all" | "ai" | "data";
 const productOrder = [0, 8, 2, 1];
@@ -74,6 +75,8 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
   const dialog = useRef<HTMLDialogElement>(null);
   const [chapter, setChapter] = useState(3);
   const [previewStep, setPreviewStep] = useState(0);
+  // Conclusion first: every file opens on the 30-second version; the full write-up is one click away.
+  const [view, setView] = useState<"brief" | "full">("brief");
   useEffect(() => {
     const node = dialog.current;
     if (!node || !project) return;
@@ -81,6 +84,7 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
     const oldOverflow = document.body.style.overflow;
     setChapter(3);
     setPreviewStep(0);
+    setView("brief");
     node.showModal();
     onCursorHostChange(node);
     node.scrollTop = 0;
@@ -91,6 +95,18 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
     {project && <div className="case-paper">
       <div className="case-toolbar"><span>OPEN FILE / {project.year}</span><button type="button" onClick={onClose} aria-label="关闭项目详情">关闭 ×</button></div>
       <header className="case-heading"><p>{project.subtitle}</p><h2 id="case-title">{project.title}</h2><p>{project.lead}</p>{project.stage && <p className="case-stage">{project.stage}</p>}{project.award && <strong className="case-award">✳ {project.award}</strong>}<div className="case-tags">{project.tags.map(t => <span key={t}>{t}</span>)}</div>
+        <div className="case-view-toggle" data-view={view} role="group" aria-label="阅读长度">
+          <button type="button" aria-pressed={view === "brief"} onClick={() => setView("brief")}>30 秒版</button>
+          <button type="button" aria-pressed={view === "full"} onClick={() => setView("full")}>完整版</button>
+        </div>
+        {view === "brief" && <section className="case-brief" aria-label="30 秒版" key={project.title}>
+          <div className="case-brief-metric"><Odometer value={project.metric} /><small>{project.metricLabel}</small></div>
+          <dl>
+            {([["我的角色", project.brief.role], ["关键结果", project.brief.result], ["方法", project.brief.method], ["亮点", project.brief.why]] as const).map(([label, text], i) => <div key={label} style={{ "--i": i } as CSSProperties}><dt>{label}</dt><dd className={i === 3 ? "is-why" : undefined}>{text}</dd></div>)}
+          </dl>
+          <button type="button" className="case-brief-more" onClick={() => setView("full")}>看完整过程：背景、取舍与证据 ↓</button>
+        </section>}
+        {view === "full" && <div className="case-full-reveal">
         {(project.contribution || project.evidence) && <dl className="case-facts">
           {project.contribution && <div><dt>我的工作</dt><dd>{project.contribution}</dd></div>}
           {project.evidence && <div><dt>当前证据</dt><dd>{project.evidence.summary}</dd></div>}
@@ -105,18 +121,19 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
           {project.evidence.links && <div className="case-proof-links">{project.evidence.links.map(link => <a key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label} ↗</a>)}</div>}
         </details>}
         {project.research && <details className="case-evidence"><summary>文献与设计依据 · {project.research.title}</summary><p>{project.research.summary}</p><p>{project.research.application}</p><div><a href={project.research.url} target="_blank" rel="noreferrer">查看指南 ↗</a><a href={project.research.notesUrl} target="_blank" rel="noreferrer">项目走查与验证计划 ↗</a></div></details>}
+        </div>}
       </header>
       <div className={`case-visual case-${project.preview}`}>
         {project.preview === "mood-diary" ? <><MoodDiaryPreview step={previewStep} /><div className="mood-demo-controls" aria-label="切换心情日记流程演示">{["种下心情", "即时关怀", "反馈与记忆"].map((label, i) => <button type="button" key={label} aria-pressed={previewStep === i} onClick={() => setPreviewStep(i)}>{mono(i + 1)} {label}</button>)}</div></> : project.preview === "focusflow" ? <img src="./photos/focusflow-preview.png" alt="FocusFlow 真实产品界面" /> : project.preview === "aybot" ? <img src="./photos/aybot-coze-workflow.jpg" alt="AYBot 的 Coze 工作流"/> : project.preview === "quiz" ? <img src="./photos/beisen-quiz-home.png" alt="北森刷题台真实界面"/> : <><ExhibitArt project={project}/><p>指标来自项目结果；图形为展示示意。</p></>}
       </div>
-      <div className="case-reading">
+      {view === "full" && <div className="case-reading case-full-reveal">
         {project.decision && <section className="case-decision" aria-label="关键取舍"><p>关键取舍</p><h3>{project.decision.title}</h3><p>{project.decision.detail}</p><small>{project.decision.basis}</small></section>}
         <div className="chapter-tabs" role="tablist" aria-label="项目叙事章节">{chapterNames.map((name, i) => <button id={`chapter-tab-${i}`} role="tab" type="button" key={name} aria-selected={chapter === i} aria-controls="case-chapter" tabIndex={chapter === i ? 0 : -1} onClick={() => setChapter(i)} onKeyDown={(e) => { if (["ArrowLeft", "ArrowRight", "Home", "End"].includes(e.key)) { e.preventDefault(); const next = e.key === "Home" ? 0 : e.key === "End" ? 3 : (i + (e.key === "ArrowRight" ? 1 : 3)) % 4; setChapter(next); document.getElementById(`chapter-tab-${next}`)?.focus(); } }}><small>{mono(i + 1)}</small>{name}</button>)}</div>
         <div id="case-chapter" role="tabpanel" aria-labelledby={`chapter-tab-${chapter}`} className="chapter-text" key={`${project.title}-${chapter}`}><span>{mono(chapter + 1)}</span><p>{project.star[chapterKeys[chapter]]}</p></div>
         {project.steps && <div className="case-process"><p>从输入到结果 / EXPERIENCE FLOW</p>{project.steps.map((step, i) => <details key={step.label}><summary><small>{mono(i + 1)}</small>{step.label}<span>＋</span></summary><p>{step.description}</p></details>)}</div>}
         {project.overturn && !project.decision && <aside className="case-rethink"><p>↺ 关键判断</p><del>{project.overturn.before}</del><p>{project.overturn.evidence}</p><strong>{project.overturn.after}</strong></aside>}
         <div className="case-actions">{project.liveUrl && <a href={project.liveUrl} target="_blank" rel="noreferrer">{project.linkLabel || "打开在线体验"} ↗</a>}{project.url && <a href={project.url} target="_blank" rel="noreferrer">查看项目源码 ↗</a>}<button type="button" onClick={onClose}>关闭项目 ↙</button></div>
-      </div>
+      </div>}
     </div>}
   </dialog>;
 }
@@ -143,9 +160,10 @@ export function WorkGallery({ projects, group, onGroupChange, surprise, onCursor
     <div className="workshop-heading"><h2 id="work-title">做过的项目<span className="work-title-dot">.</span></h2><div className="workshop-intro"><p>AI 产品 · 数据研究</p><span className="explore-count">{mono(projects.length)} PROJECTS</span></div></div>
     <div className="workshop-controls"><div className="exhibit-filters" aria-label="筛选作品">{([['all','全部作品'],['ai','AI 与产品'],['data','数据与研究']] as const).map(([key, label]) => <button type="button" key={key} aria-pressed={group === key} onClick={() => onGroupChange(key)}>{label}<span>{key === "all" ? "09" : key === "ai" ? "04" : "05"}</span></button>)}</div><span>查看项目 ↗</span></div>
     <div ref={floor} className={`exhibit-floor floor-${group}`} key={group}>
-      {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onPointerMove={moveExhibit} onPointerLeave={resetExhibit} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'AI / PRODUCT' : 'DATA / RESEARCH'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖项目" : "产品原型"}</small><h3>{p.title}</h3><p>{p.preview === "focusflow" ? "帮助开始任务，也支持中断后回来。" : p.preview === "mood-diary" ? "轻松记录，在低落时得到一点支持。" : p.lead}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
+      {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onPointerMove={moveExhibit} onPointerLeave={resetExhibit} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'AI / PRODUCT' : 'DATA / RESEARCH'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖项目" : "产品原型"}</small><h3>{p.title}</h3><p>{p.brief.result}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
     </div>
-    <div className="archive-shelf"><div className="archive-intro"><span>PROJECT INDEX</span><h3>更多项目</h3><IndexPreview project={projects[activePreview]}/></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}${activePreview === index ? " is-previewing" : ""}`} key={p.title} onPointerEnter={() => setPreview(index)} onFocus={() => setPreview(index)} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b></span></button>; })}</div></div>
+    <div className="archive-shelf"><div className="archive-intro"><span>PROJECT INDEX</span><h3>更多项目</h3><IndexPreview project={projects[activePreview]}/></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}${activePreview === index ? " is-previewing" : ""}`} key={p.title} onPointerEnter={() => setPreview(index)} onFocus={() => setPreview(index)} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span><span className="brief-result">{p.brief.result}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b></span></button>; })}</div></div>
+    <SkillMap projects={projects} onOpen={open} />
     <CaseFile project={selected === null ? null : projects[selected]} onClose={() => setSelected(null)} onCursorHostChange={onCursorHostChange}/>
   </section>;
 }
@@ -179,7 +197,7 @@ export function PhotoDesk(){
  const selected=interests.find(i=>i.key===interest)!;
  return <section id="about" className="photo-desk" aria-labelledby="offscreen-title"><div className="studio-section-top"><span>03 / OFF SCREEN</span></div><div className="photo-layout"><div className="photo-intro"><h2 id="offscreen-title">屏幕之外<span className="work-title-dot">.</span></h2><p>旅行、拍照，偶尔辩论。</p><span className="photo-handnote">拖动换一张 · 点击看背面</span></div><div className="photo-stack-wrap" id="offscreen-gallery"><div className="photo-stack" onKeyDown={e=>{if(e.key==='ArrowLeft'){e.preventDefault();select(photo-1);}if(e.key==='ArrowRight'){e.preventDefault();select(photo+1);}}}><div className="photo-underprint"><img src={`./photos/${photos[(photo+1)%photos.length].src}`} alt="" loading="lazy"/></div><div className="photo-motion" ref={photoMotion}><button type="button" className={`photo-print${flipped?' is-flipped':''}`} onPointerDown={startSwipe} onPointerMove={moveSwipe} onPointerUp={endSwipe} onPointerCancel={()=>{swipe.current.id=-1;swipe.current.moved=true;resetPhotoMotion();}} onLostPointerCapture={()=>{swipe.current.id=-1;resetPhotoMotion();}} onClick={e=>{if(e.detail!==0 && swipe.current.moved){swipe.current.moved=false;return;}setFlipped(!flipped);}} aria-label={flipped?'查看照片正面':'翻看照片背面的笔记'} aria-pressed={flipped}><span className="photo-front" aria-hidden={flipped}><img draggable={false} src={`./photos/${current.src}`} alt={current.title} loading="lazy"/><span><b>{current.place}</b><small>{mono(photo+1)} / 05</small></span></span><span className="photo-back" aria-hidden={!flipped}><small>A NOTE FROM THE OTHER SIDE</small><strong>{current.title}</strong><span>{current.note}</span><em>安颜 / travel notes</em></span></button></div><span className="photo-tape" aria-hidden="true"/></div><div className="photo-controls"><button type="button" onClick={()=>select(photo-1)} aria-label="上一张旅行照片">←</button><span aria-live="polite">{current.place}</span><button type="button" onClick={()=>select(photo+1)} aria-label="下一张旅行照片">→</button></div><div className="photo-contact-sheet" aria-label="选择旅行照片">{photos.map((p,i)=><button type="button" key={p.src} aria-label={`查看照片：${p.place}`} aria-pressed={photo===i} onClick={()=>select(i)}><img src={`./photos/${p.src}`} alt="" loading="lazy"/><span>{mono(i+1)}</span></button>)}</div></div></div>
  <div className="pocket-notes" id="interest-debate"><div className="pocket-heading"><span>A FEW FAVOURITES</span><h3>平时喜欢</h3></div><div className="interest-switches" aria-label="选择兴趣">{interests.map(i=><button type="button" key={i.key} aria-pressed={interest===i.key} onClick={()=>setInterest(i.key)}><span>{i.symbol}</span>{i.title}</button>)}</div><div className="interest-note" key={interest}><small>{selected.detail}</small><p>{selected.text}</p>{interest==='music'&&<a href="https://open.spotify.com/search/Blur%20Tender" target="_blank" rel="noreferrer">去听这首歌 ↗</a>}</div></div>
- <footer className="studio-footer"><div><span>GET IN TOUCH</span><h2>聊聊下一件事<span className="work-title-dot">.</span></h2></div><div className="footer-contact"><a href="mailto:anyan001121@gmail.com">来聊聊 <span>↗</span></a><button type="button" onClick={async()=>{try{await navigator.clipboard.writeText('anyan001121@gmail.com');setCopied(true);if(copyTimer.current)clearTimeout(copyTimer.current);copyTimer.current=setTimeout(()=>setCopied(false),2500);}catch{window.location.href='mailto:anyan001121@gmail.com';}}}>{copied?'邮箱已复制 ✓':'anyan001121@gmail.com ⧉'}</button><span role="status" className="sr-only">{copied?'邮箱已复制':''}</span></div><div className="footer-bottom"><span>© 2026 安颜</span><a href="#top">回到顶部 ↑</a></div></footer></section>;
+ <footer className="studio-footer"><div><span>GET IN TOUCH</span><h2>聊聊下一件事<span className="work-title-dot">.</span></h2></div><div className="footer-contact"><a href="mailto:anyan001121@gmail.com">来聊聊 <span>↗</span></a><button type="button" className="footer-copy" onClick={async()=>{try{await navigator.clipboard.writeText('anyan001121@gmail.com');setCopied(true);if(copyTimer.current)clearTimeout(copyTimer.current);copyTimer.current=setTimeout(()=>setCopied(false),2500);}catch{window.location.href='mailto:anyan001121@gmail.com';}}} aria-label="复制邮箱 anyan001121@gmail.com"><FlipText text={copied?'已复制到剪贴板 ✓':'anyan001121@gmail.com'}/><span aria-hidden="true">{copied?'':'⧉'}</span></button><span role="status" className="sr-only">{copied?'邮箱已复制':''}</span><div className="footer-links"><a href="https://github.com/anyan001121-dot" target="_blank" rel="noreferrer">GitHub <span>↗</span></a><a href="mailto:anyan001121@gmail.com?subject=%E7%AE%80%E5%8E%86%E7%B4%A2%E5%8F%96">简历 · 邮件索取 <span>↗</span></a></div></div><div className="footer-status"><span><strong>2026 秋招进行中</strong> · 数据分析 / AI 产品</span><span>格拉斯哥大学统计学硕士 · 2027 年 1 月毕业</span><GlasgowClock/></div><div className="footer-bottom"><span>© 2026 安颜</span><a href="#top">回到顶部 ↑</a></div></footer></section>;
 }
 
 const guideStops=[{id:'top',name:'首页',pose:'stand',text:'欢迎来我的工作室。点一下小安，让我带你逛逛。'},{id:'work',name:'项目',pose:'present',text:'点击项目查看详情，也可以让我帮你挑一个。'},{id:'self',name:'关于我',pose:'peek',text:'这些词拼起来是一个“我”。试试把它们打散，再找回喜欢的关键词。'},{id:'about',name:'屏幕之外',pose:'camera',text:'照片背面藏着一句笔记。点击翻面，左右切换，一起去散步。'}];
