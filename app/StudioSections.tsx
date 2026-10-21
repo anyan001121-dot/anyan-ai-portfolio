@@ -145,6 +145,17 @@ export function WorkGallery({ projects, group, onGroupChange, surprise, onCursor
   const [seen, setSeen] = useState<number[]>([]);
   const lastSurprise = useRef(0);
   const open = (index: number) => { setSelected(index); setSeen(s => s.includes(index) ? s : [...s, index]); };
+  // The hero's evidence strip asks for a project file by index.
+  useEffect(() => {
+    const onOpen = (event: Event) => {
+      const index = (event as CustomEvent<number>).detail;
+      if (typeof index !== "number") return;
+      setSelected(index);
+      setSeen(s => s.includes(index) ? s : [...s, index]);
+    };
+    window.addEventListener("open-project", onOpen);
+    return () => window.removeEventListener("open-project", onOpen);
+  }, []);
   useEffect(() => {
     if (!surprise || lastSurprise.current === surprise) return;
     lastSurprise.current = surprise;

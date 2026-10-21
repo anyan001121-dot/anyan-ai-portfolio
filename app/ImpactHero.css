@@ -17,12 +17,25 @@
 .impact-name { position: absolute; z-index: 0; inset: 8px 3% auto; display: flex; justify-content: space-between; margin: 0; padding-right: .045em; font: 850 clamp(190px,35cqw,500px)/1.05 var(--display); letter-spacing: -.08em; user-select: none; }
 .impact-name > span { display: block; }
 .impact-portrait { position: absolute; z-index: 2; left: 50%; bottom: 0; width: 53%; height: 103%; margin: 0; transform: translateX(-50%); }
-.impact-portrait-motion { width: 100%; height: 100%; transform: translate(var(--poster-x,0px),var(--poster-y,0px)); transition: transform .7s cubic-bezier(.2,.7,.2,1); }
-.impact-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transition: opacity .45s ease,transform .65s cubic-bezier(.16,.84,.2,1); }
-.impact-portrait .impact-cartoon { top: auto; height: 88%; }
-.impact-cartoon { opacity: 0; transform: translateY(14px) rotate(2deg); }
-.impact-hero[data-portrait="cartoon"] .impact-photo { opacity: 0; transform: translateY(14px) rotate(-2deg); }
-.impact-hero[data-portrait="cartoon"] .impact-cartoon { opacity: 1; transform: translateY(0) rotate(0); }
+.impact-portrait-motion { position: relative; width: 100%; height: 100%; }
+.impact-portrait img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center bottom; transition: clip-path .75s cubic-bezier(.65,0,.35,1); }
+/* Redraw sweep: both portraits share one 1207×1303 frame; a single edge wipes one into the other. */
+.impact-photo { clip-path: inset(0 0 0 100%); }
+.impact-cartoon { clip-path: inset(0 0 0 0); }
+.impact-hero[data-portrait="photo"] .impact-photo { clip-path: inset(0 0 0 0); }
+.impact-hero[data-portrait="photo"] .impact-cartoon { clip-path: inset(0 100% 0 0); }
+.impact-scan { position: absolute; z-index: 3; top: 6%; bottom: 0; left: 100%; width: 2px; background: #52688b; pointer-events: none; animation: impact-scan-out .75s cubic-bezier(.65,0,.35,1) both; }
+.impact-scan::before { content: ""; position: absolute; top: -5px; left: -4px; width: 10px; height: 10px; border-radius: 50%; background: #52688b; }
+.impact-hero[data-portrait="photo"] .impact-scan { animation-name: impact-scan-in; }
+@keyframes impact-scan-in { 0% { left: 100%; opacity: 1; } 90% { opacity: 1; } 100% { left: 0; opacity: 0; } }
+@keyframes impact-scan-out { 0% { left: 0; opacity: 1; } 90% { opacity: 1; } 100% { left: 100%; opacity: 0; } }
+
+/* Depth parallax: the stage sets --px/--py (-0.5…0.5); back layers move against the pointer, front layers with it. */
+.impact-name, .impact-portrait-motion, .impact-copy, .impact-switch, .impact-mascot, .impact-caption { transition: translate .9s cubic-bezier(.16,1,.3,1); }
+.impact-name { translate: calc(var(--px, 0) * -34px) calc(var(--py, 0) * -16px); }
+.impact-portrait-motion { translate: calc(var(--px, 0) * 14px) calc(var(--py, 0) * 8px); }
+.impact-copy, .impact-caption { translate: calc(var(--px, 0) * 22px) calc(var(--py, 0) * 12px); }
+.impact-switch, .impact-mascot { translate: calc(var(--px, 0) * 38px) calc(var(--py, 0) * 20px); }
 .impact-copy { background: var(--poster); padding: 12px 16px 12px 0; position: absolute; z-index: 4; left: clamp(26px,3.5vw,60px); bottom: 100px; max-width: 280px; }
 .impact-eyebrow { width: fit-content; margin: 0 0 20px; padding: 7px 0; background: var(--poster); font: 11px/1.7 var(--type); letter-spacing: .04em; }
 .impact-statement { margin: 0; font: 500 clamp(30px,3.2vw,46px)/1.25 var(--editorial); letter-spacing: -.045em; }
@@ -89,5 +102,48 @@
 }
 @media (prefers-reduced-motion: reduce) {
   .impact-hero *, .impact-hero *::before, .impact-hero *::after { animation: none!important; transition: none!important; }
-  .impact-portrait-motion { transform: none; }
+  .impact-name, .impact-portrait-motion, .impact-copy, .impact-switch, .impact-mascot, .impact-caption { translate: none; }
+  .impact-scan { display: none; }
+}
+
+/* ---------- Evidence strip in the dark foot bar ---------- */
+.impact-evidence { display: flex; flex-wrap: wrap; align-items: center; gap: 14px clamp(20px, 3vw, 44px); }
+.impact-evidence > button, .impact-evidence > a {
+  display: grid; gap: 3px; padding: 4px 0 4px 16px; border: 0; border-left: 1px solid #f7f1df40; border-bottom: 0; background: none; color: inherit; text-align: left; font: inherit;
+  transition: transform .35s cubic-bezier(.16,1,.3,1);
+}
+.impact-evidence strong { font-size: 22px; font-weight: 500; letter-spacing: -.03em; line-height: 1.1; }
+.impact-evidence small { font: 10px/1.4 var(--type); letter-spacing: .06em; opacity: .65; transition: opacity .25s; }
+.impact-evidence > button:hover, .impact-evidence > a:hover, .impact-evidence > button:focus-visible, .impact-evidence > a:focus-visible { transform: translateY(-3px); }
+.impact-evidence > button:hover small, .impact-evidence > a:hover small { opacity: 1; }
+
+/* ---------- Scroll to open: the poster comes apart as you scroll into the work ---------- */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .impact-hero { view-timeline: --poster block; }
+    .impact-name > span:first-child { animation: poster-part-l linear both; animation-timeline: --poster; animation-range: exit 0% exit 85%; }
+    .impact-name > span:last-child { animation: poster-part-r linear both; animation-timeline: --poster; animation-range: exit 0% exit 85%; }
+    .impact-portrait { animation: poster-sink linear both; animation-timeline: --poster; animation-range: exit 0% exit 100%; }
+    .impact-copy, .impact-caption { animation: poster-lift linear both; animation-timeline: --poster; animation-range: exit 0% exit 45%; }
+    .impact-switch, .impact-mascot { animation: poster-lift linear both; animation-timeline: --poster; animation-range: exit 5% exit 55%; }
+    .impact-evidence > * { animation: poster-strip linear both; animation-timeline: --poster; animation-range: exit 55% exit 100%; }
+    .workshop-heading h2 { animation: work-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 100%; }
+    /* The reel hand-off and the first steps in still win while they run. */
+    .impact-hero.is-handoff .impact-portrait { animation: poster-person .9s cubic-bezier(.16,1,.3,1) both; }
+  }
+}
+@keyframes poster-part-l { to { transform: translateX(-42%); opacity: .06; } }
+@keyframes poster-part-r { to { transform: translateX(42%); opacity: .06; } }
+@keyframes poster-sink { to { transform: translateX(-50%) translateY(16%) scale(.78); } }
+@keyframes poster-lift { to { transform: translateY(-48px); opacity: 0; } }
+@keyframes poster-strip { to { transform: translateX(-24px); opacity: .25; } }
+@keyframes work-rise { from { transform: translateY(56px); opacity: 0; } to { transform: none; opacity: 1; } }
+/* On phones the larger cartoon portrait already greets; the small figure would sit on her hair. */
+@media (max-width: 480px) {
+  .impact-mascot { display: none; }
+  .impact-evidence { gap: 12px 18px; }
+  .impact-evidence em { flex-basis: 100%; }
+  .impact-evidence > button, .impact-evidence > a { padding-left: 12px; }
+  .impact-evidence > button:first-of-type { padding-left: 0; border-left: 0; }
+  .impact-evidence strong { font-size: 19px; }
 }
