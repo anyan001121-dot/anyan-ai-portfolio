@@ -135,8 +135,6 @@ type ProjectGroup = "ai" | "data";
 
 export default function Home() {
   const [introLifted, setIntroLifted] = useState(true);
-  const [musicOpen, setMusicOpen] = useState(false);
-  const [photosOn, setPhotosOn] = useState(true);
   const [identityOpen, setIdentityOpen] = useState(false);
   const [particlesReady, setParticlesReady] = useState(false);
   const [projectGroup, setProjectGroup] = useState<ProjectGroup | "all">("all");
@@ -147,6 +145,7 @@ export default function Home() {
   const glyphCanvasRef = useRef<HTMLCanvasElement>(null);
   const wordCloudRef = useRef<HTMLButtonElement>(null);
   const hudReadoutRef = useRef<HTMLOutputElement>(null);
+  const shockRef = useRef<HTMLSpanElement>(null);
   const cursorDotRef = useRef<HTMLDivElement>(null);
   const cursorRingRef = useRef<HTMLDivElement>(null);
   const [cursorHost, setCursorHost] = useState<HTMLDialogElement | null>(null);
@@ -157,9 +156,17 @@ export default function Home() {
     if (!canvas || !container) return;
     const glyphCanvas = canvas;
     const wordCloud = container;
-    const friction = 0.82;
-    const returnSpring = 0.045;
-    const scatterSpring = 0.026;
+    const openFriction = 0.955; // almost no drag while open: the burst glides on and the words drift freely
+    const CHARGE_MS = 110; // anticipation: the glyph draws in before it blows
+    const WAVE_PX_PER_MS = 1.5; // the shockwave reaches far words later
+    let explodeAt = 0;
+    let pointerVX = 0;
+    let pointerVY = 0;
+    let lastPointerTime = 0;
+    let originX = 0;
+    let originY = 0;
+    // Visible screen area in cloud coordinates, taken at each burst: the drift stays where it can be seen.
+    let fence = { minX: 0, maxX: 0, minY: 0, maxY: 0 };
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let animationFrame = 0;
     let entryFrame = 0;
@@ -180,13 +187,17 @@ export default function Home() {
       y: number;
       originX: number;
       originY: number;
-      scatterX: number;
-      scatterY: number;
       vx: number;
       vy: number;
       phase: number;
       breathSpeed: number;
       breathAmp: number;
+      rot: number;
+      vr: number;
+      kickAt: number;
+      kickX: number;
+      kickY: number;
+      kicked: boolean;
     };
 
     let particleStates: WordParticle[] = [];
@@ -260,13 +271,17 @@ export default function Home() {
           y: old ? old.y * (maskHeight / previousHeight) : spawnY,
           originX: point.x,
           originY: point.y,
-          scatterX: -maskWidth * 0.55 + physicsRandom() * maskWidth * 2.1,
-          scatterY: -maskHeight * 0.45 + physicsRandom() * maskHeight * 1.9,
           vx: old?.vx ?? 0,
           vy: old?.vy ?? 0,
           phase: physicsRandom() * Math.PI * 2,
           breathSpeed: 0.00042 + physicsRandom() * 0.00058,
           breathAmp: 2.5 + physicsRandom() * 3.5,
+          rot: old?.rot ?? 0,
+          vr: 0,
+          kickAt: 0,
+          kickX: 0,
+          kickY: 0,
+          kicked: true,
         };
         if (reduceMotion) {
           state.x = state.originX;
@@ -279,13 +294,38 @@ export default function Home() {
 
     function updatePointer(event: PointerEvent) {
       const bounds = wordCloud.getBoundingClientRect();
-      pointerX = event.clientX - bounds.left;
-      pointerY = event.clientY - bounds.top;
+      const x = event.clientX - bounds.left;
+      const y = event.clientY - bounds.top;
+      // Smoothed pointer velocity (px per 60fps frame): the burst and the wake follow the swipe.
+      const now = performance.now();
+      if (pointerActive && lastPointerTime) {
+        const frames = Math.max(0.5, (now - lastPointerTime) / 16.667);
+        pointerVX = pointerVX * 0.55 + ((x - pointerX) / frames) * 0.45;
+        pointerVY = pointerVY * 0.55 + ((y - pointerY) / frames) * 0.45;
+      }
+      lastPointerTime = now;
+      pointerX = x;
+      pointerY = y;
       pointerActive = true;
     }
 
     function releasePointer() {
       pointerActive = false;
+      lastPointerTime = 0;
+    }
+
+    // A mouse sweeping across the cloud bursts it; leaving for a moment lets it gather back into 我.
+    let closeTimer = 0;
+    function hoverOpen(event: PointerEvent) {
+      if (event.pointerType !== "mouse") return;
+      window.clearTimeout(closeTimer);
+      updatePointer(event);
+      setIdentityOpen(true);
+    }
+    function hoverClose(event: PointerEvent) {
+      if (event.pointerType !== "mouse") return;
+      window.clearTimeout(closeTimer);
+      closeTimer = window.setTimeout(() => setIdentityOpen(false), 1200);
     }
 
     function animate(time: number) {
@@ -296,25 +336,114 @@ export default function Home() {
         const isOpen = wordCloud.classList.contains("is-open");
 
         if (isOpen && !wasOpen) {
+          // Burst from where the pointer is (or the centre): charge for a beat, then a shockwave
+          // travels outward — near words fly first and fastest, far ones a moment later — and tumble.
+          originX = pointerActive ? pointerX : maskWidth / 2;
+          originY = pointerActive ? pointerY : maskHeight / 2;
+          explodeAt = time + CHARGE_MS;
+          // Swipe: direction and speed of the pointer as it came in.
+          const swipeSpeed = Math.hypot(pointerVX, pointerVY);
+          const swipeX = swipeSpeed > 0.4 ? pointerVX / swipeSpeed : 0;
+          const swipeY = swipeSpeed > 0.4 ? pointerVY / swipeSpeed : 0;
+          const swipeWeight = Math.min(1.6, swipeSpeed / 10);
+          const reach = 0.8 + Math.min(0.45, swipeSpeed / 45);
+          const box = wordCloud.getBoundingClientRect();
+          const scale = box.width / maskWidth || 1; // the cloud is scaled down on phones
+          fence = {
+            minX: (24 - box.left) / scale,
+            maxX: (window.innerWidth - 24 - box.left) / scale,
+            minY: (84 - box.top) / scale,
+            maxY: (window.innerHeight - 24 - box.top) / scale,
+          };
           particleStates.forEach((particle) => {
-            const angle = Math.atan2(particle.y - maskHeight / 2, particle.x - maskWidth / 2) + (Math.random() - 0.5) * 1.5;
-            const impulse = 12 + Math.random() * 14;
-            particle.vx += Math.cos(angle) * impulse;
-            particle.vy += Math.sin(angle) * impulse;
+            const dx = particle.x - originX;
+            const dy = particle.y - originY;
+            const distance = Math.max(1, Math.hypot(dx, dy));
+            // Blend the radial burst with the swipe: a fast sweep throws the words along its path.
+            const rx = dx / distance + swipeX * swipeWeight;
+            const ry = dy / distance + swipeY * swipeWeight;
+            const angle = Math.atan2(ry, rx) + (Math.random() - 0.5) * 0.8;
+            // Size each throw to the room on screen: find how far this direction runs before the fence,
+            // land between about halfway and nearly the edge, so the words fill the view evenly.
+            const ux = Math.cos(angle);
+            const uy = Math.sin(angle);
+            const room = Math.max(40, Math.min(
+              ux > 0 ? (fence.maxX - particle.x) / ux : ux < 0 ? (fence.minX - particle.x) / ux : Infinity,
+              uy > 0 ? (fence.maxY - particle.y) / uy : uy < 0 ? (fence.minY - particle.y) / uy : Infinity,
+            ));
+            const travel = room * (0.45 + Math.random() * 0.5) * reach;
+            const impulse = travel * (1 - openFriction); // glide distance under drag f is v / (1 - f)
+            particle.kickAt = explodeAt + distance / WAVE_PX_PER_MS;
+            particle.kickX = Math.cos(angle) * impulse;
+            particle.kickY = Math.sin(angle) * impulse;
+            particle.kicked = false;
+          });
+          shockRef.current?.animate(
+            [
+              { transform: `translate(${originX}px, ${originY}px) scale(.02)`, opacity: 0.55 },
+              { transform: `translate(${originX}px, ${originY}px) scale(1)`, opacity: 0 },
+            ],
+            { duration: 750, delay: CHARGE_MS, easing: "cubic-bezier(.16,1,.3,1)", fill: "both" },
+          );
+        }
+
+        if (!isOpen && wasOpen) {
+          // Reassemble in a spiral: a sideways push makes the words swirl back into the glyph.
+          particleStates.forEach((particle) => {
+            const dx = particle.x - maskWidth / 2;
+            const dy = particle.y - maskHeight / 2;
+            const distance = Math.max(1, Math.hypot(dx, dy));
+            particle.vx += (-dy / distance) * 11;
+            particle.vy += (dx / distance) * 11;
+            particle.vr += (Math.random() - 0.5) * 10;
+            particle.kicked = true;
           });
         }
 
         particleStates.forEach((particle) => {
-          const targetX = isOpen
-            ? particle.scatterX
-            : particle.originX + Math.sin(time * particle.breathSpeed + particle.phase) * particle.breathAmp;
-          const targetY = isOpen
-            ? particle.scatterY
-            : particle.originY + Math.cos(time * particle.breathSpeed * 0.83 + particle.phase * 1.7) * particle.breathAmp * 0.72;
+          if (isOpen && time < explodeAt) {
+            // Charge: a quick inward draw towards the burst point.
+            particle.vx += (originX - particle.x) * 0.003 * delta;
+            particle.vy += (originY - particle.y) * 0.003 * delta;
+          } else if (isOpen && !particle.kicked && time >= particle.kickAt) {
+            particle.vx += particle.kickX;
+            particle.vy += particle.kickY;
+            particle.vr += (Math.random() - 0.5) * 32;
+            particle.kicked = true;
+          }
 
-          const spring = isOpen ? scatterSpring : returnSpring;
-          particle.vx += (targetX - particle.x) * spring * delta;
-          particle.vy += (targetY - particle.y) * spring * delta;
+          if (isOpen) {
+            // Free drift — no spring: once kicked, each word rides a slowly turning flow field.
+            if (particle.kicked) {
+              const flow = Math.sin(particle.x * 0.0042 + time * 0.00023 + particle.phase) + Math.cos(particle.y * 0.0037 - time * 0.00019) * 1.3;
+              particle.vx += Math.cos(flow * 1.7) * 0.03 * delta;
+              particle.vy += Math.sin(flow * 1.7) * 0.03 * delta;
+              particle.vr += Math.sin(time * 0.0007 + particle.phase) * 0.02 * delta;
+            }
+            // Soft fence at the screen edge: words glide back into view rather than bouncing off it.
+            if (particle.x < fence.minX) particle.vx += (fence.minX - particle.x) * 0.002 * delta;
+            if (particle.x > fence.maxX) particle.vx += (fence.maxX - particle.x) * 0.002 * delta;
+            if (particle.y < fence.minY) particle.vy += (fence.minY - particle.y) * 0.002 * delta;
+            if (particle.y > fence.maxY) particle.vy += (fence.maxY - particle.y) * 0.002 * delta;
+          } else {
+            // Reassemble with an exponential glide (no overshoot) onto the glyph, breathing gently once there.
+            const targetX = particle.originX + Math.sin(time * particle.breathSpeed + particle.phase) * particle.breathAmp;
+            const targetY = particle.originY + Math.cos(time * particle.breathSpeed * 0.83 + particle.phase * 1.7) * particle.breathAmp * 0.72;
+            const glide = 1 - Math.pow(0.92, delta);
+            particle.x += (targetX - particle.x) * glide;
+            particle.y += (targetY - particle.y) * glide;
+          }
+
+          if (isOpen && pointerActive) {
+            // Wake: words near a moving pointer are carried along its direction, like stirring water.
+            const near = Math.hypot(particle.x - pointerX, particle.y - pointerY);
+            if (near < 170) {
+              const carry = Math.exp(-near / 70) * 0.09 * delta;
+              particle.vx += pointerVX * carry;
+              particle.vy += pointerVY * carry;
+              particle.vr += (pointerVX - pointerVY) * carry * 0.6;
+            }
+          }
 
           if (pointerActive) {
             let dx = particle.x - pointerX;
@@ -335,12 +464,16 @@ export default function Home() {
             }
           }
 
-          const damping = Math.pow(friction, delta);
+          const damping = Math.pow(isOpen ? openFriction : 0.8, delta);
           particle.vx *= damping;
           particle.vy *= damping;
           particle.x += particle.vx * delta;
           particle.y += particle.vy * delta;
-          particle.element.style.transform = `translate3d(${particle.x.toFixed(2)}px,${particle.y.toFixed(2)}px,0) translate(-50%,-50%) rotate(var(--r))`;
+          // Tumble: spin decays, and the extra angle relaxes back to the word's resting tilt.
+          particle.rot += particle.vr * delta;
+          particle.vr *= Math.pow(0.92, delta);
+          particle.rot *= Math.pow(isOpen ? 0.985 : 0.92, delta);
+          particle.element.style.transform = `translate3d(${particle.x.toFixed(2)}px,${particle.y.toFixed(2)}px,0) translate(-50%,-50%) rotate(var(--r)) rotate(${particle.rot.toFixed(1)}deg)`;
         });
 
         wasOpen = isOpen;
@@ -370,6 +503,8 @@ export default function Home() {
     wordCloud.addEventListener("pointermove", updatePointer, { passive: true });
     wordCloud.addEventListener("pointerenter", updatePointer, { passive: true });
     wordCloud.addEventListener("pointerleave", releasePointer);
+    wordCloud.addEventListener("pointerenter", hoverOpen);
+    wordCloud.addEventListener("pointerleave", hoverClose);
     animationFrame = window.requestAnimationFrame(animate);
     return () => {
       window.cancelAnimationFrame(animationFrame);
@@ -380,6 +515,9 @@ export default function Home() {
       wordCloud.removeEventListener("pointermove", updatePointer);
       wordCloud.removeEventListener("pointerenter", updatePointer);
       wordCloud.removeEventListener("pointerleave", releasePointer);
+      wordCloud.removeEventListener("pointerenter", hoverOpen);
+      wordCloud.removeEventListener("pointerleave", hoverClose);
+      window.clearTimeout(closeTimer);
     };
   }, []);
 
@@ -436,6 +574,8 @@ export default function Home() {
     let ringX = pointerX;
     let ringY = pointerY;
     let magneticTarget: HTMLElement | null = null;
+    let hovering = false;
+    let hoverElement: HTMLElement | null = null;
     let cursorFrame = 0;
     dot.classList.toggle("is-visible", cursorPosition.current.visible);
     ring.classList.toggle("is-visible", cursorPosition.current.visible);
@@ -466,20 +606,27 @@ export default function Home() {
       cursorFrame = window.requestAnimationFrame(animateCursor);
     };
 
-    const magneticElements = Array.from((cursorHost || document).querySelectorAll<HTMLElement>(cursorHost ? "button, a, summary" : ".magnetic"));
-    const enterHandlers = magneticElements.map((element) => {
-      const enter = () => {
-        magneticTarget = element;
-        ring.classList.add("is-magnetic");
-      };
-      const leave = () => {
-        if (magneticTarget === element) magneticTarget = null;
-        ring.classList.remove("is-magnetic");
-      };
-      element.addEventListener("pointerenter", enter);
-      element.addEventListener("pointerleave", leave);
-      return { element, enter, leave };
-    });
+    // One rule for every interactive element, found live as the pointer moves (so content rendered later,
+    // dialogs included, behaves the same): small controls pull the ring in and snap it to their centre;
+    // large surfaces such as cards, photos or the word cloud only tint the ring — same size as everywhere else.
+    const INTERACTIVE = 'a[href], button:not(:disabled), summary, [role="button"], label, input, select, textarea';
+    const setHover = (element: HTMLElement | null) => {
+      if (element === hoverElement) return;
+      hoverElement = element;
+      const bounds = element?.getBoundingClientRect();
+      const small = Boolean(bounds && bounds.width <= 160 && bounds.height <= 80);
+      magneticTarget = small ? element : null;
+      hovering = Boolean(element) && !small;
+      ring.classList.toggle("is-magnetic", small);
+      ring.classList.toggle("is-hovering", hovering);
+    };
+    const onPointerOver = (event: PointerEvent) => {
+      if (event.pointerType === "touch") return;
+      setHover((event.target as Element | null)?.closest?.<HTMLElement>(INTERACTIVE) ?? null);
+    };
+    const onLeaveWindow = (event: PointerEvent) => { if (!event.relatedTarget) setHover(null); };
+    document.addEventListener("pointerover", onPointerOver, { passive: true });
+    document.addEventListener("pointerout", onLeaveWindow, { passive: true });
 
     window.addEventListener("pointermove", onPointerMove, { passive: true });
     window.addEventListener("pointerdown", onPointerDown);
@@ -491,10 +638,8 @@ export default function Home() {
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerdown", onPointerDown);
       window.removeEventListener("pointerup", onPointerUp);
-      enterHandlers.forEach(({ element, enter, leave }) => {
-        element.removeEventListener("pointerenter", enter);
-        element.removeEventListener("pointerleave", leave);
-      });
+      document.removeEventListener("pointerover", onPointerOver);
+      document.removeEventListener("pointerout", onLeaveWindow);
     };
   }, [cursorHost]);
 
@@ -562,8 +707,18 @@ export default function Home() {
     };
   }, []);
 
+  // Deep links (#work, #skills…): the browser looks for the anchor before React has rendered it,
+  // so scroll there once the page exists.
   useEffect(() => {
-    const sections = ["top", "work", "self", "about"]
+    const id = decodeURIComponent(window.location.hash.slice(1));
+    if (!id || id === "top") return;
+    // Jump instantly once layout has settled; a smooth scroll here gets interrupted by the page's own setup.
+    const timer = window.setTimeout(() => document.getElementById(id)?.scrollIntoView({ block: "start", behavior: "instant" }), 80);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const sections = ["top", "self", "skills", "work", "contact", "about"] // nested ids first: skills sits inside work, contact inside about
       .map((id) => document.getElementById(id))
       .filter((section): section is HTMLElement => Boolean(section));
     let frame = 0;
@@ -642,48 +797,27 @@ export default function Home() {
   </>;
 
   return (
-    <main className={"site" + (photosOn ? " photos-on" : "")}>
-      <StudioGuide section={activeSection || "top"} hidden={!introLifted} onSurprise={() => { setSurprise((v) => v + 1); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }} />
+    <main className="site photos-on">
+      {/* The hero already has the big cartoon; the guide joins from the work section on. */}
+      <StudioGuide section={activeSection === "skills" ? "work" : activeSection === "contact" ? "about" : activeSection || "top"} hidden={!introLifted || !activeSection || activeSection === "top"} onSurprise={() => { setSurprise((v) => v + 1); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }} />
       {/* Native dialogs live above every z-index; keep the cursor in that same top layer. */}
       {cursorHost ? createPortal(cursor, cursorHost) : cursor}
       <header className={`topbar${!activeSection || activeSection === "top" ? " is-over-poster" : ""}`}>
         <span className="scroll-progress" style={{ "--scroll-progress": `${scrollProgress}%` } as CSSProperties} aria-hidden="true" />
         <a className="wordmark magnetic" href="#top" aria-label="返回首页">AY<span>·</span></a>
         <nav aria-label="页面导航">
-          <a className={(activeSection === "top" ? "active " : "") + "magnetic"} href="#top" data-scramble>ME</a>
-          <a className={(activeSection === "work" ? "active " : "") + "magnetic"} href="#work" data-scramble>WORK</a>
-          <a className={(activeSection === "self" ? "active " : "") + "magnetic"} href="#self" data-scramble>ABOUT ME</a>
-          <a className={(activeSection === "about" ? "active " : "") + "magnetic"} href="#about" data-scramble>OFF SCREEN</a>
+          {([["top", "首页"], ["self", "关于"], ["work", "项目"], ["skills", "能力"], ["contact", "联系"]] as const).map(([id, label]) => (
+            <a key={id} className={(activeSection === id || (id === "self" && activeSection === "about") ? "active " : "") + "magnetic"} href={`#${id}`}>{label}</a>
+          ))}
         </nav>
-        <div className="header-actions">
-          <button className="tiny-control photo-toggle" onClick={() => setPhotosOn(!photosOn)}>
-            {photosOn ? "照片 ON" : "照片 OFF"}
-          </button>
-          <button className="music-pill" onClick={() => setMusicOpen(!musicOpen)} aria-expanded={musicOpen}>
-            <span className="equalizer" aria-hidden="true"><i /><i /><i /></span>
-            TENDER
-          </button>
-        </div>
       </header>
 
       <ImpactHero onIntroCompleteChange={setIntroLifted} />
 
-      {musicOpen && (
-        <aside className="music-card" aria-label="背景音乐说明">
-          <button onClick={() => setMusicOpen(false)} aria-label="关闭音乐卡片">×</button>
-          <p>NOW PLAYING IN MY HEAD</p>
-          <strong>Tender / Blur</strong>
-          <span>页面不会自动播放，点击可前往正版音源。</span>
-          <a href="https://open.spotify.com/search/Blur%20Tender" target="_blank" rel="noreferrer">在 Spotify 打开 ↗</a>
-        </aside>
-      )}
-
-      <WorkGallery projects={projects} group={projectGroup} onGroupChange={setProjectGroup} surprise={surprise} onCursorHostChange={setCursorHost} />
-
       <section className="self-map section interactive-section" id="self">
         <span className="section-pointer-glow" aria-hidden="true" />
         <div className="self-map-copy curtain-observe">
-          <p className="section-index mono-label" data-scramble>02 / ABOUT ME</p>
+          <p className="section-index mono-label" data-scramble>01 / ABOUT ME</p>
           <h2>
             <button
               className="identity-trigger magnetic"
@@ -739,11 +873,16 @@ export default function Home() {
             className={`self-glyph magnetic${particlesReady ? " particles-ready" : ""}${identityOpen ? " is-open" : ""}`}
             type="button"
             data-active-category={activeIdentityCategory ?? undefined}
-            onClick={() => setIdentityOpen(!identityOpen)}
+            onClick={(event) => {
+              // Mice burst it by sweeping over; taps and the keyboard toggle it.
+              if ((event.nativeEvent as PointerEvent).pointerType === "mouse") return;
+              setIdentityOpen(!identityOpen);
+            }}
             aria-pressed={identityOpen}
             aria-label={identityOpen ? "收拢个人关键词" : "展开个人关键词"}
           >
             <canvas ref={glyphCanvasRef} className="particle-mask-canvas" aria-hidden="true" />
+            <span ref={shockRef} className="identity-shock" aria-hidden="true" />
             <span className="glyph-code mono-label" data-scramble aria-hidden="true">{`[SELF::01]\n01001101 01000101\n// assembled, never finished`}</span>
             <span className="identity-hud" aria-hidden="true">
               <i className="hud-line hud-line-x" />
@@ -770,6 +909,11 @@ export default function Home() {
           </button>
         </div>
       </section>
+
+      <WorkGallery projects={projects} group={projectGroup} onGroupChange={setProjectGroup} surprise={surprise} onCursorHostChange={setCursorHost} />
+
+
+
 
 
       <PhotoDesk />

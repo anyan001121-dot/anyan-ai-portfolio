@@ -122,7 +122,7 @@ export function SkillMap({ projects, onOpen }: { projects: Project[]; onOpen: (i
   };
 
   return (
-    <section className="skill-map" aria-labelledby="skill-map-title">
+    <section className="skill-map" id="skills" aria-labelledby="skill-map-title">
       <header className="sm-head">
         <span>SKILL → EVIDENCE</span>
         <h3 id="skill-map-title">能力地图<span className="work-title-dot">.</span></h3>

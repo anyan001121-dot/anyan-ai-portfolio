@@ -14,13 +14,11 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
   const [cartoon, setCartoon] = useState(true); // the cartoon greets first; the real photo is one click away
   const [reel, setReel] = useState<"gate" | "play" | null>(null);
   const [handoff, setHandoff] = useState(false);
-  const [greeting, setGreeting] = useState(false);
   const [scan, setScan] = useState(0); // bumps on every portrait switch, replays the redraw sweep
   const [rollKey, setRollKey] = useState(0); // re-rolls the evidence numbers once the reel hands off
   const stageRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
   const handoffTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const greetingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const playing = reel !== null;
 
   const finishIntro = useCallback(() => {
@@ -53,7 +51,6 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
 
   useEffect(() => () => {
     if (handoffTimer.current) clearTimeout(handoffTimer.current);
-    if (greetingTimer.current) clearTimeout(greetingTimer.current);
   }, []);
 
   const heroName = useCallback(() => nameRef.current, []);
@@ -68,12 +65,6 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
 
   // The evidence strip opens project files that live in the work section.
   const openProject = (index: number) => window.dispatchEvent(new CustomEvent("open-project", { detail: index }));
-
-  const greet = () => {
-    if (greetingTimer.current) clearTimeout(greetingTimer.current);
-    setGreeting(true);
-    greetingTimer.current = setTimeout(() => setGreeting(false), 1400);
-  };
 
   return (
     <section id="top" className={`impact-hero${playing ? " is-reeling" : handoff ? " is-handoff" : ""}`} data-portrait={cartoon ? "cartoon" : "photo"} aria-label="安颜的个人主页">
@@ -99,10 +90,6 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
           <p className="impact-statement">研究数据，<br />也做产品。</p>
           <a className="impact-contact" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
         </div>
-        <button type="button" className={`impact-mascot${greeting ? " is-greeting" : ""}`} onClick={greet} aria-label="让小人打个招呼">
-          <img src="./photos/guide-actions-v2/present.png" width="164" height="280" alt="" />
-          <span className="impact-hello" aria-hidden="true">嗨，这是我！</span>
-        </button>
         <button type="button" className="impact-switch" onClick={() => { setCartoon((current) => !current); setScan((n) => n + 1); }} aria-pressed={cartoon} aria-label={cartoon ? "切换为真人照片" : "切换回卡通小安"}>
           <small>ANOTHER ME</small><strong>{cartoon ? "真实的我" : "小安"}</strong><span aria-hidden="true">↗</span>
         </button>

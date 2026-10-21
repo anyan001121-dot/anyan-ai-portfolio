@@ -165,6 +165,7 @@ button { color: inherit; font: inherit; }
 .cursor-dot.is-visible,.cursor-ring.is-visible { opacity: 1; }
 .cursor-ring.is-magnetic { border-width: 1.5px; border-color: var(--accent); background: rgba(var(--accent-rgb),.08); }
 .cursor-ring.is-pressed { opacity: .34; }
+.cursor-ring.is-hovering { border-color: var(--accent); background: rgba(var(--accent-rgb),.06); }
 
 .topbar {
   position: fixed; z-index: 40; inset: 0 0 auto; height: 64px; padding: 0 clamp(20px, 3vw, 52px);
@@ -179,6 +180,13 @@ button { color: inherit; font: inherit; }
 .topbar nav a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: -8px; height: 2px; background: var(--ink); transition: right .25s; }
 .topbar nav a:hover::after,.topbar nav a.active::after { right: 0; }
 .topbar nav a.active { color: var(--accent); }
+/* Five Chinese labels on the right; the old photo / music toggles are gone. */
+.topbar { grid-template-columns: 110px 1fr; }
+.topbar nav { justify-self: end; font: 500 13px/1 var(--sans); letter-spacing: .04em; }
+/* The old layout hid the nav below 1050px; five short labels fit at every width. */
+@media (max-width: 1050px) {
+  .topbar nav { display: flex !important; gap: clamp(14px, 3vw, 28px); }
+}
 .header-actions { justify-self: end; display: flex; align-items: center; gap: 7px; }
 .tiny-control, .music-pill { border: 1px solid var(--line); background: color-mix(in srgb,var(--paper) 86%,transparent); height: 30px; padding: 0 11px; font-size: 9px; letter-spacing: .12em; cursor: pointer; display: flex; align-items: center; gap: 7px; transition: border-color .2s, color .2s; }
 .tiny-control:hover, .music-pill:hover { border-color: var(--accent); color: var(--accent); }
@@ -380,6 +388,8 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 .particle-mask-canvas { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .glyph-code { position: absolute; z-index: 4; right: 2%; bottom: 4%; white-space: pre; text-align: left; color: rgba(24,20,15,.17); font: 7px/1.7 ui-monospace,"SFMono-Regular",monospace; letter-spacing: .13em; transition: opacity .35s ease; }
 .identity-word { position: absolute; z-index: 2; left: 0; top: 0; display: inline-flex; align-items: baseline; gap: 2px; white-space: nowrap; padding: 2px 0; color: #18140f; background: transparent; font: 800 9px/.92 ui-monospace,"SFMono-Regular","PingFang SC",monospace; letter-spacing: -.035em; opacity: 0; pointer-events: none; transition: opacity .65s ease; transition-delay: var(--delay); will-change: transform; }
+/* Shockwave ring for the burst; positioned and played from the physics loop. */
+.identity-shock { position: absolute; z-index: 1; left: -320px; top: -320px; width: 640px; height: 640px; border: 1px solid #52688b; border-radius: 50%; opacity: 0; pointer-events: none; }
 .identity-word i { color: currentColor; opacity: .5; font-size: 6px; font-weight: 700; font-style: normal; }
 .self-glyph.particles-ready .identity-word { opacity: .86; }
 .self-glyph:hover .identity-word,.self-glyph:focus-visible .identity-word,.self-glyph.is-open .identity-word { opacity: 1; }
@@ -400,7 +410,8 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 .self-glyph.is-open .glyph-code { opacity: .1; }
 .self-glyph:focus-visible { outline: 1px dashed rgba(var(--accent-rgb),.55); outline-offset: 12px; }
 .identity-hud { position: absolute; z-index: 1; inset: 0; pointer-events: none; opacity: 0; transition: opacity .25s; }
-.self-glyph.hud-active .identity-hud { opacity: .16; }
+/* The crosshair read as a second, oversized cursor; the custom cursor is the same on every section. */
+.self-glyph.hud-active .identity-hud { opacity: 0; }
 .hud-line { position: absolute; display: block; background: #18140f; }
 .hud-line-x { left: 0; right: 0; top: var(--hud-y); height: 1px; }
 .hud-line-y { top: 0; bottom: 0; left: var(--hud-x); width: 1px; }
@@ -408,7 +419,8 @@ h1 em::after, h2 em::after { content: ""; position: absolute; z-index: -1; left:
 
 @media (hover: hover) and (pointer: fine) {
   .cursor-dot,.cursor-ring { display: block; }
-  body.has-custom-cursor,body.has-custom-cursor a,body.has-custom-cursor button,body.has-custom-cursor summary { cursor: none!important; }
+  /* Only the custom cursor, everywhere — no section or overlay may bring the system pointer back. */
+  body.has-custom-cursor,body.has-custom-cursor * { cursor: none!important; }
 }
 
 .music-card { position: fixed; z-index: 50; right: 32px; top: 88px; width: 275px; padding: 22px; border: 1px solid var(--line); background: var(--paper-2); box-shadow: 0 20px 44px rgba(0,0,0,.5); }

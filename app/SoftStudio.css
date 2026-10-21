@@ -171,7 +171,6 @@
 .topbar.is-over-poster { background:#e8ebe2; color:#2c322c; border-color:var(--soft-line); }
 .impact-eyebrow,.impact-switch { background:var(--poster); }
 .impact-switch { box-shadow:none; border-color:#727c6577; }.impact-switch:hover { background:#dce2d4; }
-.impact-hello { border-radius:8px; background:#f7f7ef; }
 .site .topbar { border-bottom-color:var(--soft-line); }
 .cursor-dot,.cursor-ring { --accent:#52688b; --accent-rgb:82,104,139; }
 .cursor-ring.is-magnetic { border-width:1px; }

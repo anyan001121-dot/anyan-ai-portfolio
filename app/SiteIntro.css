@@ -40,9 +40,13 @@
 /* ---------- Stage: everything that zooms together, including the thread ---------- */
 .ri-stage {
   position: absolute; inset: 0;
-  animation: ri-zoom calc(var(--ri-beat) * 22) linear both;
+  /* Slow push-in, plus a punch on every beat: snaps in on the kick and settles within the beat, no overshoot. */
+  animation:
+    ri-zoom calc(var(--ri-beat) * 22) linear both,
+    ri-pulse var(--ri-beat) cubic-bezier(.16, 1, .3, 1) 22;
 }
 @keyframes ri-zoom { from { transform: scale(1); } to { transform: scale(1.04); } }
+@keyframes ri-pulse { from { scale: 1.022; } to { scale: 1; } }
 
 /* Shots: visible only during their own bar, so every cut is a hard cut on a downbeat. */
 .ri-shot {
