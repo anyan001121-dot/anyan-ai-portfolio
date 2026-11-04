@@ -16,8 +16,9 @@ function fromAddress(): Selection {
   const skill = skillIds.find(id => id === params.get("skill")) ?? initial.skill;
   const choices = projectsFor(skill);
   const project = choices.find(id => id === params.get("project")) ?? choices[0];
-  const page = Number(params.get("frame")) - 1;
-  return { skill, project, frame: Number.isInteger(page) && entries[project].frames?.[page] ? page : 0 };
+  const page = Number(params.get("frame"));
+  const frame = entries[project].frames?.findIndex((f, i) => (f.linkPage ?? i + 1) === page) ?? -1;
+  return { skill, project, frame: Math.max(0, frame) };
 }
 
 export default function SkillExhibit({ projects, onOpen }: { projects: Project[]; onOpen: (index: number) => void }) {
@@ -55,7 +56,7 @@ export default function SkillExhibit({ projects, onOpen }: { projects: Project[]
     url.hash = "skills";
     url.searchParams.set("skill", next.skill);
     url.searchParams.set("project", next.project);
-    if (next.frame) url.searchParams.set("frame", String(next.frame + 1));
+    if (next.frame) url.searchParams.set("frame", String(entries[next.project].frames?.[next.frame]?.linkPage ?? next.frame + 1));
     else url.searchParams.delete("frame");
     window.history.pushState(null, "", url);
     setChoice(next);

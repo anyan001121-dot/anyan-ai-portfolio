@@ -102,8 +102,5 @@ html { scroll-snap-type:none; }
 /* Final small-screen and embedded-demo adjustments. */
 .workshop,.method-lab,.photo-desk{scroll-margin-top:0}
 .case-visual.case-mood-diary{max-height:none;background:transparent;overflow:visible}
-.mood-demo-controls{display:flex;gap:7px;margin-top:14px;flex-wrap:wrap}
-.mood-demo-controls button{border:1px solid #8b9d76;padding:10px 12px;background:transparent;border-radius:5px;font-size:11px}
-.mood-demo-controls button[aria-pressed=true]{background:#dae6ba}
-@media(max-width:760px){.shelf-doodle{top:auto;bottom:0;font-size:55px}.exhibit-blue .exhibit-caption h3{font-size:26px}.mood-demo-controls button{font-size:10px;padding:10px 8px}}
+@media(max-width:760px){.shelf-doodle{top:auto;bottom:0;font-size:55px}.exhibit-blue .exhibit-caption h3{font-size:26px}}
 @media(max-width:760px){.photo-intro > p{position:static;margin-top:20px}.photo-handnote{margin-top:18px}.photo-intro h2{font-size:53px}.photo-intro h2 em{white-space:nowrap}}

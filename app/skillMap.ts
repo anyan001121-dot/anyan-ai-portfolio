@@ -5,7 +5,7 @@ type Skill = { name: string; works: Partial<Record<ProjectId, string>> };
 export const skills = {
   product: { name: "产品设计", works: {
     focus: "面试、简历、论文一起挤过来的时候，先做哪一件？我把选择放在第一步。选好以后，屏幕上只留眼前要做的事，和做到哪里算完成。",
-    mood: "有些日子只想记一下心情。我把五档感受放在入口，点一下就能记。想多说两句，再写字。花园里的植物可以慢慢收集。",
+    mood: "有些日子只想记一下心情。在花园点一下「不错」，这条心情就记好了。想多说一点，再去选强度、勾原因，或者写句话。",
     quiz: "我把题目按模块收在一起。做错一道，先就地看解析，下次还能从错题里找到它。"
   }},
   ai: { name: "AI 工作流", works: {
@@ -34,7 +34,8 @@ export const skillIds = Object.keys(skills) as SkillId[];
 export function worksFor(id: SkillId): Skill["works"] { return skills[id].works; }
 export function projectsFor(id: SkillId) { return Object.keys(skills[id].works) as ProjectId[]; }
 
-type Frame = { label: string; image: string; caption: string; source?: string };
+// Keep shared frame URLs stable when screenshots are inserted or reordered.
+type Frame = { linkPage?: number; portrait?: boolean; label: string; image: string; caption: string; source?: string };
 type Entry = { title: string; status: string; process: string[]; cover?: string; source?: string; frames?: Frame[] };
 
 const photo = (file: string) => "./photos/evidence/" + file;
@@ -52,14 +53,21 @@ export const entries: Record<ProjectId, Entry> = {
       {label:"原型界面",image:"./photos/focusflow-preview.png",caption:"原型里的任务与执行界面。",source:"FocusFlow · 项目截图"}
     ]},
   mood: {title:"心情日记", status:"已上线", cover:"./photos/mood-diary/tulip.webp",
-    process:["从五档感受里选一个，文字和事件都可以留空。","心情低落时，可以挑一个呼吸或书写练习。","之后可以回来翻日记，也可以逛逛植物图鉴。"],
+    source:"心情日记发布版 · 示例操作截图",
+    process:["在花园里选一个心情，花就种下了。","点「补充一点」，先选强度，再选和什么有关，最后可以留一句话。","只想记一下的话，选「今天就记到这里」就好。"],
     frames:[
-      {label:"花朵",image:"./photos/mood-diary/tulip.webp",caption:"我挑了这朵郁金香做封面。放大一点，几层珊瑚色的花瓣就能看清。",source:"项目插画 · Soft open bloom"},
-      {label:"应用图标",image:photo("mood-logo.jpeg"),caption:"图标里也留了一朵橙花，底色换成薄荷绿。",source:"心情日记 · 原始应用图标"},
-      {label:"记录界面",image:photo("mood1.webp"),caption:"选一下今天的感受就能记下来。下面的事件和文字，想填再填。",source:"开发版「心晴日记」· 示例花园，画面使用演示数据"},
-      {label:"花园",image:"./photos/mood-diary/garden.webp",caption:"记录心情时用到的花园背景。",source:"心情日记 · 场景插画"},
-      {label:"向日葵",image:"./photos/mood-diary/sunflower.webp",caption:"花园里的向日葵。",source:"心情日记 · 植物插画"},
-      {label:"垂下的花",image:"./photos/mood-diary/low-flower.webp",caption:"心情低落时，对应的是这朵垂下来的花。",source:"心情日记 · 植物插画"}
+      {linkPage:3,portrait:true,label:"花园选心情",image:photo("mood-garden-entry.jpg"),caption:"花园下面有五种心情。这次点「不错」。"},
+      {linkPage:7,portrait:true,label:"已经记下",image:photo("mood-recorded.jpg"),caption:"花园里多了一朵花。点「今天就记到这里」就可以离开，想多说一点再继续。"},
+      {linkPage:8,portrait:true,label:"选强度",image:photo("mood-intensity.jpg"),caption:"补充的第一步是选强度。这次选 3。"},
+      {linkPage:9,portrait:true,label:"选关联因素",image:photo("mood-factors.jpg"),caption:"这次勾了「天气」。没想到原因，也可以跳过。"},
+      {linkPage:10,portrait:true,label:"留一句话",image:photo("mood-note.jpg"),caption:"最后可以留一句话。今天没什么想写的，就点「先不写」。"},
+      {linkPage:11,portrait:true,label:"低落时",image:photo("mood-care.jpg"),caption:"选「低落」时，会弹出关怀选项。可以停一会儿、说说发生了什么，也可以只留下记录。"},
+      {linkPage:12,portrait:true,label:"练习后",image:photo("mood-feedback.jpg"),caption:"选「和我待一会儿」，做完一分钟呼吸练习，再记一下此刻的感受。"},
+      {linkPage:1,label:"花朵",image:"./photos/mood-diary/tulip.webp",caption:"我挑了这朵郁金香做封面。放大一点，几层珊瑚色的花瓣就能看清。",source:"项目插画 · Soft open bloom"},
+      {linkPage:2,label:"应用图标",image:photo("mood-logo.jpeg"),caption:"图标里也留了一朵橙花，底色换成薄荷绿。",source:"心情日记 · 原始应用图标"},
+      {linkPage:4,label:"花园",image:"./photos/mood-diary/garden.webp",caption:"记录心情时用到的花园背景。",source:"心情日记 · 场景插画"},
+      {linkPage:5,label:"向日葵",image:"./photos/mood-diary/sunflower.webp",caption:"花园里的向日葵。",source:"心情日记 · 植物插画"},
+      {linkPage:6,label:"垂下的花",image:"./photos/mood-diary/low-flower.webp",caption:"心情低落时，对应的是这朵垂下来的花。",source:"心情日记 · 植物插画"}
     ]},
   quiz: {title:"北森刷题台",status:"已上线 · 727 道题",cover:photo("quiz1.webp"),source:"言语模块第 1 题 · 实际作答截图",
     process:["选言语、资料或图形模块，打开一张题卡。","作答后，题卡显示正确选项和解析。","需要再练的题，可以从错题和收藏里找。"],

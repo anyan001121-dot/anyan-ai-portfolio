@@ -19,8 +19,8 @@ export default function ProjectMaterials({ project, frame, onSelect }: Props) {
     </figure>;
   }
   const current = frames[index];
-  return <figure className="ex-material" aria-label={item.title + "的项目材料"}>
-    <div className="ex-material-head"><span className="ex-kicker">{project.id === "olist" ? "分析图表" : project.id === "mood" ? "花与记录" : "项目素材"}</span>
+  return <figure className="ex-material" data-format={current.portrait ? "phone" : undefined} aria-label={item.title + "的项目材料"}>
+    <div className="ex-material-head"><span className="ex-kicker">{project.id === "olist" ? "分析图表" : project.id === "mood" ? (current.portrait ? "应用界面" : "项目插画与图标") : "项目素材"}</span>
       <span>{String(index + 1).padStart(2,"0")} / {String(frames.length).padStart(2,"0")}</span></div>
     <div className="ex-pages" role="group" aria-label="选择材料">{frames.map((f,n) =>
       <button type="button" key={f.image} aria-pressed={n === index} onClick={() => (onSelect ?? setLocalFrame)(n)}>{f.label}</button>)}</div>

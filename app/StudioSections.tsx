@@ -6,7 +6,6 @@ import ExhibitArt from "./ProjectArtwork";
 import ProjectMaterials from "./ProjectMaterials";
 import { entries } from "./skillMap";
 import SkillExhibit from "./SkillExhibit";
-import MoodDiaryPreview from "./MoodDiaryPreview";
 import { FlipText, GlasgowClock, Odometer } from "./Evidence";
 
 type Group = "all" | "ai" | "data";
@@ -60,7 +59,6 @@ function IndexPreview({ project }: { project: Project }) {
 function CaseFile({ project, onClose, onCursorHostChange }: { project: Project | null; onClose: () => void; onCursorHostChange: (host: HTMLDialogElement | null) => void }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [chapter, setChapter] = useState(3);
-  const [previewStep, setPreviewStep] = useState(0);
   // Conclusion first: every file opens on the 30-second version; the full write-up is one click away.
   const [view, setView] = useState<"brief" | "full">("brief");
   useEffect(() => {
@@ -69,7 +67,6 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
     const previous = document.activeElement as HTMLElement | null;
     const oldOverflow = document.body.style.overflow;
     setChapter(3);
-    setPreviewStep(0);
     setView("brief");
     node.showModal();
     onCursorHostChange(node);
@@ -110,9 +107,9 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
         </div>}
       </header>
       <div className={`case-visual case-${project.preview}`}>
-        {project.preview === "mood-diary" ? <><MoodDiaryPreview step={previewStep} /><div className="mood-demo-controls" aria-label="切换心情日记流程演示">{["种下心情", "即时关怀", "反馈与记忆"].map((label, i) => <button type="button" key={label} aria-pressed={previewStep === i} onClick={() => setPreviewStep(i)}>{mono(i + 1)} {label}</button>)}</div></> : project.preview === "focusflow" ? <img src="./photos/focusflow-preview.png" alt="FocusFlow 真实产品界面" /> : project.preview === "aybot" ? <img src="./photos/aybot-coze-workflow.jpg" alt="AYBot 的 Coze 工作流"/> : project.preview === "quiz" ? <img src="./photos/beisen-quiz-home.png" alt="北森刷题台真实界面"/> : <><ExhibitArt project={project}/><p>指标来自项目结果；图形为展示示意。</p></>}
+        {project.preview === "mood-diary" ? <ProjectMaterials key={project.id} project={project} /> : project.preview === "focusflow" ? <img src="./photos/focusflow-preview.png" alt="FocusFlow 真实产品界面" /> : project.preview === "aybot" ? <img src="./photos/aybot-coze-workflow.jpg" alt="AYBot 的 Coze 工作流"/> : project.preview === "quiz" ? <img src="./photos/beisen-quiz-home.png" alt="北森刷题台真实界面"/> : <><ExhibitArt project={project}/><p>指标来自项目结果；图形为展示示意。</p></>}
       </div>
-      {entries[project.id].frames && <details className="case-originals" key={project.id}>
+      {project.preview !== "mood-diary" && entries[project.id].frames && <details className="case-originals" key={project.id}>
         <summary>翻看项目素材</summary>
         <ProjectMaterials project={project} />
       </details>}
