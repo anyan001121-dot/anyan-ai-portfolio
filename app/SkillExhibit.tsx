@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Project, ProjectId } from "./projects";
 import { entries, skills, skillIds, worksFor, projectsFor, type SkillId } from "./skillMap";
+import ProjectMaterials from "./ProjectMaterials";
 import "./SkillExhibit.css";
 
 type Selection = { skill: SkillId; project: ProjectId; frame: number };
@@ -75,7 +76,7 @@ export default function SkillExhibit({ projects, onOpen }: { projects: Project[]
       const origin = section.getBoundingClientRect();
       const a = selected.getBoundingClientRect(), b = card.getBoundingClientRect();
       const x = a.right - origin.left, y = a.top + a.height / 2 - origin.top;
-      const end = b.left - origin.left, tip = b.top - origin.top + Math.min(36, b.height / 2);
+      const end = b.left - origin.left, tip = b.top - origin.top + b.height / 2;
       const bend = Math.max(20, (end - x) * .48);
       line.current?.setAttribute("d", `M${x} ${y} C${x + bend} ${y} ${end - bend} ${tip} ${end} ${tip}`);
     };
@@ -104,7 +105,7 @@ export default function SkillExhibit({ projects, onOpen }: { projects: Project[]
 
   return <section className="skill-exhibit" id="skills" aria-labelledby="ex-title">
     <header className="ex-heading">
-      <div><span className="ex-kicker">PROJECT NOTES</span><h3 id="ex-title">能力与作品<span>.</span></h3><p>选一个方向，看看我具体做了什么。</p></div>
+      <div><span className="ex-kicker">PROJECT NOTES</span><h3 id="ex-title">能力与作品<span className="work-title-dot">.</span></h3><p>选一个方向，看看我具体做了什么。</p></div>
       <img ref={host} src="./photos/portrait-cartoon-simple.webp" width="102" height="110" alt="" loading="lazy" />
     </header>
     <div className="ex-stage" ref={body}>
@@ -122,7 +123,7 @@ export default function SkillExhibit({ projects, onOpen }: { projects: Project[]
           }}><span>{skills[id].name}</span><small>{number(projectsFor(id).length)}</small></button>)}
       </div>
       <svg className="ex-wire" aria-hidden="true"><path ref={line}/></svg>
-      <div className="ex-cards" role="group" aria-label={group.name + "相关作品"} data-count={ids.length}>
+      <div className="ex-cards" role="group" aria-label={group.name + "相关作品"}>
         {ids.map((id, i) => {
           const info = entries[id];
           const p = projects.find(candidate => candidate.id === id)!;
@@ -130,10 +131,13 @@ export default function SkillExhibit({ projects, onOpen }: { projects: Project[]
             onPointerEnter={() => setRelated(id)} onPointerLeave={() => setRelated(null)}
             onFocus={() => setRelated(id)} onBlur={() => setRelated(null)}
             onClick={() => select({skill, project:id, frame: id === project ? frame : 0})}>
-            <small>{number(i + 1)} / {p.year}</small><strong>{info.title}</strong>
-            <span className="ex-subtitle">{p.subtitle}</span>
-            {info.cover && (i === 0 || id === "mood") && <span className="ex-cover" aria-hidden="true"><img src={info.cover} alt="" loading="lazy"/></span>}
-            <span className="ex-card-foot">{id === project ? "正在看 ↓" : "看我的工作 ↘"}</span>
+            <span className="ex-marker" aria-hidden="true">
+              {info.cover ? <img src={info.cover} alt="" loading="lazy"/> : id === "qar" ?
+                <img src="./photos/project-flat-v1/qar-plane.png" alt="" loading="lazy"/> :
+                <span className="ex-metric">{p.metric}</span>}
+            </span>
+            <span className="ex-project-text"><small>{number(i + 1)} / {p.year}</small><strong>{info.title}</strong><span className="ex-subtitle">{p.subtitle}</span></span>
+            <span className="ex-card-foot"><span className="sr-only">{id === project ? "正在看" : "看我的工作"}</span><span aria-hidden="true">{id === project ? "↓" : "↗"}</span></span>
           </button>;
         })}
       </div>
@@ -146,13 +150,7 @@ export default function SkillExhibit({ projects, onOpen }: { projects: Project[]
         {(record.liveUrl || record.url) && <a href={project === "olist" ? record.url : record.liveUrl || record.url} target="_blank" rel="noreferrer">
           {project === "olist" ? "看原始分析" : record.liveUrl ? "打开应用" : "看源码"} ↗</a>}</div>
     </div>
-    {plate && item.frames && <figure className="ex-material" aria-label={item.title + "的项目材料"}>
-      <div className="ex-material-head"><span className="ex-kicker">{project === "olist" ? "分析图表" : project === "mood" ? "花与记录" : "界面实录"}</span><span>{number(frame + 1)} / {number(item.frames.length)}</span></div>
-      <div className="ex-pages" role="group" aria-label="选择材料">{item.frames.map((f, n) => <button type="button" key={f.image} aria-pressed={n === frame}
-        onClick={() => select({...choice, frame:n})}>{f.label}</button>)}</div>
-      <div className="ex-plate"><a href={plate.image} target="_blank" rel="noreferrer" aria-label={"打开大图：" + plate.label}><img src={plate.image} alt={item.title + " · " + plate.label} loading="lazy" decoding="async"/></a></div>
-      <figcaption><p>{plate.caption}</p><small>{plate.source || item.source}</small><a href={plate.image} target="_blank" rel="noreferrer">看大图 ↗</a></figcaption>
-    </figure>}
+    <ProjectMaterials project={record} frame={frame} onSelect={n => select({...choice, frame:n})} />
     {project === "olist" && <div className="ex-sql"><small className="ex-kicker">先按订单算金额 · SQL 摘编</small><pre><code>{"SELECT order_id, SUM(price + freight_value) AS order_amount\nFROM ods_order_items GROUP BY order_id;"}</code></pre></div>}
     <details className="ex-process" key={skill + project}><summary>我怎么做的</summary><ol>{item.process.map(step => <li key={step}>{step}</li>)}</ol></details>
     <span className="sr-only" role="status">{group.name}，{item.title}{plate ? "，" + plate.label : ""}。</span>

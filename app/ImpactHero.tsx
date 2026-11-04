@@ -11,10 +11,8 @@ import "./ImpactHero.css";
 const INTRO_KEY = "anyan-reel-intro-v1";
 
 export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteChange: (complete: boolean) => void }) {
-  const [cartoon, setCartoon] = useState(true); // the cartoon greets first; the real photo is one click away
   const [reel, setReel] = useState<"gate" | "play" | null>(null);
   const [handoff, setHandoff] = useState(false);
-  const [scan, setScan] = useState(0); // bumps on every portrait switch, replays the redraw sweep
   const [rollKey, setRollKey] = useState(0); // re-rolls the evidence numbers once the reel hands off
   const stageRef = useRef<HTMLDivElement>(null);
   const nameRef = useRef<HTMLHeadingElement>(null);
@@ -67,7 +65,7 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
   const openProject = (index: number) => window.dispatchEvent(new CustomEvent("open-project", { detail: index }));
 
   return (
-    <section id="top" className={`impact-hero${playing ? " is-reeling" : handoff ? " is-handoff" : ""}`} data-portrait={cartoon ? "cartoon" : "photo"} aria-label="安颜的个人主页">
+    <section id="top" className={`impact-hero${playing ? " is-reeling" : handoff ? " is-handoff" : ""}`} data-portrait="cartoon" aria-label="安颜的个人主页">
       <div
         className="impact-stage"
         ref={stageRef}
@@ -80,9 +78,7 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
         <h1 className="impact-name" ref={nameRef} aria-label="安颜 · Yan An"><span>安</span><span>颜</span></h1>
         <figure className="impact-portrait">
           <div className="impact-portrait-motion">
-            <img className="impact-photo" src="./photos/portrait-outline.webp" width="1207" height="1303" decoding="async" alt="安颜的描边人像照片" aria-hidden={cartoon} />
-            <img className="impact-cartoon" src="./photos/portrait-cartoon-simple.webp" width="1207" height="1303" fetchPriority="high" alt="安颜的卡通形象：挥手打招呼的小安" aria-hidden={!cartoon} />
-            {scan > 0 && <span className="impact-scan" key={scan} aria-hidden="true" />}
+            <img className="impact-cartoon" src="./photos/portrait-cartoon-simple.webp" width="1207" height="1303" fetchPriority="high" alt="安颜的卡通形象：挥手打招呼的小安" />
           </div>
         </figure>
         <div className="impact-copy">
@@ -90,10 +86,10 @@ export default function ImpactHero({ onIntroCompleteChange }: { onIntroCompleteC
           <p className="impact-statement">研究数据，<br />也做产品。</p>
           <a className="impact-contact" href="mailto:anyan001121@gmail.com">联系我 ↗</a>
         </div>
-        <button type="button" className="impact-switch" onClick={() => { setCartoon((current) => !current); setScan((n) => n + 1); }} aria-pressed={cartoon} aria-label={cartoon ? "切换为真人照片" : "切换回卡通小安"}>
-          <small>ANOTHER ME</small><strong>{cartoon ? "真实的我" : "小安"}</strong><span aria-hidden="true">↗</span>
-        </button>
-        <p className="impact-caption" aria-live="polite"><span>{cartoon ? "01 / XIAO AN" : "02 / THE REAL ME"}</span><span>PORTFOLIO · 2026</span></p>
+        <a className="impact-switch" href="#work" aria-label="看我的作品">
+          <small>MY WORK</small><strong>我的作品</strong><span aria-hidden="true">↘</span>
+        </a>
+        <p className="impact-caption"><span>01 / XIAO AN</span><span>PORTFOLIO · 2026</span></p>
       </div>
       <div className="impact-foot">
         <div className="impact-evidence" key={rollKey}>
