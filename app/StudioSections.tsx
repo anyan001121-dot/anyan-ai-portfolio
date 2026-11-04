@@ -2,8 +2,9 @@
 /* eslint-disable @next/next/no-img-element */
 import { useEffect, useRef, useState, type CSSProperties, type PointerEvent } from "react";
 import type { Project } from "./projects";
+import SkillExhibit from "./SkillExhibit";
 import MoodDiaryPreview from "./MoodDiaryPreview";
-import { FlipText, GlasgowClock, Odometer, SkillMap } from "./Evidence";
+import { FlipText, GlasgowClock, Odometer } from "./Evidence";
 
 type Group = "all" | "ai" | "data";
 const productOrder = [0, 8, 2, 1];
@@ -102,9 +103,9 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
         {view === "brief" && <section className="case-brief" aria-label="30 秒版" key={project.title}>
           <div className="case-brief-metric"><Odometer value={project.metric} /><small>{project.metricLabel}</small></div>
           <dl>
-            {([["我的角色", project.brief.role], ["关键结果", project.brief.result], ["方法", project.brief.method], ["亮点", project.brief.why]] as const).map(([label, text], i) => <div key={label} style={{ "--i": i } as CSSProperties}><dt>{label}</dt><dd className={i === 3 ? "is-why" : undefined}>{text}</dd></div>)}
+            {([["我的角色", project.brief.role], ["关键结果", project.brief.result], ["方法", project.brief.method], ["我的取舍", project.brief.why]] as const).map(([label, text], i) => <div key={label} style={{ "--i": i } as CSSProperties}><dt>{label}</dt><dd className={i === 3 ? "is-why" : undefined}>{text}</dd></div>)}
           </dl>
-          <button type="button" className="case-brief-more" onClick={() => setView("full")}>看完整过程：背景、取舍与证据 ↓</button>
+          <button type="button" className="case-brief-more" onClick={() => setView("full")}>看完整过程 ↓</button>
         </section>}
         {view === "full" && <div className="case-full-reveal">
         {(project.contribution || project.evidence) && <dl className="case-facts">
@@ -171,10 +172,10 @@ export function WorkGallery({ projects, group, onGroupChange, surprise, onCursor
     <div className="workshop-heading"><h2 id="work-title">做过的项目<span className="work-title-dot">.</span></h2><div className="workshop-intro"><p>AI 产品 · 数据研究</p><span className="explore-count">{mono(projects.length)} PROJECTS</span></div></div>
     <div className="workshop-controls"><div className="exhibit-filters" aria-label="筛选作品">{([['all','全部作品'],['ai','AI 与产品'],['data','数据与研究']] as const).map(([key, label]) => <button type="button" key={key} aria-pressed={group === key} onClick={() => onGroupChange(key)}>{label}<span>{key === "all" ? "09" : key === "ai" ? "04" : "05"}</span></button>)}</div><span>查看项目 ↗</span></div>
     <div ref={floor} className={`exhibit-floor floor-${group}`} key={group}>
-      {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onPointerMove={moveExhibit} onPointerLeave={resetExhibit} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'AI / PRODUCT' : 'DATA / RESEARCH'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖项目" : "产品原型"}</small><h3>{p.title}</h3><p>{p.brief.result}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
+      {featured.map((index, position) => { const p = projects[index]; return <button type="button" className={`exhibit exhibit-${p.tone} exhibit-position-${position}`} key={p.title} onPointerMove={moveExhibit} onPointerLeave={resetExhibit} onClick={() => open(index)} aria-label={`打开项目：${p.title}`}><div className="exhibit-topline"><span>{productOrder.includes(index) ? 'AI / PRODUCT' : 'DATA / RESEARCH'}</span><span>{p.year} ↗</span></div><ExhibitArt project={p}/><div className="exhibit-caption"><div><small>{p.award ? "获奖项目" : p.liveUrl ? "已上线" : "产品原型"}</small><h3>{p.title}</h3><p>{p.brief.result}</p></div><span className="exhibit-open">↗</span></div>{seen.includes(index) && <span className="seen-mark">已翻阅 ✓</span>}</button>; })}
     </div>
     <div className="archive-shelf"><div className="archive-intro"><span>PROJECT INDEX</span><h3>更多项目</h3><IndexPreview project={projects[activePreview]}/></div><div className="archive-files">{archive.map((index, i) => { const p=projects[index]; return <button type="button" className={`archive-file file-${productOrder.includes(index) ? "product" : "data"}${activePreview === index ? " is-previewing" : ""}`} key={p.title} onPointerEnter={() => setPreview(index)} onFocus={() => setPreview(index)} onClick={() => open(index)} style={{'--file-i':i} as CSSProperties}><span className="file-tab">{productOrder.includes(index) ? 'BUILD' : 'RESEARCH'} / {mono(i+1)}</span><span className="file-content"><span><small>{p.year}{p.award ? ' · 获奖项目' : ''}</small><strong>{p.title}</strong><span>{p.subtitle}</span><span className="brief-result">{p.brief.result}</span></span><b>{seen.includes(index) ? '✓' : '↗'}</b></span></button>; })}</div></div>
-    <SkillMap projects={projects} onOpen={open} />
+    <SkillExhibit projects={projects} onOpen={open} />
     <CaseFile project={selected === null ? null : projects[selected]} onClose={() => setSelected(null)} onCursorHostChange={onCursorHostChange}/>
   </section>;
 }

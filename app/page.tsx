@@ -799,7 +799,7 @@ export default function Home() {
   return (
     <main className="site photos-on">
       {/* The hero already has the big cartoon; the guide joins from the work section on. */}
-      <StudioGuide section={activeSection === "skills" ? "work" : activeSection === "contact" ? "about" : activeSection || "top"} hidden={!introLifted || !activeSection || activeSection === "top"} onSurprise={() => { setSurprise((v) => v + 1); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }} />
+      <StudioGuide section={activeSection === "skills" ? "work" : activeSection === "contact" ? "about" : activeSection || "top"} hidden={!introLifted || !activeSection || activeSection === "top" || activeSection === "skills"} onSurprise={() => { setSurprise((v) => v + 1); document.getElementById("work")?.scrollIntoView({ behavior: "smooth" }); }} />
       {/* Native dialogs live above every z-index; keep the cursor in that same top layer. */}
       {cursorHost ? createPortal(cursor, cursorHost) : cursor}
       <header className={`topbar${!activeSection || activeSection === "top" ? " is-over-poster" : ""}`}>

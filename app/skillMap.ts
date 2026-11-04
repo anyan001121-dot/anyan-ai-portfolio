@@ -1,96 +1,78 @@
-/*
- * Skill → evidence map. Keys are indexes into `projects` (app/projects.ts);
- * every sentence is condensed from that project's own write-up — only skills
- * the projects actually show are listed.
- */
+import type { ProjectId } from "./projects";
 
-export type Skill = { key: string; name: string; en: string; uses: Record<number, string> };
+type Skill = { name: string; works: Partial<Record<ProjectId, string>> };
 
-export const skills: Skill[] = [
-  {
-    key: "ml", name: "机器学习", en: "MACHINE LEARNING",
-    uses: {
-      5: "比较 LDA、决策树、随机森林、SVM、kNN 等 7 类模型；随机森林 AUC 0.769。",
-      6: "只用下单时可得特征训练 LightGBM，测试集 Top 10% 差评命中率为基线 2.43 倍。",
-      3: "用 LOF 生成离群标签，再训练 Sigmoid 核 SVM 做异常分类。",
-    },
-  },
-  {
-    key: "causal", name: "因果推断", en: "CAUSAL INFERENCE",
-    uses: {
-      6: "用 PSM、IPW 与回归调整比较延迟与按时订单；匹配 110 维协变量后 ATT 估计 +45.05 个百分点。",
-    },
-  },
-  {
-    key: "regression", name: "回归建模", en: "REGRESSION",
-    uses: {
-      7: "HC3 稳健回归与 GLM / GAM：BMI 每增 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%。",
-      4: "用 Cobb-Douglas 岭回归拟合碳排放，样本内 R² 0.973。",
-      6: "回归调整作为 PSM、IPW 之外的对照估计。",
-    },
-  },
-  {
-    key: "validation", name: "评估与防泄漏", en: "VALIDATION",
-    uses: {
-      6: "发现卖家历史特征混入未来订单，把 AUC 从 0.932 修正为 0.636。",
-      5: "剔除上映后变量防止泄漏，70/30 分层切分，按召回与精确率选模型。",
-    },
-  },
-  {
-    key: "feature", name: "特征选择", en: "FEATURE SELECTION",
-    uses: {
-      3: "用 PCA 与随机森林，从 100+ 项飞行参数中筛出 5 项关键指标。",
-      7: "用 Lasso 与 BMA 筛选变量，并通过共线性检查精简候选位点。",
-    },
-  },
-  {
-    key: "forecast", name: "时间序列预测", en: "FORECASTING",
-    uses: {
-      4: "GM(1,1) 推演新能源汽车保有量，历史拟合平均相对误差 1.983%。",
-    },
-  },
-  {
-    key: "sql", name: "SQL 与数据口径", en: "SQL · DATA MODELLING",
-    uses: {
-      6: "用 DuckDB 统一 9 张表的订单粒度，修正一对多 JOIN 带来的 GMV 高估。",
-      4: "收集并统一市场、能源与宏观数据的统计口径。",
-    },
-  },
-  {
-    key: "python", name: "Python", en: "PYTHON",
-    uses: {
-      3: "负责 Python 分析代码、整体建模框架与可视化。",
-      4: "负责 Python 数据分析、代码实现与可视化。",
-      0: "用 LangGraph 串联任务拆解与执行流程，Streamlit 做界面，SQLite 保存状态。",
-    },
-  },
-  {
-    key: "r", name: "R", en: "R",
-    uses: {
-      5: "用 R 完成数据清洗、7 类模型比较、评价指标与 ROC 可视化。",
-    },
-  },
-  {
-    key: "llm", name: "LLM 与 RAG", en: "LLM · RAG",
-    uses: {
-      2: "在 Coze 中拆成 5 个节点：先召回 Top 3 片段，再生成答案，来源可追溯。",
-      0: "模型只判断杂念与当前任务是否相关，核心状态由规则控制。",
-      8: "可选的“小萤” AI 陪聊，用户使用自己的 API Key。",
-    },
-  },
-  {
-    key: "product", name: "产品设计", en: "PRODUCT DESIGN",
-    uses: {
-      0: "两轮情境走查，修正了完成标准未显示、暂存输入未清空等问题。",
-      8: "五档心情作为入口，文字按意愿补充，先让一次记录足够轻。",
-      1: "设计从抽题、作答到错题回看的完整练习流程。",
-    },
-  },
-  {
-    key: "frontend", name: "前端开发", en: "FRONT-END",
-    uses: {
-      1: "原生 JS 与 LocalStorage 实现答题卡、收藏、错题筛选与成绩报告。",
-      8: "JavaScript 与 Web Audio 实现记录、正念呼吸与植物图鉴。",
-    },
-  },
-];
+export const skills = {
+  product: { name: "产品设计", works: {
+    focus: "面试、简历、论文一起挤过来的时候，先做哪一件？我把选择放在第一步。选好以后，屏幕上只留眼前要做的事，和做到哪里算完成。",
+    mood: "有些日子只想记一下心情。我把五档感受放在入口，点一下就能记。想多说两句，再写字。花园里的植物可以慢慢收集。",
+    quiz: "我把题目按模块收在一起。做错一道，先就地看解析，下次还能从错题里找到它。"
+  }},
+  ai: { name: "AI 工作流", works: {
+    focus: "做到一半又想起别的事，我让模型先判断这个念头跟手头的任务有没有关系。要不要暂停，由使用的人决定。进度存在 SQLite 里，回来还能接着做。",
+    aybot: "做毕业设计时，我把找资料和写回答分成两个节点。回答偏了，就能回头看是漏了资料，还是拿到了资料却没用好。"
+  }},
+  data: { name: "数据分析", works: {
+    olist: "一张订单可能有好几件商品，直接连表会把钱算重。我先把每单的金额加起来，再去看这单什么时候送到、买家给了几星。",
+    qar: "团队里我负责分析代码和图表。把飞行数据按机场、飞行阶段和超限类型分开看，比只看一个异常总数更容易找到要检查的地方。",
+    ev: "市场销量、能源消费和碳排放来自不同的数据表。我参与收集资料，先对齐各项指标的口径，再用 Python 分析和画图。"
+  }},
+  model: { name: "统计建模", works: {
+    qar: "我用 PCA 和随机森林从一百多项飞行参数里筛出五项，再用 LOF 找出离群记录，交给 SVM 分类。这里识别的是异常线索。",
+    thesis: "我的硕士论文用了 3,808 名参与者的数据。我比较了几种模型下血糖和 HDL 的关联，最后把篇幅留给 BMI 等结果更稳定的因素。",
+    movie: "这是小组项目。我负责清洗数据、训练其中几类模型，再画 ROC 曲线。随机森林的 AUC 是 0.769。想少漏掉潜力片时，我也会单独看召回率。",
+    ev: "我把两个问题分开算。新能源汽车保有量用灰色模型推演，碳排放和宏观因素的关系用岭回归估计，分别看各自的历史拟合。"
+  }},
+  web: { name: "前端实现", works: {
+    mood: "记录、植物图鉴和呼吸练习都可以在浏览器里用。日记存在本机，音景用 Web Audio 生成。想写字的时候，记录页才需要键盘。",
+    quiz: "我用原生 JavaScript 做了答题卡，把进度、收藏和错题存在浏览器里。刷新以后，做过的题还能找回来。"
+  }}
+} satisfies Record<string, Skill>;
+
+export type SkillId = keyof typeof skills;
+export const skillIds = Object.keys(skills) as SkillId[];
+export function worksFor(id: SkillId): Skill["works"] { return skills[id].works; }
+export function projectsFor(id: SkillId) { return Object.keys(skills[id].works) as ProjectId[]; }
+
+type Frame = { label: string; image: string; caption: string; source?: string };
+type Entry = { title: string; status: string; process: string[]; cover?: string; source?: string; frames?: Frame[] };
+
+const photo = (file: string) => "./photos/evidence/" + file;
+
+export const entries: Record<ProjectId, Entry> = {
+  focus: {title:"FocusFlow", status:"可运行原型", cover:photo("focus2.webp"), source:"本地练习模式 · 这组步骤使用模板生成",
+    process:["先把想做的事写在一起，挑出现在要做的一件。","把任务拆成小步骤，每次只显示一步和完成条件。","临时想到的事可以暂存。暂停时留个提示，回来就知道从哪里接。"],
+    frames:[
+      {label:"写下来", image:photo("focus1.webp"), caption:"“明天要面试，今天改简历，还要开始写论文，周末想整理旅行照片。”"},
+      {label:"挑一件事", image:photo("focus2.webp"), caption:"面试、简历和论文留在候选里，旅行照片先放到稍后。这次选面试。"},
+      {label:"打开题单", image:photo("focus3.webp"), caption:"第一步只要打开面试题单或职位描述，读第一条。看到内容就算完成。"},
+      {label:"找个细节", image:photo("focus4.webp"), caption:"看着刚打开的那一条，找出接下来能动手的一个细节。"},
+      {label:"动手做", image:photo("focus5.webp"), caption:"这次只做刚选的那件事，做完就停。"}
+    ]},
+  mood: {title:"心情日记", status:"已上线", cover:"./photos/mood-diary/tulip.webp",
+    process:["从五档感受里选一个，文字和事件都可以留空。","心情低落时，可以挑一个呼吸或书写练习。","之后可以回来翻日记，也可以逛逛植物图鉴。"],
+    frames:[
+      {label:"花朵",image:"./photos/mood-diary/tulip.webp",caption:"我挑了这朵郁金香做封面。放大一点，几层珊瑚色的花瓣就能看清。",source:"项目插画 · Soft open bloom"},
+      {label:"应用图标",image:photo("mood-logo.jpeg"),caption:"图标里也留了一朵橙花，底色换成薄荷绿。",source:"心情日记 · 原始应用图标"},
+      {label:"记录界面",image:photo("mood1.webp"),caption:"选一下今天的感受就能记下来。下面的事件和文字，想填再填。",source:"开发版「心晴日记」· 示例花园，画面使用演示数据"}
+    ]},
+  quiz: {title:"北森刷题台",status:"已上线 · 727 道题",cover:photo("quiz1.webp"),source:"言语模块第 1 题 · 实际作答截图",
+    process:["选言语、资料或图形模块，打开一张题卡。","作答后，题卡显示正确选项和解析。","需要再练的题，可以从错题和收藏里找。"],
+    frames:[
+      {label:"题卡",image:photo("quiz1.webp"),caption:"读题时，四个选项和当前进度都在眼前。"},
+      {label:"作答反馈",image:photo("quiz2.webp"),caption:"这次选了 A。提交后能看到正确答案是 D，也能看到 A 漏掉了哪一层意思。"}
+    ]},
+  olist: {title:"Olist",status:"公开订单数据 · 离线分析",cover:photo("olist1.webp"),source:"Olist-analysis · 项目仓库原图",
+    process:["先按订单汇总明细，核对连表前后的订单数和成交额。","比较按时和延迟订单，再按送达天数细分。","调整已观测的订单差异，最后拆开履约环节，看先查哪里。"],
+    frames:[
+      {label:"按时和晚到",image:photo("olist1.webp"),caption:"按时送达的订单里，9.2% 收到差评。晚到的订单里，这个比例是 54.0%。"},
+      {label:"晚了几天",image:photo("olist2.webp"),caption:"提前一两天或当天送到的订单，差评率是 11.7%。晚到 1 至 3 天，就到了 32.2%。"},
+      {label:"匹配后再比",image:photo("olist3.webp"),caption:"把已知特征相近的订单放在一起比，估计差距还有 45.05 个百分点。数据里没记录的差异仍可能影响结果。"},
+      {label:"先查哪一段",image:photo("olist4.webp"),caption:"按项目的口径拆分超时量，运输段占 85.5%。如果接着查，我会先看运输线路。"}
+    ]},
+  aybot:{title:"AYBot",status:"毕业设计原型",process:["收到问题，分别查知识库和外部资料。","知识库最多取三个相关片段。","把找到的材料交给回答节点，保留可回查的来源。"]},
+  qar:{title:"QAR 航空安全",status:"MathorCup 全国二等奖 · 团队项目",process:["整理一百多项高频飞行参数。","筛出五项关键指标，找出离群记录。","按机场和飞行阶段回看超限情况，缩小排查范围。"]},
+  ev:{title:"新能源汽车与双碳",status:"长三角数学建模竞赛二等奖 · 团队项目",process:["对齐市场、能源和宏观数据的口径。","分别建模，估计保有量趋势和碳排放关联。","用历史数据检查拟合情况。"]},
+  thesis:{title:"血糖与 HDL",status:"统计学硕士论文 · 3,808 名参与者",process:["整理临床、生活方式和遗传变量。","比较不同回归模型，检查变量之间的相关性。","把单个位点的证据和整个基因面板的结果分开解释。"]},
+  movie:{title:"电影商业成功预测",status:"IMDb · 小组项目",process:["整理上映前能知道的信息，划分训练集和测试集。","比较七类模型，分别看精确率和召回率。","结合筛选潜力片时漏判和误判的代价来选模型。"]}
+};

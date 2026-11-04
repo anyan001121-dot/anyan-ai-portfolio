@@ -1,4 +1,7 @@
+export type ProjectId = "focus" | "quiz" | "aybot" | "qar" | "ev" | "movie" | "olist" | "thesis" | "mood";
+
 export type Project = {
+  id: ProjectId;
   year: string; title: string; subtitle: string; tags: string[];
   metric: string; metricLabel: string; lead: string;
   star: { situation: string; task: string; action: string; result: string };
@@ -21,14 +24,15 @@ export type Project = {
 
 export const projects: Project[] = [
   {
+    id: "focus",
     year: "2026",
     title: "FocusFlow",
-    brief: { role: "独立设计与开发，用 Claude Code、Codex 辅助编码", result: "可运行原型：逐步执行、杂念暂存、暂停后接回", method: "LangGraph · Streamlit · SQLite", why: "AI 可以理解杂念，不能擅自换掉当前任务" },
+    brief: { role: "独立设计与开发，用 Claude Code、Codex 辅助编码", result: "先挑一件事，再做眼前这一步。中途停了，回来可以接着做。", method: "LangGraph · Streamlit · SQLite", why: "模型帮我判断突然冒出的念头跟任务有没有关，要不要换任务，留给人来选" },
     subtitle: "面向 ADHD 任务启动困难的 AI 助手",
     stage: "可运行原型 · 使用效果待验证",
     contribution: "独立设计任务启动与中断工作流，使用 Claude Code、Codex 辅助需求拆解、代码开发、调试与迭代。",
     decision: {
-      title: "AI 可以理解杂念，不能擅自换掉当前任务。",
+      title: "模型帮我判断突然冒出的念头跟任务有没有关，要不要换任务，留给人来选。",
       detail: "临时输入先进入稍后列表，模型只判断与当前任务的相关性，核心状态由规则控制。需要处理急事时，用户可以主动暂停。计时默认收起，优先保留当前步骤、完成标准和返回提示。",
       basis: "依据：工作流设计与两轮情境走查记录。走查暴露了完成标准未显示、暂存输入未清空等问题，随后完成修正。",
     },
@@ -69,9 +73,10 @@ export const projects: Project[] = [
     url: "https://github.com/anyan001121-dot/focusflow",
   },
   {
+    id: "quiz",
     year: "2026",
     title: "北森刷题台",
-    brief: { role: "独立开发并上线", result: "727 道题、三大模块，可在线练习与复盘", method: "原生 JS · LocalStorage", why: "从抽题、作答到错题回看，一条完整练习流程" },
+    brief: { role: "独立开发并上线", result: "727 道题分成三个模块。答完看解析，错题留着下次练。", method: "原生 JS · LocalStorage", why: "把反馈放回刚做的那道题，题干和解析可以对照着看" },
     subtitle: "校招测评练习产品",
     tags: ["Vanilla JS", "LocalStorage", "Quiz UX", "GitHub Pages"],
     metric: "727",
@@ -94,9 +99,10 @@ export const projects: Project[] = [
     liveUrl: "https://anyan001121-dot.github.io/beisen-quiz/",
   },
   {
+    id: "aybot",
     year: "2024",
     title: "AYBot",
-    brief: { role: "毕业设计，独立完成需求、知识库与工作流", result: "5 节点检索工作流原型，回答可追溯来源", method: "Coze · LangChain · RAG", why: "把找资料和组织答案拆开，出错时能分清是哪一步" },
+    brief: { role: "毕业设计，独立完成需求、知识库与工作流", result: "五个节点串起一次问答，回答用到了哪些资料，可以回头查。", method: "Coze · LangChain · RAG", why: "把找资料和组织答案拆开，出错时能分清是哪一步" },
     subtitle: "RAG 知识检索助手",
     stage: "毕业设计原型 · 检索与回答质量待系统评估",
     contribution: "独立完成需求分析、知识库构建、Coze 工作流、Prompt 设计、外部信息接入与案例调试。",
@@ -127,9 +133,10 @@ export const projects: Project[] = [
     preview: "aybot",
   },
   {
+    id: "qar",
     year: "2023",
     title: "QAR 航空安全模型",
-    brief: { role: "团队项目：负责代码、建模框架、可视化与调优", result: "MathorCup 全国二等奖；100+ 参数中筛出 5 项关键指标", method: "PCA · 随机森林 · LOF · SVM", why: "先缩小分析范围，再定位异常出现的场景" },
+    brief: { role: "团队项目：负责代码、建模框架、可视化与调优", result: "团队拿到 MathorCup 全国二等奖。我参与搭建模型，从一百多项飞行参数里筛出五项。", method: "PCA · 随机森林 · LOF · SVM", why: "先缩小分析范围，再定位异常出现的场景" },
     subtitle: "高维飞行数据风险识别与预警",
     stage: "数模竞赛 · 离线建模与风险分析",
     contribution: "团队项目中负责 Python 分析代码、整体建模框架、可视化和模型调优。",
@@ -161,9 +168,10 @@ export const projects: Project[] = [
     preview: "metric",
   },
   {
+    id: "ev",
     year: "2023",
     title: "新能源汽车与双碳",
-    brief: { role: "团队项目：负责数据分析、建模框架与可视化", result: "长三角二等奖；碳排放模型样本内 R² 0.973", method: "GM(1,1) · 多元回归 · 岭回归", why: "把市场趋势和碳排放拆成两个问题分别回答" },
+    brief: { role: "团队项目：负责数据分析、建模框架与可视化", result: "项目获长三角二等奖。碳排放模型在历史样本上的 R² 为 0.973。", method: "GM(1,1) · 多元回归 · 岭回归", why: "把市场趋势和碳排放拆成两个问题分别回答" },
     subtitle: "市场增长与双碳目标建模",
     stage: "数模竞赛 · 历史数据分析与趋势推演",
     contribution: "团队项目中负责 Python 数据分析、整体建模框架、代码实现及可视化，参与公开数据采集和口径统一。",
@@ -196,9 +204,10 @@ export const projects: Project[] = [
     preview: "metric",
   },
   {
+    id: "movie",
     year: "2026",
     title: "电影商业成功预测",
-    brief: { role: "小组项目：负责清洗、建模、评价与 ROC 可视化", result: "随机森林 AUC 0.769；SVM 召回率 45.5%", method: "R · 7 类模型比较", why: "只用上映前信息，按决策成本选模型" },
+    brief: { role: "小组项目：负责清洗、建模、评价与 ROC 可视化", result: "随机森林的 AUC 是 0.769，SVM 的召回率是 45.5%。", method: "R · 7 类模型比较", why: "只用上映前信息，按决策成本选模型" },
     subtitle: "IMDb 数据挖掘小组项目",
     contribution: "小组项目中负责数据清洗、分层划分、决策树系列与 SVM 建模、评价指标、ROC 可视化及结果整合。",
     tags: ["R", "LDA", "SVM", "Random Forest", "kNN"],
@@ -215,16 +224,17 @@ export const projects: Project[] = [
     preview: "metric",
   },
   {
+    id: "olist",
     year: "2026",
     title: "Olist 履约质量分析",
-    brief: { role: "负责口径治理、履约分析与下单时预警建模", result: "测试集 Top 10% 差评命中率为基线 2.43 倍", method: "DuckDB · PSM / IPW · LightGBM", why: "发现时间泄漏后，主动把 AUC 从 0.932 修正为 0.636" },
+    brief: { role: "我整理了订单数据，分析送达时间和差评的关系，也做了下单时的预警模型", result: "按风险评分取前 10% 的订单，差评率是测试集平均值的 2.43 倍。", method: "DuckDB · PSM / IPW · LightGBM", why: "先把同一单里的商品加起来，再算成交额。直接连表会多算 4.57%" },
     subtitle: "巴西电商履约与差评归因",
     stage: "公开数据分析 · 运营建议待实际干预验证",
-    contribution: "完成多表口径治理、履约分析、特征调整与下单时预警建模，并将结果整理为运营建议。",
+    contribution: "我整理了九张表，分析订单晚到和差评的关系，再用下单时能知道的信息找出值得提前跟进的订单。",
     decision: {
-      title: "接受更低的 AUC，让模型符合使用时点。",
-      detail: "第一版 AUC 达到 0.932，回查发现卖家历史特征混入未来订单。改为只使用下单前的扩展窗口统计后，AUC 回落至 0.636；再按高风险订单的命中率评估是否值得小范围试验。",
-      basis: "依据：项目 README 中的时间泄漏排查记录与下单时预警结果。",
+      title: "一单有好几件商品，成交额该怎么算？",
+      detail: "直接把商品明细连到其他表，一笔金额可能出现好几次。我先把每单的商品金额和运费加起来，再关联评论和物流记录。这样每张订单只算一次。",
+      basis: "我用关联前后的订单数和金额核对了一遍，原来的成交额多算了 4.57%。",
     },
     evidence: {
       summary: "在公开历史数据中找到履约排查方向，并给出离线预警结果。",
@@ -240,17 +250,12 @@ export const projects: Project[] = [
     tags: ["DuckDB", "PSM/IPW", "因果推断", "LightGBM"],
     metric: "2.43×",
     metricLabel: "测试集 Top 10% 差评命中率 / 基线",
-    lead: "先修正指标口径，再判断履约排查与提前干预该从哪里开始。",
+    lead: "订单晚到几天，差评会多多少？我从订单、评论和物流记录里找线索。",
     star: {
       situation: "Olist 公开数据涉及 9 张表、约 9.8 万订单、11.2 万明细和 10 万条评论。客户标识、同日多单和一对多关联会改变复购与 GMV 口径，需要先确认统计对象。",
       task: "围绕样本中 13.7% 的差评率，检查延迟与差评的关系，并判断应优先排查哪些履约环节、哪些订单适合提前干预。",
       action: "用 DuckDB 统一订单粒度，修正一对多 JOIN 带来的 GMV 高估 4.57%，并采用跨日复购口径。比较延迟与按时订单，使用 PSM、IPW 和回归调整检查可观测特征的影响；再拆分运输与备货超时，构建仅使用下单时可得特征的 LightGBM 模型。",
-      result: "分析更支持优先排查运输网络，同时保留具体卖家的问题检查。修正时间泄漏后，预警模型 AUC 为 0.636；测试集 Top 10% 订单差评率为 24.6%，是测试集基线的 2.43 倍。据此提出定向干预建议，实际成本与收益尚待验证。",
-    },
-    overturn: {
-      before: "下单时差评预警模型第一版 AUC 达到 0.932，卖家历史特征贡献异常突出。",
-      evidence: "排查特征口径才发现问题：卖家历史表现用的是“全期平均值”，混进了预测那一刻还没发生的未来订单信息，是一次时间穿越泄漏。",
-      after: "改用下单前的扩展窗口统计后，AUC 回落到 0.636，符合提前预警的特征时点。是否适合部署，还要结合干预成本、监测和实际验证。",
+      result: "拆开履约环节后，我会先查运输线路。预警模型在测试集里挑出的前 10% 订单中，24.6% 后来收到差评，是测试集平均差评率的 2.43 倍。提前跟进这些订单有没有用，还要在线上试。",
     },
     steps: [
       { label: "确认统计对象", description: "先区分订单、客户和商品明细，检查 9 张表的键和关联关系。" },
@@ -264,9 +269,10 @@ export const projects: Project[] = [
     linkLabel: "查看分析报告",
   },
   {
+    id: "thesis",
     year: "2026",
     title: "血糖与 HDL 关联因素",
-    brief: { role: "硕士论文，独立完成分析、写作与答辩", result: "N = 3,808：BMI 每增 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%", method: "HC3 · GAM · Lasso · BMA", why: "没有为了结论好看而夸大遗传效应" },
+    brief: { role: "硕士论文，独立完成分析、写作与答辩", result: "N = 3,808：BMI 每增 1 kg/m²，血糖约升 1.2%、HDL 约降 1.4%", method: "HC3 · GAM · Lasso · BMA", why: "单个位点的证据有限，论文里我多写了 BMI 等结果更稳定的因素" },
     subtitle: "统计学硕士论文",
     contribution: "独立完成数据处理、探索分析、统计建模、稳健性检查、英文论文及答辩。",
     tags: ["HC3", "GAM", "Lasso", "BMA"],
@@ -288,9 +294,10 @@ export const projects: Project[] = [
     preview: "metric",
   },
   {
+    id: "mood",
     year: "2026",
     title: "心情日记",
-    brief: { role: "提出产品方向，设计图鉴、随机事件与回看思路", result: "已上线：轻量记录、低落关怀、植物图鉴与趋势回看", method: "JavaScript · Web Audio · LLM", why: "先让一次记录足够轻，再给下次一点期待" },
+    brief: { role: "提出产品方向，设计图鉴、随机事件与回看思路", result: "点一下就能记心情。过几天回来，可以翻日记，也可以看看花园。", method: "JavaScript · Web Audio · LLM", why: "我把选心情放在最前面，想写字的时候再写" },
     subtitle: "轻量情绪记录与日常关怀",
     stage: "已上线 · 长期记录的 API 关联分析规划中",
     contribution: "提出轻量记录与低落关怀的产品方向，设计植物图鉴、随机事件和长期回看思路。",
