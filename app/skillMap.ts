@@ -41,16 +41,14 @@ type Entry = { title: string; status: string; process: string[]; cover?: string;
 const photo = (file: string) => "./photos/evidence/" + file;
 
 export const entries: Record<ProjectId, Entry> = {
-  focus: {title:"FocusFlow", status:"可运行原型", cover:"./photos/project-flat-v1/focusflow.png", source:"本地练习模式 · 这组步骤使用模板生成",
-    process:["先把想做的事写在一起，挑出现在要做的一件。","把任务拆成小步骤，每次只显示一步和完成条件。","临时想到的事可以暂存。暂停时留个提示，回来就知道从哪里接。"],
+  focus: {title:"FocusFlow", status:"网页版已上线", cover:photo("focus-web-entry.png"), source:"FocusFlow 公开网页版 · 示例操作截图",
+    process:["在鹅卵石草稿区写下一件事，点「出发咯」。","从一个可编辑的动作开始。临时想起别的事，可以先放进念头口袋。","暂停时给自己留句话，回来接着做。需要更贴合任务的建议时，可以连接自己的 AI。"],
     frames:[
-      {label:"写下来", image:photo("focus1.webp"), caption:"“明天要面试，今天改简历，还要开始写论文，周末想整理旅行照片。”"},
-      {label:"挑一件事", image:photo("focus2.webp"), caption:"面试、简历和论文留在候选里，旅行照片先放到稍后。这次选面试。"},
-      {label:"打开题单", image:photo("focus3.webp"), caption:"第一步只要打开面试题单或职位描述，读第一条。看到内容就算完成。"},
-      {label:"找个细节", image:photo("focus4.webp"), caption:"看着刚打开的那一条，找出接下来能动手的一个细节。"},
-      {label:"动手做", image:photo("focus5.webp"), caption:"这次只做刚选的那件事，做完就停。"},
-      {label:"项目插画",image:"./photos/project-flat-v1/focusflow.png",caption:"FocusFlow 的项目封面插画。",source:"FocusFlow · 原主页插画"},
-      {label:"原型界面",image:"./photos/focusflow-preview.png",caption:"原型里的任务与执行界面。",source:"FocusFlow · 项目截图"}
+      {label:"写下任务", image:photo("focus-web-entry.png"), caption:"写下眼前这一件事。鹅卵石草稿区保留横线和「出发咯」。"},
+      {label:"眼前一步", image:photo("focus-web-active.png"), caption:"第一步可以自己改。回邮件的念头已放进下方口袋，眼前的任务还在。"},
+      {label:"暂停书签", image:photo("focus-web-paused.png"), caption:"留下接续提示，刷新后仍能从原步骤接回。"},
+      {label:"AI 设置", image:photo("focus-web-ai.png"), caption:"可以接入自己的 AI 接口，并补充当下的时间或精力。默认用离线模板。"},
+      {label:"项目插画", image:"./photos/project-flat-v1/focusflow.png", caption:"FocusFlow 的项目封面插画。", source:"FocusFlow · 原主页插画"}
     ]},
   mood: {title:"心情日记", status:"已上线", cover:"./photos/mood-diary/tulip.webp",
     source:"心情日记发布版 · 示例操作截图",

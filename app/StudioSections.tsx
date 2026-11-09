@@ -107,9 +107,9 @@ function CaseFile({ project, onClose, onCursorHostChange }: { project: Project |
         </div>}
       </header>
       <div className={`case-visual case-${project.preview}`}>
-        {project.preview === "mood-diary" ? <ProjectMaterials key={project.id} project={project} /> : project.preview === "focusflow" ? <img src="./photos/focusflow-preview.png" alt="FocusFlow 真实产品界面" /> : project.preview === "aybot" ? <img src="./photos/aybot-coze-workflow.jpg" alt="AYBot 的 Coze 工作流"/> : project.preview === "quiz" ? <img src="./photos/beisen-quiz-home.png" alt="北森刷题台真实界面"/> : <><ExhibitArt project={project}/><p>指标来自项目结果；图形为展示示意。</p></>}
+        {(project.preview === "mood-diary" || project.preview === "focusflow") ? <ProjectMaterials key={project.id} project={project} /> : project.preview === "aybot" ? <img src="./photos/aybot-coze-workflow.jpg" alt="AYBot 的 Coze 工作流"/> : project.preview === "quiz" ? <img src="./photos/beisen-quiz-home.png" alt="北森刷题台真实界面"/> : <><ExhibitArt project={project}/><p>指标来自项目结果；图形为展示示意。</p></>}
       </div>
-      {project.preview !== "mood-diary" && entries[project.id].frames && <details className="case-originals" key={project.id}>
+      {project.preview !== "mood-diary" && project.preview !== "focusflow" && entries[project.id].frames && <details className="case-originals" key={project.id}>
         <summary>翻看项目素材</summary>
         <ProjectMaterials project={project} />
       </details>}
