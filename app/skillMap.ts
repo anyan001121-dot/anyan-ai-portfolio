@@ -41,14 +41,16 @@ type Entry = { title: string; status: string; process: string[]; cover?: string;
 const photo = (file: string) => "./photos/evidence/" + file;
 
 export const entries: Record<ProjectId, Entry> = {
-  focus: {title:"FocusFlow", status:"网页版已上线", cover:photo("focus-web-entry.png"), source:"FocusFlow 公开网页版 · 示例操作截图",
-    process:["在鹅卵石草稿区写下一件事，点「出发咯」。","从一个可编辑的动作开始。临时想起别的事，可以先放进念头口袋。","暂停时给自己留句话，回来接着做。需要更贴合任务的建议时，可以连接自己的 AI。"],
+  focus: {title:"FocusFlow", status:"网页版工作台已上线", cover:photo("focus-web-active.png"), source:"FocusFlow 网页工作台 · 示例操作截图",
+    process:["写下一件事，点「出发咯」。第一步可以改，草稿会自动保存。","先去做别的事也可以。原来的步骤和提示留在待接回，子任务可以从任务树里找。","做完以后，回看已经推进的小步、自己记下的分神原因，以及下次想试的办法。"],
     frames:[
-      {label:"写下任务", image:photo("focus-web-entry.png"), caption:"写下眼前这一件事。鹅卵石草稿区保留横线和「出发咯」。"},
-      {label:"眼前一步", image:photo("focus-web-active.png"), caption:"第一步可以自己改。回邮件的念头已放进下方口袋，眼前的任务还在。"},
-      {label:"暂停书签", image:photo("focus-web-paused.png"), caption:"留下接续提示，刷新后仍能从原步骤接回。"},
-      {label:"AI 设置", image:photo("focus-web-ai.png"), caption:"可以接入自己的 AI 接口，并补充当下的时间或精力。默认用离线模板。"},
-      {label:"项目插画", image:"./photos/project-flat-v1/focusflow.png", caption:"FocusFlow 的项目封面插画。", source:"FocusFlow · 原主页插画"}
+      {linkPage:1,label:"写下任务", image:photo("focus-web-entry.png"), caption:"写下眼前这件事，点「出发咯」看看第一步，也可以先存到待接回。"},
+      {linkPage:2,label:"三栏工作台", image:photo("focus-web-active.png"), caption:"左边找任务，中间做眼前一步，右边暂存念头。"},
+      {linkPage:3,label:"暂停书签", image:photo("focus-web-paused.png"), caption:"回来时还能看到原步骤和给自己留下的那句话。"},
+      {linkPage:6,label:"任务树与回看", image:photo("focus-web-tree.png"), caption:"从左侧展开分支，在右侧查看另一件事的步骤和书签。"},
+      {linkPage:7,label:"任务回顾", image:photo("focus-web-recap.png"), caption:"按顺序回看做过的小步、任务结果和记下的分神原因。"},
+      {linkPage:4,label:"AI 设置", image:photo("focus-web-ai.png"), caption:"默认用离线模板。需要时，可以接入自己的 AI 接口。"},
+      {linkPage:5,label:"项目插画", image:"./photos/project-flat-v1/focusflow.png", caption:"FocusFlow 的项目封面插画。", source:"FocusFlow · 原主页插画"}
     ]},
   mood: {title:"心情日记", status:"已上线", cover:"./photos/mood-diary/tulip.webp",
     source:"心情日记发布版 · 示例操作截图",
